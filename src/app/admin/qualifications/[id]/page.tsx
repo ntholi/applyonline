@@ -7,6 +7,7 @@ import { Box, Tabs, TabsList, TabsPanel, TabsTab } from '@mantine/core';
 import { IconBooks, IconInfoSquare } from '@tabler/icons-react';
 import { notFound } from 'next/navigation';
 import SubjectsTable from './SubjectsTable';
+import GradesTable from './GradesTable';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -39,12 +40,18 @@ export default async function QualificationDetails({ params }: Props) {
             <TabsTab value='subjects' leftSection={<IconBooks size='1rem' />}>
               Subjects
             </TabsTab>
+            <TabsTab value='grades' leftSection={<IconBooks size='1rem' />}>
+              Grades
+            </TabsTab>
           </TabsList>
           <TabsPanel value='basic' pt='xl'>
             <FieldView label='Name'>{qualification.name}</FieldView>
           </TabsPanel>
           <TabsPanel value='subjects' pt='xl'>
             <SubjectsTable subjects={qualification.subjects} />
+          </TabsPanel>
+          <TabsPanel value='grades' pt='xl'>
+            <GradesTable grades={qualification.grades} />
           </TabsPanel>
         </Tabs>
       </Box>

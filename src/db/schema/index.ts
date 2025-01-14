@@ -24,6 +24,7 @@ export const qualificationsRelations = relations(
   qualifications,
   ({ many }) => ({
     subjects: many(subjects),
+    grades: many(qualificationGrades),
   })
 );
 
@@ -50,3 +51,30 @@ export const subjectsRelations = relations(subjects, ({ one }) => ({
     references: [qualifications.id],
   }),
 }));
+
+export const qualificationGrades = sqliteTable(
+  'qualification_grades',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    qualificationId: integer()
+      .notNull()
+      .references(() => qualifications.id, { onDelete: 'cascade' }),
+    index: integer().notNull(),
+    name: text().notNull(),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    nameIdx: index('qualification_grade_name_idx').on(table.name),
+  })
+);
+
+export const qualificationGradesRelations = relations(
+  qualificationGrades,
+  ({ one }) => ({
+    qualification: one(qualifications, {
+      fields: [qualificationGrades.qualificationId],
+      references: [qualifications.id],
+    }),
+  })
+);

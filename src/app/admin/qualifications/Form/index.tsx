@@ -8,6 +8,7 @@ import { createInsertSchema } from 'drizzle-zod';
 import { useRouter } from 'next/navigation';
 import { Qualification } from '../types';
 import SubjectsForm from './SubjectsForm';
+import GradesForm from './GradesForm';
 
 type Props = {
   onSubmit: (values: Qualification) => Promise<Qualification>;
@@ -35,6 +36,7 @@ export default function QualificationForm({
       defaultValues={
         defaultValues ?? {
           subjects: [],
+          grades: [],
         }
       }
       onSuccess={({ id }) => {
@@ -51,12 +53,18 @@ export default function QualificationForm({
             <TabsTab value='subjects' leftSection={<IconBooks size='1rem' />}>
               Subjects
             </TabsTab>
+            <TabsTab value='grades' leftSection={<IconBooks size='1rem' />}>
+              Grades
+            </TabsTab>
           </TabsList>
           <TabsPanel value='basic' pt='lg'>
-            <TextInput label='Name' {...form.getInputProps('name')} />
+            <TextInput label='Name' {...form.getInputProps('name')} required />
           </TabsPanel>
           <TabsPanel value='subjects' pt='lg'>
             <SubjectsForm form={form} />
+          </TabsPanel>
+          <TabsPanel value='grades' pt='lg'>
+            <GradesForm />
           </TabsPanel>
         </Tabs>
       )}
