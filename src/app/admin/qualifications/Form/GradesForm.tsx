@@ -188,9 +188,14 @@ function SortableGradeItem({ id, name, index, onRemove }: GradeItemProps) {
             stroke={1.5}
           />
         </ActionIcon>
-        <Text size='sm' className='flex-1'>
-          {index} | {name}
-        </Text>
+        <Group ml={'lg'} gap='md' className='flex-1'>
+          <Paper radius={50} p='xs' withBorder>
+            <Text size='xs' c='dimmed'>
+              {String(index + 1).padStart(2, '0')}
+            </Text>
+          </Paper>
+          <Text size='sm'>{name}</Text>
+        </Group>
         <ActionIcon
           variant='light'
           color='red'
