@@ -1,25 +1,13 @@
 'use client';
 
 import {
-  ActionIcon,
-  Button,
-  Divider,
-  Paper,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-} from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { IconGripVertical, IconTrashFilled } from '@tabler/icons-react';
-import {
-  DndContext,
   closestCenter,
+  DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -29,6 +17,20 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+  ActionIcon,
+  Button,
+  Divider,
+  Grid,
+  GridCol,
+  Paper,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { IconGripVertical, IconTrashFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Qualification } from '../types';
 
@@ -42,53 +44,6 @@ type GradeItemProps = {
   onRemove: () => void;
 };
 
-function SortableGradeItem({ id, name, onRemove }: GradeItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <Paper
-      ref={setNodeRef}
-      style={style}
-      p="md"
-      withBorder
-      className="flex items-center gap-4 bg-white"
-    >
-      <ActionIcon
-        {...attributes}
-        {...listeners}
-        variant="subtle"
-        aria-label="Drag handle"
-      >
-        <IconGripVertical style={{ width: '70%', height: '70%' }} stroke={1.5} />
-      </ActionIcon>
-      <Text size="sm" className="flex-1">
-        {name}
-      </Text>
-      <ActionIcon
-        variant="light"
-        color="red"
-        aria-label="Delete"
-        onClick={onRemove}
-      >
-        <IconTrashFilled style={{ width: '70%', height: '70%' }} stroke={1.5} />
-      </ActionIcon>
-    </Paper>
-  );
-}
-
 export default function GradesForm({ form }: Props) {
   const [name, setName] = useState<string>('');
   const sensors = useSensors(
@@ -100,10 +55,12 @@ export default function GradesForm({ form }: Props) {
 
   function handleAdd() {
     if (!name.trim()) return;
-    
-    const maxIndex = form.values.grades.reduce((max, grade) => 
-      Math.max(max, grade.index), -1);
-      
+
+    const maxIndex = form.values.grades.reduce(
+      (max, grade) => Math.max(max, grade.index),
+      -1
+    );
+
     form.insertListItem('grades', {
       index: maxIndex + 1,
       name: name.trim(),
@@ -139,22 +96,30 @@ export default function GradesForm({ form }: Props) {
 
   return (
     <Stack>
-      <Stack gap="xs">
-        <TextInput
-          label="Grade Name"
-          placeholder="Enter grade name"
-          value={name}
-          onChange={(e) => setName(e.currentTarget.value)}
-          rightSection={
-            <Button onClick={handleAdd} disabled={!name.trim()}>
+      <Stack gap='xs'>
+        <Grid align='flex-end'>
+          <GridCol span={10}>
+            <TextInput
+              label='Grade Name'
+              placeholder='Enter grade name'
+              value={name}
+              onChange={(e) => setName(e.currentTarget.value)}
+            />
+          </GridCol>
+          <GridCol span={2}>
+            <Button
+              w={'100%'}
+              onClick={handleAdd}
+              disabled={!name.trim()}
+              variant='outline'
+            >
               Add
             </Button>
-          }
-          rightSectionWidth={80}
-        />
+          </GridCol>
+        </Grid>
       </Stack>
 
-      <Title order={4} fw={100} mt="md">
+      <Title order={4} fw={100} mt='md'>
         Grades
       </Title>
       <Divider />
@@ -168,7 +133,7 @@ export default function GradesForm({ form }: Props) {
           items={form.values.grades.map((g) => `grade-${g.index}`)}
           strategy={verticalListSortingStrategy}
         >
-          <Stack gap="xs">
+          <Stack gap='xs'>
             {form.values.grades.map((grade, idx) => (
               <SortableGradeItem
                 key={`grade-${grade.index}`}
@@ -181,5 +146,55 @@ export default function GradesForm({ form }: Props) {
         </SortableContext>
       </DndContext>
     </Stack>
+  );
+}
+
+function SortableGradeItem({ id, name, onRemove }: GradeItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <Paper
+      ref={setNodeRef}
+      style={style}
+      p='md'
+      withBorder
+      className='flex items-center gap-4 bg-white'
+    >
+      <ActionIcon
+        {...attributes}
+        {...listeners}
+        variant='subtle'
+        aria-label='Drag handle'
+      >
+        <IconGripVertical
+          style={{ width: '70%', height: '70%' }}
+          stroke={1.5}
+        />
+      </ActionIcon>
+      <Text size='sm' className='flex-1'>
+        {name}
+      </Text>
+      <ActionIcon
+        variant='light'
+        color='red'
+        aria-label='Delete'
+        onClick={onRemove}
+      >
+        <IconTrashFilled style={{ width: '70%', height: '70%' }} stroke={1.5} />
+      </ActionIcon>
+    </Paper>
   );
 }
