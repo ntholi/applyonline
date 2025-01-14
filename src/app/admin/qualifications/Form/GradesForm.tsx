@@ -1,53 +1,108 @@
 'use client';
 
-import { Button, Group, NumberInput, TextInput } from '@mantine/core';
-import { useFieldArray, useFormContext } from 'react-hook-form';
-import { IconTrash } from '@tabler/icons-react';
+import {
+  ActionIcon,
+  Button,
+  Divider,
+  Grid,
+  Stack,
+  Table,
+  TableTbody,
+  TableTd,
+  TableTh,
+  TableThead,
+  TableTr,
+  TextInput,
+  Title,
+  NumberInput,
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { IconTrashFilled } from '@tabler/icons-react';
+import { useState } from 'react';
 import { Qualification } from '../types';
 
-export default function GradesForm() {
-  const form = useFormContext<Qualification>();
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'grades',
-  });
+type Props = {
+  form: ReturnType<typeof useForm<Qualification>>;
+};
+
+export default function GradesForm({ form }: Props) {
+  const [index, setIndex] = useState<number>();
+  const [name, setName] = useState<string>();
+
+  function handleAdd() {
+    if (!name || !index) return;
+    form.insertListItem('grades', {
+      index,
+      name,
+      qualificationId: form.values.id,
+    });
+    setName('');
+    setIndex(undefined);
+  }
+
+  function handleRemove(index: number) {
+    form.removeListItem('grades', index);
+  }
 
   return (
-    <div className='space-y-4'>
-      {fields.map((field, index) => (
-        <Group key={field.id}>
+    <Stack>
+      <Grid align='flex-end'>
+        <Grid.Col span={{ base: 6, md: 5 }}>
           <NumberInput
             label='Index'
-            {...form.register(`grades.${index}.index`, { valueAsNumber: true })}
+            value={index}
+            onChange={(value) => setIndex(Number(value))}
             className='w-24'
           />
+        </Grid.Col>
+        <Grid.Col span={{ base: 6, md: 5 }}>
           <TextInput
             label='Name'
-            {...form.register(`grades.${index}.name`)}
+            value={name}
+            onChange={(e) => setName(e.currentTarget.value)}
             className='flex-1'
           />
-          <Button
-            color='red'
-            variant='subtle'
-            onClick={() => remove(index)}
-            className='self-end'
-          >
-            <IconTrash size='1rem' />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 2 }}>
+          <Button onClick={handleAdd} fullWidth>
+            Add
           </Button>
-        </Group>
-      ))}
-      <Button
-        variant='light'
-        onClick={() =>
-          append({
-            index: fields.length + 1,
-            name: '',
-            qualificationId: form.getValues('id'),
-          })
-        }
-      >
-        Add Grade
-      </Button>
-    </div>
+        </Grid.Col>
+      </Grid>
+      <Title order={4} fw={100} mt={'md'}>
+        Grades
+      </Title>
+      <Divider />
+      <Table withTableBorder>
+        <TableThead>
+          <TableTr>
+            <TableTh>Index</TableTh>
+            <TableTh>Name</TableTh>
+            <TableTh></TableTh>
+          </TableTr>
+        </TableThead>
+        <TableTbody>
+          {form.values.grades.map((grade, index) => (
+            <TableTr key={index}>
+              <TableTd>{grade.index}</TableTd>
+              <TableTd>{grade.name}</TableTd>
+              <TableTd align='right'>
+                <ActionIcon
+                  variant='light'
+                  color='red'
+                  aria-label='Delete'
+                  onClick={() => handleRemove(index)}
+                >
+                  <IconTrashFilled
+                    style={{ width: '70%', height: '70%' }}
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </TableTd>
+            </TableTr>
+          ))}
+        </TableTbody>
+      </Table>
+    </Stack>
   );
 }

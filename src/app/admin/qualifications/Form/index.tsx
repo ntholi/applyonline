@@ -64,7 +64,7 @@ export default function QualificationForm({
             <SubjectsForm form={form} />
           </TabsPanel>
           <TabsPanel value='grades' pt='lg'>
-            <GradesForm />
+            <GradesForm form={form} />
           </TabsPanel>
         </Tabs>
       )}
