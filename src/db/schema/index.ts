@@ -1,14 +1,45 @@
-import { sql } from 'drizzle-orm';
-import { int, sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { relations, sql } from 'drizzle-orm';
+import {
+  int,
+  sqliteTable,
+  text,
+  integer,
+  index,
+} from 'drizzle-orm/sqlite-core';
 
-export const subjects = sqliteTable('subjects', {
-  id: int().primaryKey({ autoIncrement: true }),
-  name: text().notNull(),
-});
+export const qualifications = sqliteTable(
+  'qualifications',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    name: text().notNull(),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    nameIdx: index('name_idx').on(table.name),
+  })
+);
 
-export const qualifications = sqliteTable('qualifications', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  name: text(),
-  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
-  updatedAt: integer({ mode: 'timestamp' }),
-});
+export const subjects = sqliteTable(
+  'subjects',
+  {
+    id: int().primaryKey({ autoIncrement: true }),
+    name: text().notNull(),
+    code: text().notNull(),
+    qualificationId: integer()
+      .notNull()
+      .references(() => qualifications.id, { onDelete: 'cascade' }),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    nameIdx: index('name_idx').on(table.name),
+  })
+);
+
+export const subjectsRelations = relations(subjects, ({ one }) => ({
+  qualification: one(qualifications, {
+    fields: [subjects.qualificationId],
+    references: [qualifications.id],
+  }),
+}));

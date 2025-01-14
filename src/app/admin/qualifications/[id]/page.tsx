@@ -1,11 +1,12 @@
+import { DetailsView, DetailsViewHeader, FieldView } from '@/components/adease';
 import {
-  DetailsView,
-  DetailsViewHeader,
-  FieldView,
-  DetailsViewBody,
-} from '@/components/adease';
+  deleteQualification,
+  getQualification,
+} from '@/server/qualifications/actions';
+import { Box, Tabs, TabsList, TabsPanel, TabsTab } from '@mantine/core';
+import { IconBooks, IconInfoSquare } from '@tabler/icons-react';
 import { notFound } from 'next/navigation';
-import { getQualification, deleteQualification } from '@/server/qualifications/actions';
+import SubjectsTable from './SubjectsTable';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -14,24 +15,39 @@ type Props = {
 export default async function QualificationDetails({ params }: Props) {
   const { id } = await params;
   const qualification = await getQualification(Number(id));
-  
+
   if (!qualification) {
     return notFound();
   }
 
   return (
     <DetailsView>
-      <DetailsViewHeader 
-        title={'Qualification'} 
+      <DetailsViewHeader
+        title={'Qualification'}
         queryKey={['qualifications']}
         handleDelete={async () => {
           'use server';
           await deleteQualification(Number(id));
         }}
       />
-      <DetailsViewBody>
-        <FieldView label='Name'>{qualification.name}</FieldView>
-      </DetailsViewBody>
+      <Box p='sm'>
+        <Tabs defaultValue='basic'>
+          <TabsList>
+            <TabsTab value='basic' leftSection={<IconInfoSquare size='1rem' />}>
+              Basic Info
+            </TabsTab>
+            <TabsTab value='subjects' leftSection={<IconBooks size='1rem' />}>
+              Subjects
+            </TabsTab>
+          </TabsList>
+          <TabsPanel value='basic' pt='xl'>
+            <FieldView label='Name'>{qualification.name}</FieldView>
+          </TabsPanel>
+          <TabsPanel value='subjects' pt='xl'>
+            <SubjectsTable subjects={qualification.subjects} />
+          </TabsPanel>
+        </Tabs>
+      </Box>
     </DetailsView>
   );
 }
