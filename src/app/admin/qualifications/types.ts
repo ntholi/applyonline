@@ -4,5 +4,5 @@ export type QualificationGrade = typeof qualificationGrades.$inferSelect;
 
 export type Qualification = typeof qualifications.$inferSelect & {
   subjects: (typeof subjects.$inferSelect)[];
-  grades?: QualificationGrade[];
+  grades: QualificationGrade[];
 };
