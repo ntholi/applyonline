@@ -2,6 +2,7 @@ import { Qualification } from '@/app/admin/qualifications/types';
 import { db } from '@/db';
 import { qualifications, subjects } from '@/db/schema';
 import BaseRepository from '@/server/base/BaseRepository';
+import { eq } from 'drizzle-orm';
 
 export default class QualificationRepository extends BaseRepository<
   typeof qualifications,
@@ -39,6 +40,32 @@ export default class QualificationRepository extends BaseRepository<
       return inserted;
     });
     return inserted;
+  }
+
+  async update(id: number, data: Qualification) {
+    return db.transaction(async (tx) => {
+      const { subjects: subjectsData, ...qualification } = data;
+
+      const [updated] = await tx
+        .update(qualifications)
+        .set({ ...qualification, updatedAt: new Date() })
+        .where(eq(qualifications.id, id))
+        .returning();
+
+      await tx.delete(subjects).where(eq(subjects.qualificationId, id));
+
+      if (subjectsData && subjectsData.length > 0) {
+        await tx.insert(subjects).values(
+          subjectsData.map((s) => ({
+            ...s,
+            qualificationId: id,
+            updatedAt: new Date(),
+          }))
+        );
+      }
+
+      return updated;
+    });
   }
 }
 

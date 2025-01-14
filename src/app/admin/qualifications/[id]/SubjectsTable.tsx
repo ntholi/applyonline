@@ -26,7 +26,7 @@ export default function SubjectsTable({ subjects }: Props) {
   });
 
   return (
-    <Table>
+    <Table striped withTableBorder>
       <TableThead>
         <TableTr>
           <TableTh>Name</TableTh>
