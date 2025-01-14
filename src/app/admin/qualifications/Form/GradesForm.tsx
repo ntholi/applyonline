@@ -4,20 +4,31 @@ import {
   ActionIcon,
   Button,
   Divider,
-  Grid,
+  Paper,
   Stack,
-  Table,
-  TableTbody,
-  TableTd,
-  TableTh,
-  TableThead,
-  TableTr,
+  Text,
   TextInput,
   Title,
-  NumberInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconTrashFilled } from '@tabler/icons-react';
+import { IconGripVertical, IconTrashFilled } from '@tabler/icons-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useState } from 'react';
 import { Qualification } from '../types';
 
@@ -25,84 +36,150 @@ type Props = {
   form: ReturnType<typeof useForm<Qualification>>;
 };
 
+type GradeItemProps = {
+  id: string;
+  name: string;
+  onRemove: () => void;
+};
+
+function SortableGradeItem({ id, name, onRemove }: GradeItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <Paper
+      ref={setNodeRef}
+      style={style}
+      p="md"
+      withBorder
+      className="flex items-center gap-4 bg-white"
+    >
+      <ActionIcon
+        {...attributes}
+        {...listeners}
+        variant="subtle"
+        aria-label="Drag handle"
+      >
+        <IconGripVertical style={{ width: '70%', height: '70%' }} stroke={1.5} />
+      </ActionIcon>
+      <Text size="sm" className="flex-1">
+        {name}
+      </Text>
+      <ActionIcon
+        variant="light"
+        color="red"
+        aria-label="Delete"
+        onClick={onRemove}
+      >
+        <IconTrashFilled style={{ width: '70%', height: '70%' }} stroke={1.5} />
+      </ActionIcon>
+    </Paper>
+  );
+}
+
 export default function GradesForm({ form }: Props) {
-  const [index, setIndex] = useState<number>();
-  const [name, setName] = useState<string>();
+  const [name, setName] = useState<string>('');
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   function handleAdd() {
-    if (!name || !index) return;
+    if (!name.trim()) return;
+    
+    const maxIndex = form.values.grades.reduce((max, grade) => 
+      Math.max(max, grade.index), -1);
+      
     form.insertListItem('grades', {
-      index,
-      name,
+      index: maxIndex + 1,
+      name: name.trim(),
       qualificationId: form.values.id,
     });
     setName('');
-    setIndex(undefined);
   }
 
   function handleRemove(index: number) {
     form.removeListItem('grades', index);
   }
 
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = form.values.grades.findIndex(
+      (grade) => `grade-${grade.index}` === active.id
+    );
+    const newIndex = form.values.grades.findIndex(
+      (grade) => `grade-${grade.index}` === over.id
+    );
+
+    const newGrades = arrayMove(form.values.grades, oldIndex, newIndex).map(
+      (grade, idx) => ({
+        ...grade,
+        index: idx,
+      })
+    );
+
+    form.setFieldValue('grades', newGrades);
+  }
+
   return (
     <Stack>
-      <Grid align='flex-end'>
-        <Grid.Col span={{ base: 6, md: 5 }}>
-          <NumberInput
-            label='Index'
-            value={index}
-            onChange={(value) => setIndex(Number(value))}
-            className='w-24'
-          />
-        </Grid.Col>
-        <Grid.Col span={{ base: 6, md: 5 }}>
-          <TextInput
-            label='Name'
-            value={name}
-            onChange={(e) => setName(e.currentTarget.value)}
-            className='flex-1'
-          />
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 2 }}>
-          <Button onClick={handleAdd} fullWidth>
-            Add
-          </Button>
-        </Grid.Col>
-      </Grid>
-      <Title order={4} fw={100} mt={'md'}>
+      <Stack gap="xs">
+        <TextInput
+          label="Grade Name"
+          placeholder="Enter grade name"
+          value={name}
+          onChange={(e) => setName(e.currentTarget.value)}
+          rightSection={
+            <Button onClick={handleAdd} disabled={!name.trim()}>
+              Add
+            </Button>
+          }
+          rightSectionWidth={80}
+        />
+      </Stack>
+
+      <Title order={4} fw={100} mt="md">
         Grades
       </Title>
       <Divider />
-      <Table withTableBorder>
-        <TableThead>
-          <TableTr>
-            <TableTh>Index</TableTh>
-            <TableTh>Name</TableTh>
-            <TableTh></TableTh>
-          </TableTr>
-        </TableThead>
-        <TableTbody>
-          {form.values.grades.map((grade, index) => (
-            <TableTr key={index}>
-              <TableTd>{grade.index}</TableTd>
-              <TableTd>{grade.name}</TableTd>
-              <TableTd align='right'>
-                <ActionIcon
-                  variant='light'
-                  color='red'
-                  aria-label='Delete'
-                  onClick={() => handleRemove(index)}
-                >
-                  <IconTrashFilled
-                    style={{ width: '70%', height: '70%' }}
-                    stroke={1.5}
-                  />
-                </ActionIcon>
-              </TableTd>
-            </TableTr>
-          ))}
-        </TableTbody>
-      </Table>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={form.values.grades.map((g) => `grade-${g.index}`)}
+          strategy={verticalListSortingStrategy}
+        >
+          <Stack gap="xs">
+            {form.values.grades.map((grade, idx) => (
+              <SortableGradeItem
+                key={`grade-${grade.index}`}
+                id={`grade-${grade.index}`}
+                name={grade.name}
+                onRemove={() => handleRemove(idx)}
+              />
+            ))}
+          </Stack>
+        </SortableContext>
+      </DndContext>
     </Stack>
   );
 }
