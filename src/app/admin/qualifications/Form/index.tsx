@@ -7,6 +7,7 @@ import { IconBooks, IconInfoSquare } from '@tabler/icons-react';
 import { createInsertSchema } from 'drizzle-zod';
 import { useRouter } from 'next/navigation';
 import { Qualification } from '../types';
+import SubjectsForm from './SubjectsForm';
 
 type Props = {
   onSubmit: (values: Qualification) => Promise<Qualification>;
@@ -31,7 +32,11 @@ export default function QualificationForm({
       action={onSubmit}
       queryKey={['qualifications']}
       schema={createInsertSchema(qualifications)}
-      defaultValues={defaultValues}
+      defaultValues={
+        defaultValues ?? {
+          subjects: [],
+        }
+      }
       onSuccess={({ id }) => {
         router.push(`/admin/qualifications/${id}`);
       }}
@@ -51,7 +56,7 @@ export default function QualificationForm({
             <TextInput label='Name' {...form.getInputProps('name')} />
           </TabsPanel>
           <TabsPanel value='subjects' pt='lg'>
-            <div>Subjects will be added after creating the qualification</div>
+            <SubjectsForm form={form} />
           </TabsPanel>
         </Tabs>
       )}
