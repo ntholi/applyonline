@@ -60,7 +60,7 @@ export default function GradesForm({ form }: Props) {
 
     const maxIndex = form.values.grades.reduce(
       (max, grade) => Math.max(max, grade.index),
-      -1
+      0
     );
 
     form.insertListItem('grades', {
@@ -89,7 +89,7 @@ export default function GradesForm({ form }: Props) {
     const newGrades = arrayMove(form.values.grades, oldIndex, newIndex).map(
       (grade, idx) => ({
         ...grade,
-        index: idx,
+        index: idx + 1,
       })
     );
 
@@ -191,7 +191,7 @@ function SortableGradeItem({ id, name, index, onRemove }: GradeItemProps) {
         <Group ml={'lg'} gap='md' className='flex-1'>
           <Paper radius={50} p='xs' withBorder>
             <Text size='xs' c='dimmed'>
-              {String(index + 1).padStart(2, '0')}
+              {String(index).padStart(2, '0')}{' '}
             </Text>
           </Paper>
           <Text size='sm'>{name}</Text>
