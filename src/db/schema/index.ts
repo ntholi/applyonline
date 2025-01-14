@@ -16,7 +16,14 @@ export const qualifications = sqliteTable(
     updatedAt: integer({ mode: 'timestamp' }),
   },
   (table) => ({
-    nameIdx: index('name_idx').on(table.name),
+    nameIdx: index('qualification_name_idx').on(table.name),
+  })
+);
+
+export const qualificationsRelations = relations(
+  qualifications,
+  ({ many }) => ({
+    subjects: many(subjects),
   })
 );
 
@@ -33,7 +40,7 @@ export const subjects = sqliteTable(
     updatedAt: integer({ mode: 'timestamp' }),
   },
   (table) => ({
-    nameIdx: index('name_idx').on(table.name),
+    nameIdx: index('subject_name_idx').on(table.name),
   })
 );
 
