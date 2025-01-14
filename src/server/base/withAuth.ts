@@ -1,7 +1,8 @@
 'use server';
 
-import { users } from '@/db/schema/users';
-import { getServerSession } from '@/lib/auth/server';
+import { auth } from '@/auth';
+import { users } from '@/db/schema/auth';
+import { Session } from 'next-auth';
 import { forbidden, unauthorized } from 'next/navigation';
 
 type Role = (typeof users.$inferSelect)['role'] | 'all';
@@ -9,11 +10,9 @@ type Role = (typeof users.$inferSelect)['role'] | 'all';
 export default async function withAuth<T>(
   fn: () => Promise<T>,
   roles: Role[] = [],
-  accessCheck?: (
-    session: NonNullable<Awaited<ReturnType<typeof getServerSession>>>,
-  ) => Promise<boolean>,
+  accessCheck?: (session: Session) => Promise<boolean>
 ) {
-  const session = await getServerSession();
+  const session = await auth();
   const stack = new Error().stack;
   const callerLine = stack?.split('\n')[2] || '';
   const methodMatch = callerLine.match(/at\s+(.*?)\s+\(/);
