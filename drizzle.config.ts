@@ -9,4 +9,5 @@ export default defineConfig({
     url: process.env.TURSO_DATABASE_URL!,
     authToken: process.env.TURSO_AUTH_TOKEN!,
   },
+  casing: 'snake_case',
 });
