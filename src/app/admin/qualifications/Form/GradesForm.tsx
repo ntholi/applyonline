@@ -23,6 +23,7 @@ import {
   Divider,
   Grid,
   GridCol,
+  Group,
   Paper,
   Stack,
   Text,
@@ -40,6 +41,7 @@ type Props = {
 
 type GradeItemProps = {
   id: string;
+  index: number;
   name: string;
   onRemove: () => void;
 };
@@ -139,6 +141,7 @@ export default function GradesForm({ form }: Props) {
                 key={`grade-${grade.index}`}
                 id={`grade-${grade.index}`}
                 name={grade.name}
+                index={grade.index}
                 onRemove={() => handleRemove(idx)}
               />
             ))}
@@ -149,7 +152,7 @@ export default function GradesForm({ form }: Props) {
   );
 }
 
-function SortableGradeItem({ id, name, onRemove }: GradeItemProps) {
+function SortableGradeItem({ id, name, index, onRemove }: GradeItemProps) {
   const {
     attributes,
     listeners,
@@ -173,28 +176,33 @@ function SortableGradeItem({ id, name, onRemove }: GradeItemProps) {
       withBorder
       className='flex items-center gap-4 bg-white'
     >
-      <ActionIcon
-        {...attributes}
-        {...listeners}
-        variant='subtle'
-        aria-label='Drag handle'
-      >
-        <IconGripVertical
-          style={{ width: '70%', height: '70%' }}
-          stroke={1.5}
-        />
-      </ActionIcon>
-      <Text size='sm' className='flex-1'>
-        {name}
-      </Text>
-      <ActionIcon
-        variant='light'
-        color='red'
-        aria-label='Delete'
-        onClick={onRemove}
-      >
-        <IconTrashFilled style={{ width: '70%', height: '70%' }} stroke={1.5} />
-      </ActionIcon>
+      <Group>
+        <ActionIcon
+          {...attributes}
+          {...listeners}
+          variant='default'
+          aria-label='Drag handle'
+        >
+          <IconGripVertical
+            style={{ width: '70%', height: '70%' }}
+            stroke={1.5}
+          />
+        </ActionIcon>
+        <Text size='sm' className='flex-1'>
+          {index} | {name}
+        </Text>
+        <ActionIcon
+          variant='light'
+          color='red'
+          aria-label='Delete'
+          onClick={onRemove}
+        >
+          <IconTrashFilled
+            style={{ width: '70%', height: '70%' }}
+            stroke={1.5}
+          />
+        </ActionIcon>
+      </Group>
     </Paper>
   );
 }
