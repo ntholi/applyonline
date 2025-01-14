@@ -17,6 +17,7 @@ import {
 import { modals } from '@mantine/modals';
 import {
   Icon,
+  IconBook,
   IconChevronRight,
   IconLogout2,
   IconUsers,
@@ -45,6 +46,11 @@ const navigation: NavItem[] = [
     label: 'Users',
     href: '/admin/users',
     icon: IconUsers,
+  },
+  {
+    label: 'Qualifications',
+    href: '/admin/qualifications',
+    icon: IconBook,
   },
 ];
 

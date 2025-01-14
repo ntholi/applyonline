@@ -28,10 +28,7 @@ export default async function withAuth<T>(
     return unauthorized();
   }
 
-  if (
-    roles.length > 0 &&
-    !['admin', ...roles].includes(session.user.role as Role)
-  ) {
+  if (!['admin', ...roles].includes(session.user.role as Role)) {
     console.error(`Permission Error caused by ${method}`);
     return forbidden();
   }
