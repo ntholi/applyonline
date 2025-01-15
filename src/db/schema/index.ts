@@ -128,3 +128,49 @@ export const programQualificationsRelations = relations(
     }),
   })
 );
+
+export const qualificationSubjects = sqliteTable(
+  'qualification_subjects',
+  {
+    qualificationId: integer()
+      .notNull()
+      .references(() => programQualifications.qualificationId),
+    subjectId: integer()
+      .notNull()
+      .references(() => subjects.id, { onDelete: 'cascade' }),
+    gradeId: integer()
+      .notNull()
+      .references(() => qualificationGrades.id, { onDelete: 'cascade' }),
+    required: integer({
+      mode: 'boolean',
+    })
+      .notNull()
+      .default(false),
+    recommended: integer({
+      mode: 'boolean',
+    })
+      .notNull()
+      .default(false),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    compositePK: primaryKey({
+      columns: [table.qualificationId, table.subjectId],
+    }),
+  })
+);
+
+export const qualificationSubjectsRelations = relations(
+  qualificationSubjects,
+  ({ one }) => ({
+    qualification: one(programQualifications, {
+      fields: [qualificationSubjects.qualificationId],
+      references: [programQualifications.qualificationId],
+    }),
+    subject: one(subjects, {
+      fields: [qualificationSubjects.subjectId],
+      references: [subjects.id],
+    }),
+  })
+);
