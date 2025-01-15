@@ -124,12 +124,14 @@ export default function ProgramQualificationsForm({ form }: Props) {
                           />
                         </ActionIcon>
                       </Tooltip>
-                      <QualificationSubjectsForm
-                        form={form}
-                        qualificationIndex={index}
-                      />
                     </Stack>
                   </Group>
+                </Card.Section>
+                <Card.Section withBorder inheritPadding py='xs'>
+                  <QualificationSubjectsForm
+                    form={form}
+                    qualificationIndex={index}
+                  />
                 </Card.Section>
               </Card>
             ))}

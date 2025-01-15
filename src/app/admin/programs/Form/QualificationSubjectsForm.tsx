@@ -15,9 +15,8 @@ import {
   Text,
   ThemeIcon,
   Tooltip,
-  rem,
-  useMantineTheme,
   rgba,
+  useMantineTheme,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
@@ -82,16 +81,12 @@ export default function QualificationSubjectsForm({
 
   return (
     <Stack gap='xl'>
-      <Group justify='flex-end'>
-        <Button
-          variant='light'
-          leftSection={<IconPlus style={{ width: rem(16), height: rem(16) }} />}
-          onClick={open}
-        >
-          Subject
-        </Button>
+      <Group justify='space-between'>
+        <Text>Subjects</Text>
+        <ActionIcon variant='outline' onClick={open}>
+          <IconPlus size={'1rem'} />
+        </ActionIcon>
       </Group>
-
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing='md' verticalSpacing='md'>
         {subjects.map((subject, index) => {
           const isRequired = subject.required;
@@ -152,7 +147,6 @@ export default function QualificationSubjectsForm({
           );
         })}
       </SimpleGrid>
-
       <Modal
         opened={opened}
         onClose={close}
