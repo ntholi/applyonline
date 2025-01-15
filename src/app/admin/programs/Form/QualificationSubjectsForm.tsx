@@ -41,8 +41,7 @@ export default function QualificationSubjectsForm({
   const [opened, { open, close }] = useDisclosure(false);
   const [subjectId, setSubjectId] = useState<string>();
   const [gradeId, setGradeId] = useState<string>();
-  const [required, setRequired] = useState(false);
-  const [recommended, setRecommended] = useState(false);
+  const [mandatory, setMandatory] = useState(false);
   const theme = useMantineTheme();
 
   const qualificationId =
@@ -73,14 +72,12 @@ export default function QualificationSubjectsForm({
       {
         subjectId: Number(subjectId),
         gradeId: Number(gradeId),
-        required,
-        recommended,
+        mandatory,
       }
     );
     setSubjectId(undefined);
     setGradeId(undefined);
-    setRequired(false);
-    setRecommended(false);
+    setMandatory(false);
     close();
   }
 
@@ -193,25 +190,11 @@ export default function QualificationSubjectsForm({
 
           <Stack gap='xs'>
             <Checkbox
-              label='Required Subject'
+              label='Mandatory Subject'
               description='Student must have this subject'
-              checked={required}
+              checked={mandatory}
               onChange={(e) => {
-                setRequired(e.currentTarget.checked);
-                if (e.currentTarget.checked) {
-                  setRecommended(false);
-                }
-              }}
-            />
-            <Checkbox
-              label='Recommended Subject'
-              description='Subject is recommended but not required'
-              checked={recommended}
-              onChange={(e) => {
-                setRecommended(e.currentTarget.checked);
-                if (e.currentTarget.checked) {
-                  setRequired(false);
-                }
+                setMandatory(e.currentTarget.checked);
               }}
             />
           </Stack>
