@@ -12,8 +12,6 @@ import {
   Stack,
   Badge,
   Group,
-  List,
-  ListItem,
 } from '@mantine/core';
 import {
   IconInfoSquare,
@@ -89,29 +87,56 @@ export default async function ProgramDetails({ params }: Props) {
                       </Badge>
                     </Group>
                     {qual.subjects && qual.subjects.length > 0 && (
-                      <Box mt='sm'>
-                        <Text size='sm' fw={500} c='dimmed' mb='xs'>
-                          Required Subjects
-                        </Text>
-                        <List
-                          spacing='xs'
+                      <Box mt='md'>
+                        <Text
                           size='sm'
-                          center
-                          icon={
-                            <IconCircleCheck
-                              style={{
-                                color: 'var(--mantine-color-blue-filled)',
-                              }}
-                              size='1rem'
-                            />
-                          }
+                          fw={600}
+                          c='dimmed'
+                          mb='md'
+                          tt='uppercase'
                         >
+                          Entry Requirements
+                        </Text>
+                        <Stack gap='xs'>
                           {qual.subjects.map((subject) => (
-                            <ListItem key={subject.subjectId}>
-                              {subject.subject?.name}
-                            </ListItem>
+                            <Card
+                              key={subject.subjectId}
+                              withBorder
+                              radius='md'
+                              p='xs'
+                            >
+                              <Group justify='space-between' wrap='nowrap'>
+                                <Group gap='sm' wrap='nowrap'>
+                                  <IconCircleCheck
+                                    style={{
+                                      color: subject.mandatory
+                                        ? 'var(--mantine-color-blue-filled)'
+                                        : 'var(--mantine-color-gray-filled)',
+                                    }}
+                                    size='1.2rem'
+                                  />
+                                  <div>
+                                    <Text size='sm' fw={500}>
+                                      {subject.subject?.name}
+                                    </Text>
+                                    <Text size='xs' c='dimmed'>
+                                      Minimum Grade (ID: {subject.gradeId} )
+                                    </Text>
+                                  </div>
+                                </Group>
+                                <Badge
+                                  variant={
+                                    subject.mandatory ? 'filled' : 'light'
+                                  }
+                                  color={subject.mandatory ? 'blue' : 'gray'}
+                                  size='sm'
+                                >
+                                  {subject.mandatory ? 'Required' : 'Optional'}
+                                </Badge>
+                              </Group>
+                            </Card>
                           ))}
-                        </List>
+                        </Stack>
                       </Box>
                     )}
                   </Card>
