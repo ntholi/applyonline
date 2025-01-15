@@ -20,6 +20,7 @@ import {
   IconBook,
   IconChevronRight,
   IconLogout2,
+  IconSchool,
   IconUsers,
 } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
@@ -51,6 +52,11 @@ const navigation: NavItem[] = [
     label: 'Qualifications',
     href: '/admin/qualifications',
     icon: IconBook,
+  },
+  {
+    label: 'Programs',
+    href: '/admin/programs',
+    icon: IconSchool,
   },
 ];
 

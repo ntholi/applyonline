@@ -2,12 +2,12 @@
 
 import { programs } from '@/db/schema';
 import { Form } from '@/components/adease';
-import { TextInput } from '@mantine/core';
+import { Select, Textarea, TextInput } from '@mantine/core';
 import { createInsertSchema } from 'drizzle-zod';
 import { useRouter } from 'next/navigation';
+import { faculties } from './faculties';
 
 type Program = typeof programs.$inferInsert;
-
 
 type Props = {
   onSubmit: (values: Program) => Promise<Program>;
@@ -21,13 +21,13 @@ type Props = {
 
 export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
   const router = useRouter();
-  
+
   return (
-    <Form 
+    <Form
       title={title}
-      action={onSubmit} 
+      action={onSubmit}
       queryKey={['programs']}
-      schema={createInsertSchema(programs)} 
+      schema={createInsertSchema(programs)}
       defaultValues={defaultValues}
       onSuccess={({ id }) => {
         router.push(`/admin/programs/${id}`);
@@ -36,8 +36,15 @@ export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
       {(form) => (
         <>
           <TextInput label='Name' {...form.getInputProps('name')} />
-          <TextInput label='Faculty' {...form.getInputProps('faculty')} />
-          <TextInput label='Description' {...form.getInputProps('description')} />
+          <Select
+            label='Faculty'
+            {...form.getInputProps('faculty')}
+            data={faculties.map((f) => ({ value: f.code, label: f.name }))}
+          />
+          <Textarea
+            label='Description'
+            {...form.getInputProps('description')}
+          />
         </>
       )}
     </Form>
