@@ -24,7 +24,7 @@ export function DetailsViewHeader({
 }: DetailsViewHeaderProps) {
   const pathname = usePathname();
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const [_, setView] = useViewSelect();
+  const [, setView] = useViewSelect();
   const searchParams = useSearchParams();
   const newSearchParams = new URLSearchParams(searchParams);
   newSearchParams.set('view', 'details');

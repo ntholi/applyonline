@@ -2,8 +2,7 @@ import { qualifications } from '@/db/schema';
 import QualificationRepository from './repository';
 import withAuth from '@/server/base/withAuth';
 import { FindAllParams } from '../base/BaseRepository';
-
-type Qualification = typeof qualifications.$inferInsert;
+import { Qualification } from '@/app/admin/qualifications/types';
 
 class QualificationService {
   constructor(private readonly repository = new QualificationRepository()) {}

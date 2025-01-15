@@ -1,9 +1,7 @@
 'use server';
 
-import { qualifications } from '@/db/schema';
+import { Qualification } from '@/app/admin/qualifications/types';
 import { qualificationsService as service } from './service';
-
-type Qualification = typeof qualifications.$inferInsert;
 
 export async function getQualification(id: number) {
   return service.get(id);
