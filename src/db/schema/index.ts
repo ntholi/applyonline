@@ -5,6 +5,7 @@ import {
   text,
   integer,
   index,
+  primaryKey,
 } from 'drizzle-orm/sqlite-core';
 import { nanoid } from 'nanoid';
 export const qualifications = sqliteTable(
@@ -89,3 +90,41 @@ export const programs = sqliteTable('programs', {
   createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
   updatedAt: integer({ mode: 'timestamp' }),
 });
+
+export const programsRelations = relations(programs, ({ many }) => ({
+  qualifications: many(programQualifications),
+}));
+
+export const programQualifications = sqliteTable(
+  'program_qualifications',
+  {
+    programId: text()
+      .notNull()
+      .references(() => programs.id, { onDelete: 'cascade' }),
+    qualificationId: integer()
+      .notNull()
+      .references(() => qualifications.id, { onDelete: 'cascade' }),
+    name: text().notNull(),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    compositePK: primaryKey({
+      columns: [table.programId, table.qualificationId],
+    }),
+  })
+);
+
+export const programQualificationsRelations = relations(
+  programQualifications,
+  ({ one }) => ({
+    program: one(programs, {
+      fields: [programQualifications.programId],
+      references: [programs.id],
+    }),
+    qualification: one(qualifications, {
+      fields: [programQualifications.qualificationId],
+      references: [qualifications.id],
+    }),
+  })
+);
