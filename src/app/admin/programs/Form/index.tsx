@@ -9,6 +9,12 @@ import {
   TabsList,
   TabsTab,
   TabsPanel,
+  Paper,
+  Title,
+  Container,
+  Stack,
+  Text,
+  rem,
 } from '@mantine/core';
 import { IconBooks, IconInfoSquare } from '@tabler/icons-react';
 import { createInsertSchema } from 'drizzle-zod';
@@ -16,7 +22,7 @@ import { useRouter } from 'next/navigation';
 import { faculties } from '../data/faculties';
 import { getProgramByFaculty } from '../data/programs';
 import { Program } from '../types';
-import { ProgramQualificationsForm } from './ProgramQualificationsForm';
+import ProgramQualificationsForm from './ProgramQualificationsForm';
 
 type Props = {
   onSubmit: (values: Program) => Promise<Program>;
@@ -32,59 +38,109 @@ export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
   const router = useRouter();
 
   return (
-    <Form
-      title={title}
-      action={onSubmit}
-      queryKey={['programs']}
-      schema={createInsertSchema(programs)}
-      defaultValues={
-        defaultValues ?? {
-          programQualifications: [],
-        }
-      }
-      onSuccess={({ id }) => {
-        router.push(`/admin/programs/${id}`);
-      }}
-    >
-      {(form) => (
-        <Tabs defaultValue='basic'>
-          <TabsList>
-            <TabsTab value='basic' leftSection={<IconInfoSquare size='1rem' />}>
-              Basic Info
-            </TabsTab>
-            <TabsTab
-              value='qualifications'
-              leftSection={<IconBooks size='1rem' />}
-            >
-              Qualifications
-            </TabsTab>
-          </TabsList>
-          <TabsPanel value='basic' pt='lg'>
-            <Select
-              label='Faculty'
-              {...form.getInputProps('faculty')}
-              data={faculties.map((f) => ({ value: f.code, label: f.name }))}
-            />
-            <Select
-              label='Name'
-              {...form.getInputProps('name')}
-              data={getProgramByFaculty(form?.values?.faculty as string).map(
-                (p) => ({
-                  value: p.name,
-                  label: p.name,
-                })
-              )}
-            />
-            <Textarea
-              label='Description'
-              {...form.getInputProps('description')}
-            />
-          </TabsPanel>
-          <TabsPanel value='qualifications' pt='lg'>
-            <ProgramQualificationsForm form={form} />
-          </TabsPanel>
-        </Tabs>
-      )}
-    </Form>
+    <Container size='lg' py='xl'>
+      <Paper shadow='sm' p='xl' radius='md' withBorder>
+        <Form
+          title={title}
+          action={onSubmit}
+          queryKey={['programs']}
+          schema={createInsertSchema(programs)}
+          defaultValues={
+            defaultValues ?? {
+              programQualifications: [],
+            }
+          }
+          onSuccess={({ id }) => {
+            router.push(`/admin/programs/${id}`);
+          }}
+        >
+          {(form) => (
+            <Stack>
+              <Tabs defaultValue='basic' variant='outline'>
+                <TabsList>
+                  <TabsTab
+                    value='basic'
+                    leftSection={
+                      <IconInfoSquare
+                        style={{ width: rem(16), height: rem(16) }}
+                      />
+                    }
+                  >
+                    Basic Information
+                  </TabsTab>
+                  <TabsTab
+                    value='qualifications'
+                    leftSection={
+                      <IconBooks style={{ width: rem(16), height: rem(16) }} />
+                    }
+                  >
+                    Qualifications
+                  </TabsTab>
+                </TabsList>
+
+                <Paper p='md' mt='md'>
+                  <TabsPanel value='basic'>
+                    <Stack gap='md'>
+                      <Title order={3} fw={500} c='dimmed' mb='xs'>
+                        Program Details
+                      </Title>
+                      <Select
+                        label='Faculty'
+                        description='Select the faculty this program belongs to'
+                        placeholder='Choose a faculty'
+                        {...form.getInputProps('faculty')}
+                        data={faculties.map((f) => ({
+                          value: f.code,
+                          label: f.name,
+                        }))}
+                        searchable
+                        nothingFoundMessage='No faculty found'
+                        clearable
+                      />
+                      <Select
+                        label='Program Name'
+                        description='Select the program name'
+                        placeholder='Choose a program'
+                        {...form.getInputProps('name')}
+                        data={getProgramByFaculty(
+                          form?.values?.faculty as string
+                        ).map((p) => ({
+                          value: p.name,
+                          label: p.name,
+                        }))}
+                        searchable
+                        nothingFoundMessage='Please select a faculty first'
+                        disabled={!form.values.faculty}
+                        clearable
+                      />
+                      <Textarea
+                        label='Program Description'
+                        description='Provide a detailed description of the program'
+                        placeholder='Enter program description'
+                        {...form.getInputProps('description')}
+                        minRows={4}
+                        autosize
+                        maxRows={8}
+                      />
+                    </Stack>
+                  </TabsPanel>
+                  <TabsPanel value='qualifications'>
+                    <Stack gap='md'>
+                      <Title order={3} fw={500} c='dimmed' mb='xs'>
+                        Program Qualifications
+                      </Title>
+                      <Text size='sm' c='dimmed'>
+                        Manage the qualification requirements for this program
+                      </Text>
+                      <ProgramQualificationsForm form={form} />
+                    </Stack>
+                  </TabsPanel>
+                </Paper>
+              </Tabs>
+            </Stack>
+          )}
+        </Form>
+      </Paper>
+    </Container>
   );
 }

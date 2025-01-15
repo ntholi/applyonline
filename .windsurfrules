@@ -1,1 +1,2 @@
-When using @tanstack/react-query avoid using it with fetch but rather use existing server actions which are typically stored in associated actions.ts files in the src/server/* directory
+- When using @tanstack/react-query avoid using it with fetch but rather use existing server actions which are typically stored in associated actions.ts files in the src/server/* directory
+- When building mantine components please strictly use mantine version 7 only v7 and above, strictly!

@@ -3,21 +3,25 @@
 import { getQualificationGrades } from '@/server/qualifications/actions';
 import {
   ActionIcon,
+  Badge,
   Button,
+  Card,
   Checkbox,
+  Group,
   Modal,
   Select,
+  SimpleGrid,
   Stack,
-  Table,
-  TableTbody,
-  TableTd,
-  TableTh,
-  TableThead,
-  TableTr,
+  Text,
+  ThemeIcon,
+  Tooltip,
+  rem,
+  useMantineTheme,
+  rgba,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { IconTrashFilled } from '@tabler/icons-react';
+import { IconBook2, IconPlus, IconTrashFilled } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Program } from '../types';
@@ -37,11 +41,12 @@ export default function QualificationSubjectsForm({
   const [gradeId, setGradeId] = useState<string>();
   const [required, setRequired] = useState(false);
   const [recommended, setRecommended] = useState(false);
+  const theme = useMantineTheme();
 
   const qualificationId =
     form.values.programQualifications[qualificationIndex].qualificationId;
 
-  const { data: grades } = useQuery({
+  const { data: grades, isLoading } = useQuery({
     queryKey: ['qualification-grades', qualificationId],
     queryFn: () => getQualificationGrades(qualificationId),
     enabled: Boolean(qualificationId),
@@ -72,19 +77,106 @@ export default function QualificationSubjectsForm({
     );
   }
 
+  const subjects = form.values.programQualifications[qualificationIndex].subjects;
+
   return (
-    <>
-      <Button onClick={open}>Add Subject</Button>
-      <Modal opened={opened} onClose={close} title='Add Subject'>
-        <Stack>
+    <Stack gap="xl">
+      <Group justify="flex-end">
+        <Button
+          variant="light"
+          leftSection={<IconPlus style={{ width: rem(16), height: rem(16) }} />}
+          onClick={open}
+        >
+          Add Subject
+        </Button>
+      </Group>
+
+      <SimpleGrid
+        cols={{ base: 1, sm: 2, lg: 3 }}
+        spacing="md"
+        verticalSpacing="md"
+      >
+        {subjects.map((subject, index) => {
+          const isRequired = subject.required;
+          const isRecommended = subject.recommended;
+          const color = isRequired ? 'red' : isRecommended ? 'blue' : 'gray';
+
+          return (
+            <Card key={index} withBorder padding={0} radius="md">
+              <Card.Section
+                p="md"
+                bg={rgba(theme.colors[color][6], 0.1)}
+              >
+                <Group justify="space-between">
+                  <Group>
+                    <ThemeIcon
+                      size={40}
+                      radius="md"
+                      color={color}
+                      variant="light"
+                    >
+                      <IconBook2 style={{ width: '60%', height: '60%' }} />
+                    </ThemeIcon>
+                    <div>
+                      <Text fw={500} size="lg" mb={4}>
+                        {subject.subjectId}
+                      </Text>
+                      <Badge size="sm" color={color} variant="dot">
+                        {isRequired
+                          ? 'Required'
+                          : isRecommended
+                          ? 'Recommended'
+                          : 'Optional'}
+                      </Badge>
+                    </div>
+                  </Group>
+                  <Tooltip label="Remove subject">
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      onClick={() => handleRemove(index)}
+                    >
+                      <IconTrashFilled style={{ width: '70%', height: '70%' }} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Group>
+              </Card.Section>
+
+              <Card.Section p="md">
+                <Group justify="space-between" align="center">
+                  <Text size="sm" c="dimmed">
+                    Minimum Grade
+                  </Text>
+                  <Text fw={600} size="xl">
+                    {subject.gradeId}
+                  </Text>
+                </Group>
+              </Card.Section>
+            </Card>
+          );
+        })}
+      </SimpleGrid>
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        title="Add Subject Requirement"
+        size="lg"
+      >
+        <Stack gap="lg">
           <SubjectSelect
-            label='Subject'
+            label="Subject"
+            description="Select the required subject"
+            placeholder="Choose a subject"
             value={subjectId}
             onChange={(value) => setSubjectId(value ?? undefined)}
             qualificationId={qualificationId}
           />
+
           <Select
-            label='Grade'
+            label="Minimum Grade"
+            description="Select the minimum required grade"
+            placeholder="Choose a grade"
             value={gradeId}
             onChange={(value) => setGradeId(value ?? undefined)}
             data={
@@ -93,53 +185,47 @@ export default function QualificationSubjectsForm({
                 label: g.name,
               })) ?? []
             }
+            disabled={isLoading}
+            nothingFoundMessage={
+              isLoading ? 'Loading grades...' : 'No grades found'
+            }
           />
-          <Checkbox
-            label='Required'
-            checked={required}
-            onChange={(e) => setRequired(e.currentTarget.checked)}
-          />
-          <Checkbox
-            label='Recommended'
-            checked={recommended}
-            onChange={(e) => setRecommended(e.currentTarget.checked)}
-          />
-          <Button onClick={handleAdd}>Add</Button>
+
+          <Stack gap="xs">
+            <Checkbox
+              label="Required Subject"
+              description="Student must have this subject"
+              checked={required}
+              onChange={(e) => {
+                setRequired(e.currentTarget.checked);
+                if (e.currentTarget.checked) {
+                  setRecommended(false);
+                }
+              }}
+            />
+            <Checkbox
+              label="Recommended Subject"
+              description="Subject is recommended but not required"
+              checked={recommended}
+              onChange={(e) => {
+                setRecommended(e.currentTarget.checked);
+                if (e.currentTarget.checked) {
+                  setRequired(false);
+                }
+              }}
+            />
+          </Stack>
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="subtle" onClick={close}>
+              Cancel
+            </Button>
+            <Button onClick={handleAdd} disabled={!subjectId || !gradeId}>
+              Add Subject
+            </Button>
+          </Group>
         </Stack>
       </Modal>
-
-      <Table>
-        <TableThead>
-          <TableTr>
-            <TableTh>Subject</TableTh>
-            <TableTh>Grade</TableTh>
-            <TableTh>Required</TableTh>
-            <TableTh>Recommended</TableTh>
-            <TableTh />
-          </TableTr>
-        </TableThead>
-        <TableTbody>
-          {form.values.programQualifications[qualificationIndex].subjects.map(
-            (subject, index) => (
-              <TableTr key={index}>
-                <TableTd>{subject.subjectId}</TableTd>
-                <TableTd>{subject.gradeId}</TableTd>
-                <TableTd>{subject.required ? 'Yes' : 'No'}</TableTd>
-                <TableTd>{subject.recommended ? 'Yes' : 'No'}</TableTd>
-                <TableTd>
-                  <ActionIcon
-                    variant='subtle'
-                    color='red'
-                    onClick={() => handleRemove(index)}
-                  >
-                    <IconTrashFilled size={16} />
-                  </ActionIcon>
-                </TableTd>
-              </TableTr>
-            )
-          )}
-        </TableTbody>
-      </Table>
-    </>
+    </Stack>
   );
 }
