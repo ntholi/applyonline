@@ -20,7 +20,7 @@ import { useRouter } from 'next/navigation';
 import { faculties } from '../data/faculties';
 import { getProgramByFaculty } from '../data/programs';
 import { Program } from '../types';
-import ProgramQualificationsForm from './ProgramQualificationsForm';
+import QualificationsForm from './QualificationsForm';
 
 type Props = {
   onSubmit: (values: Program) => Promise<Program>;
@@ -114,7 +114,7 @@ export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
                     </Stack>
                   </TabsPanel>
                   <TabsPanel value='qualifications'>
-                    <ProgramQualificationsForm form={form} />
+                    <QualificationsForm form={form} />
                   </TabsPanel>
                 </Paper>
               </Tabs>

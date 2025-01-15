@@ -26,13 +26,13 @@ import {
 import { useState } from 'react';
 import { Program } from '../types';
 import QualificationSelect from './QualificationSelect';
-import QualificationSubjectsForm from './QualificationSubjectsForm';
+import SubjectsForm from './SubjectsForm';
 
 interface Props {
   form: ReturnType<typeof useForm<Program>>;
 }
 
-export default function ProgramQualificationsForm({ form }: Props) {
+export default function QualificationsForm({ form }: Props) {
   const [qualificationId, setQualificationId] = useState<string>();
   const theme = useMantineTheme();
 
@@ -173,10 +173,7 @@ export default function ProgramQualificationsForm({ form }: Props) {
                   </Group>
                 </Card.Section>
                 <Card.Section withBorder inheritPadding py='xs'>
-                  <QualificationSubjectsForm
-                    form={form}
-                    qualificationIndex={index}
-                  />
+                  <SubjectsForm form={form} qualificationIndex={index} />
                 </Card.Section>
               </Card>
             ))}

@@ -34,10 +34,7 @@ type Props = {
   qualificationIndex: number;
 };
 
-export default function QualificationSubjectsForm({
-  form,
-  qualificationIndex,
-}: Props) {
+export default function SubjectsForm({ form, qualificationIndex }: Props) {
   const [opened, { open, close }] = useDisclosure(false);
   const [subjectId, setSubjectId] = useState<string>();
   const [gradeId, setGradeId] = useState<string>();
