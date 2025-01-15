@@ -152,8 +152,7 @@ export default function QualificationSubjectsForm({
                     Minimum Grade
                   </Text>
                   <Text fw={600} size='xl'>
-                    {grades?.find((g) => g.id === subject.gradeId)?.name ??
-                      subject.gradeId}
+                    {grades?.find((g) => g.id === subject.gradeId)?.name ?? subject.gradeId}
                   </Text>
                 </Group>
               </Card.Section>

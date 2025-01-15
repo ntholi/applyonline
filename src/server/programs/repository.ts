@@ -53,6 +53,7 @@ export default class ProgramRepository extends BaseRepository<
             await tx.insert(qualificationSubjects).values(
               qualification.subjects.map((s) => ({
                 ...s,
+                programId: inserted.id,
                 qualificationId: insertedQualification.qualificationId,
               }))
             );
@@ -98,19 +99,14 @@ export default class ProgramRepository extends BaseRepository<
 
           await tx
             .delete(qualificationSubjects)
-            .where(
-              eq(
-                qualificationSubjects.qualificationId,
-                insertedQualification.qualificationId
-              )
-            );
+            .where(eq(qualificationSubjects.programId, id));
 
           if (qualification.subjects && qualification.subjects.length > 0) {
             await tx.insert(qualificationSubjects).values(
               qualification.subjects.map((s) => ({
                 ...s,
+                programId: id,
                 qualificationId: insertedQualification.qualificationId,
-                updatedAt: new Date(),
               }))
             );
           }
