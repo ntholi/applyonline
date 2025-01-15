@@ -7,6 +7,7 @@ import {
   Divider,
   Grid,
   Group,
+  NumberInput,
   ScrollArea,
   Stack,
   Text,
@@ -41,6 +42,8 @@ export default function ProgramQualificationsForm({ form }: Props) {
     form.insertListItem('programQualifications', {
       qualificationId: parseInt(qualificationId),
       subjects: [],
+      minCredits: 0,
+      minPasses: 0,
     });
     setQualificationId(undefined);
   }
@@ -52,14 +55,56 @@ export default function ProgramQualificationsForm({ form }: Props) {
   return (
     <Stack gap='lg'>
       <Grid align='flex-end'>
-        <Grid.Col span={{ base: 12, md: 9 }}>
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <QualificationSelect
             label='Add Qualification'
             value={qualificationId}
             onChange={(value) => setQualificationId(value ?? undefined)}
           />
         </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 3 }}>
+        <Grid.Col span={{ base: 12, md: 2 }}>
+          <NumberInput
+            label='Min Credits'
+            value={
+              form.values.programQualifications?.[
+                form.values.programQualifications.length - 1
+              ]?.minCredits ?? 0
+            }
+            onChange={(value) => {
+              if (form.values.programQualifications?.length) {
+                form.setFieldValue(
+                  `programQualifications.${
+                    form.values.programQualifications.length - 1
+                  }.minCredits`,
+                  value
+                );
+              }
+            }}
+            min={0}
+          />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 2 }}>
+          <NumberInput
+            label='Min Passes'
+            value={
+              form.values.programQualifications?.[
+                form.values.programQualifications.length - 1
+              ]?.minPasses ?? 0
+            }
+            onChange={(value) => {
+              if (form.values.programQualifications?.length) {
+                form.setFieldValue(
+                  `programQualifications.${
+                    form.values.programQualifications.length - 1
+                  }.minPasses`,
+                  value
+                );
+              }
+            }}
+            min={0}
+          />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 2 }}>
           <Button
             fullWidth
             onClick={handleAdd}

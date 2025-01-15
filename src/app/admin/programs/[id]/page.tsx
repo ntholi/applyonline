@@ -86,6 +86,22 @@ export default async function ProgramDetails({ params }: Props) {
                         Qualification
                       </Badge>
                     </Group>
+                    <Group gap="xl">
+                      <Badge 
+                        variant="dot" 
+                        color="blue"
+                        leftSection={<IconCircleCheck size="0.9rem" />}
+                      >
+                        Min Credits: {qual.minCredits}
+                      </Badge>
+                      <Badge 
+                        variant="dot" 
+                        color="green"
+                        leftSection={<IconCircleCheck size="0.9rem" />}
+                      >
+                        Min Passes: {qual.minPasses}
+                      </Badge>
+                    </Group>
                     {qual.subjects && qual.subjects.length > 0 && (
                       <Box mt='md'>
                         <Text
