@@ -57,11 +57,13 @@ export default async function ProgramDetails({ params }: Props) {
             </TabsTab>
           </TabsList>
           <TabsPanel value='basic' p='lg' pt={'xl'}>
-            <FieldView label='Name'>{program.name}</FieldView>
-            <FieldView label='Faculty'>
-              {program.faculty?.toUpperCase()}
-            </FieldView>
-            <FieldView label='Description'>{program.description}</FieldView>
+            <Stack gap='md'>
+              <FieldView label='Name'>{program.name}</FieldView>
+              <FieldView label='Faculty'>
+                {program.faculty?.toUpperCase()}
+              </FieldView>
+              <FieldView label='Description'>{program.description}</FieldView>
+            </Stack>
           </TabsPanel>
           <TabsPanel value='qualifications' p='lg' pt={'xl'}>
             {program.qualifications && program.qualifications.length > 0 ? (
