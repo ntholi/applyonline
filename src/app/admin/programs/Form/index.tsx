@@ -5,8 +5,8 @@ import { programs } from '@/db/schema';
 import { Select, Textarea } from '@mantine/core';
 import { createInsertSchema } from 'drizzle-zod';
 import { useRouter } from 'next/navigation';
-import { faculties } from './types/faculties';
-import { getProgramByFaculty } from './types/programs';
+import { faculties } from '../types/faculties';
+import { getProgramByFaculty } from '../types/programs';
 
 type Program = typeof programs.$inferInsert;
 
