@@ -117,7 +117,7 @@ export const programQualifications = sqliteTable(
 
 export const programQualificationsRelations = relations(
   programQualifications,
-  ({ one }) => ({
+  ({ one, many }) => ({
     program: one(programs, {
       fields: [programQualifications.programId],
       references: [programs.id],
@@ -126,6 +126,7 @@ export const programQualificationsRelations = relations(
       fields: [programQualifications.qualificationId],
       references: [qualifications.id],
     }),
+    subjects: many(qualificationSubjects),
   })
 );
 

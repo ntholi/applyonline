@@ -22,3 +22,13 @@ export async function updateQualification(id: number, value: Qualification) {
 export async function deleteQualification(id: number) {
   return service.delete(id);
 }
+
+export async function getQualificationSubjects(qualificationId: number) {
+  const qualification = await service.get(qualificationId);
+  return qualification?.subjects ?? [];
+}
+
+export async function getQualificationGrades(qualificationId: number) {
+  const qualification = await service.get(qualificationId);
+  return qualification?.grades ?? [];
+}
