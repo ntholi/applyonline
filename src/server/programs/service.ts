@@ -2,8 +2,7 @@ import { programs } from '@/db/schema';
 import ProgramRepository from './repository';
 import withAuth from '@/server/base/withAuth';
 import { FindAllParams } from '../base/BaseRepository';
-
-type Program = typeof programs.$inferInsert;
+import { Program } from '@/app/admin/programs/types';
 
 class ProgramService {
   constructor(private readonly repository = new ProgramRepository()) {}

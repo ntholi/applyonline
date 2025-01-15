@@ -1,11 +1,7 @@
-import {
-  programQualifications,
-  programs,
-  qualificationSubjects,
-} from '@/db/schema';
+import { programQualifications, programs, requiredSubjects } from '@/db/schema';
 
 export type ProgramQualification = typeof programQualifications.$inferInsert & {
-  subjects: (typeof qualificationSubjects.$inferSelect)[];
+  subjects: (typeof requiredSubjects.$inferSelect)[];
 };
 
 export type Program = typeof programs.$inferInsert & {

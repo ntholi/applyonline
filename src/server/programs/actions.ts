@@ -1,11 +1,7 @@
 'use server';
 
-
-import { programs } from '@/db/schema';
-import { programsService as service} from './service';
-
-type Program = typeof programs.$inferInsert;
-
+import { Program } from '@/app/admin/programs/types';
+import { programsService as service } from './service';
 
 export async function getProgram(id: string) {
   return service.get(id);

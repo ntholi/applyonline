@@ -100,7 +100,9 @@ export default function QualificationSubjectsForm({
         <Stack gap={0}>
           <Text>Subjects</Text>
           {qualification && (
-            <Text size="sm" c="dimmed">{qualification.name}</Text>
+            <Text size='sm' c='dimmed'>
+              {qualification.name}
+            </Text>
           )}
         </Stack>
         <ActionIcon variant='outline' onClick={open}>
@@ -109,9 +111,7 @@ export default function QualificationSubjectsForm({
       </Group>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing='md' verticalSpacing='md'>
         {formSubjects.map((subject, index) => {
-          const isRequired = subject.required;
-          const isRecommended = subject.recommended;
-          const color = isRequired ? 'red' : isRecommended ? 'blue' : 'gray';
+          const color = subject.mandatory ? 'red' : 'gray';
           const subjectDetails = subjects?.find(
             (s) => s.id === subject.subjectId
           );
@@ -125,11 +125,7 @@ export default function QualificationSubjectsForm({
                       {subjectDetails?.name ?? subject.subjectId}
                     </Text>
                     <Badge size='xs' color={color} variant='outline'>
-                      {isRequired
-                        ? 'Required'
-                        : isRecommended
-                        ? 'Recommended'
-                        : 'Optional'}
+                      {subject.mandatory ? 'Required' : 'Optional'}
                     </Badge>
                   </Group>
                   <Tooltip label='Remove subject'>
@@ -152,7 +148,8 @@ export default function QualificationSubjectsForm({
                     Minimum Grade
                   </Text>
                   <Text fw={600} size='xl'>
-                    {grades?.find((g) => g.id === subject.gradeId)?.name ?? subject.gradeId}
+                    {grades?.find((g) => g.id === subject.gradeId)?.name ??
+                      subject.gradeId}
                   </Text>
                 </Group>
               </Card.Section>

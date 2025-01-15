@@ -126,12 +126,12 @@ export const programQualificationsRelations = relations(
       fields: [programQualifications.qualificationId],
       references: [qualifications.id],
     }),
-    subjects: many(qualificationSubjects),
+    subjects: many(requiredSubjects),
   })
 );
 
-export const qualificationSubjects = sqliteTable(
-  'qualification_subjects',
+export const requiredSubjects = sqliteTable(
+  'required_subjects',
   {
     programId: text().notNull(),
     qualificationId: integer().notNull(),
@@ -141,16 +141,7 @@ export const qualificationSubjects = sqliteTable(
     gradeId: integer()
       .notNull()
       .references(() => qualificationGrades.id, { onDelete: 'cascade' }),
-    required: integer({
-      mode: 'boolean',
-    })
-      .notNull()
-      .default(false),
-    recommended: integer({
-      mode: 'boolean',
-    })
-      .notNull()
-      .default(false),
+    mandatory: integer({ mode: 'boolean' }).notNull().default(false),
     createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
     updatedAt: integer({ mode: 'timestamp' }),
   },
@@ -166,20 +157,17 @@ export const qualificationSubjects = sqliteTable(
 );
 
 export const qualificationSubjectsRelations = relations(
-  qualificationSubjects,
+  requiredSubjects,
   ({ one }) => ({
     programQualification: one(programQualifications, {
-      fields: [
-        qualificationSubjects.programId,
-        qualificationSubjects.qualificationId,
-      ],
+      fields: [requiredSubjects.programId, requiredSubjects.qualificationId],
       references: [
         programQualifications.programId,
         programQualifications.qualificationId,
       ],
     }),
     subject: one(subjects, {
-      fields: [qualificationSubjects.subjectId],
+      fields: [requiredSubjects.subjectId],
       references: [subjects.id],
     }),
   })

@@ -1,10 +1,6 @@
 import { Program } from '@/app/admin/programs/types';
 import { db } from '@/db';
-import {
-  programs,
-  programQualifications,
-  qualificationSubjects,
-} from '@/db/schema';
+import { programs, programQualifications, requiredSubjects } from '@/db/schema';
 import BaseRepository from '@/server/base/BaseRepository';
 import { eq } from 'drizzle-orm';
 
@@ -55,7 +51,7 @@ export default class ProgramRepository extends BaseRepository<
           const insertedQualification = insertedQualifications[i];
 
           if (qualification.subjects && qualification.subjects.length > 0) {
-            await tx.insert(qualificationSubjects).values(
+            await tx.insert(requiredSubjects).values(
               qualification.subjects.map((s) => ({
                 ...s,
                 programId: inserted.id,
@@ -103,11 +99,11 @@ export default class ProgramRepository extends BaseRepository<
           const insertedQualification = insertedQualifications[i];
 
           await tx
-            .delete(qualificationSubjects)
-            .where(eq(qualificationSubjects.programId, id));
+            .delete(requiredSubjects)
+            .where(eq(requiredSubjects.programId, id));
 
           if (qualification.subjects && qualification.subjects.length > 0) {
-            await tx.insert(qualificationSubjects).values(
+            await tx.insert(requiredSubjects).values(
               qualification.subjects.map((s) => ({
                 ...s,
                 programId: id,

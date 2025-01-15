@@ -2,6 +2,7 @@ import { Box } from '@mantine/core';
 import { notFound } from 'next/navigation';
 import Form from '../../Form';
 import { getProgram, updateProgram } from '@/server/programs/actions';
+import { Program } from '../../types';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -9,10 +10,15 @@ type Props = {
 
 export default async function ProgramEdit({ params }: Props) {
   const { id } = await params;
-  const program = await getProgram(id);
-  if (!program) {
+  const programData = await getProgram(id);
+  if (!programData) {
     return notFound();
   }
+
+  const program = {
+    ...programData,
+    programQualifications: programData.qualifications,
+  };
 
   return (
     <Box p={'lg'}>
@@ -21,7 +27,7 @@ export default async function ProgramEdit({ params }: Props) {
         defaultValues={program}
         onSubmit={async (value) => {
           'use server';
-          return await updateProgram(id, value);
+          return (await updateProgram(id, value)) as Program;
         }}
       />
     </Box>
