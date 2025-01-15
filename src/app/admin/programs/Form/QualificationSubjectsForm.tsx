@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  getQualification,
   getQualificationGrades,
   getQualificationSubjects,
 } from '@/server/qualifications/actions';
@@ -47,6 +48,12 @@ export default function QualificationSubjectsForm({
   const qualificationId =
     form.values.programQualifications[qualificationIndex].qualificationId;
 
+  const { data: qualification } = useQuery({
+    queryKey: ['qualification', qualificationId],
+    queryFn: () => getQualification(qualificationId),
+    enabled: Boolean(qualificationId),
+  });
+
   const { data: grades, isLoading } = useQuery({
     queryKey: ['qualification-grades', qualificationId],
     queryFn: () => getQualificationGrades(qualificationId),
@@ -90,7 +97,12 @@ export default function QualificationSubjectsForm({
   return (
     <Stack gap='xl'>
       <Group justify='space-between'>
-        <Text>Subjects</Text>
+        <Stack gap={0}>
+          <Text>Subjects</Text>
+          {qualification && (
+            <Text size="sm" c="dimmed">{qualification.name}</Text>
+          )}
+        </Stack>
         <ActionIcon variant='outline' onClick={open}>
           <IconPlus size={'1rem'} />
         </ActionIcon>
