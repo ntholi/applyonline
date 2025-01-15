@@ -22,7 +22,12 @@ export default class ProgramRepository extends BaseRepository<
       with: {
         qualifications: {
           with: {
-            subjects: true,
+            subjects: {
+              with: {
+                subject: true,
+              },
+            },
+            qualification: true,
           },
         },
       },
