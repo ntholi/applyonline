@@ -11,7 +11,13 @@ export default function Layout({ children }: PropsWithChildren) {
       queryKey={['programs']}
       getItems={findAllPrograms}
       actionIcons={[<NewLink key={'new-link'} href='/admin/programs/new' />]}
-      renderItem={(it) => <ListItem id={it.id} label={it.id} />}
+      renderItem={(it) => (
+        <ListItem
+          id={it.id}
+          label={it.name}
+          description={it.faculty?.toUpperCase()}
+        />
+      )}
     >
       {children}
     </ListLayout>
