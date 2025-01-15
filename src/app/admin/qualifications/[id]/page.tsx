@@ -44,13 +44,13 @@ export default async function QualificationDetails({ params }: Props) {
               Grades
             </TabsTab>
           </TabsList>
-          <TabsPanel value='basic' pt='xl'>
+          <TabsPanel value='basic' p='lg' pt={'xl'}>
             <FieldView label='Name'>{qualification.name}</FieldView>
           </TabsPanel>
-          <TabsPanel value='subjects' pt='xl'>
+          <TabsPanel value='subjects' p='lg' pt={'xl'}>
             <SubjectsTable subjects={qualification.subjects} />
           </TabsPanel>
-          <TabsPanel value='grades' pt='xl'>
+          <TabsPanel value='grades' p='lg' pt={'xl'}>
             <GradesTable grades={qualification.grades} />
           </TabsPanel>
         </Tabs>
