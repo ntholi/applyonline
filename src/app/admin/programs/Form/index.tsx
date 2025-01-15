@@ -12,7 +12,6 @@ import {
   TabsPanel,
   TabsTab,
   Textarea,
-  Title,
   rem,
 } from '@mantine/core';
 import { IconBooks, IconInfoSquare } from '@tabler/icons-react';
@@ -80,13 +79,8 @@ export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
                 <Paper p='md' mt='md'>
                   <TabsPanel value='basic'>
                     <Stack gap='md'>
-                      <Title order={3} fw={500} c='dimmed' mb='xs'>
-                        Program Details
-                      </Title>
                       <Select
                         label='Faculty'
-                        description='Select the faculty this program belongs to'
-                        placeholder='Choose a faculty'
                         {...form.getInputProps('faculty')}
                         data={faculties.map((f) => ({
                           value: f.code,
@@ -98,8 +92,6 @@ export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
                       />
                       <Select
                         label='Program Name'
-                        description='Select the program name'
-                        placeholder='Choose a program'
                         {...form.getInputProps('name')}
                         data={getProgramByFaculty(
                           form?.values?.faculty as string
@@ -114,8 +106,6 @@ export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
                       />
                       <Textarea
                         label='Program Description'
-                        description='Provide a detailed description of the program'
-                        placeholder='Enter program description'
                         {...form.getInputProps('description')}
                         minRows={4}
                         autosize
