@@ -16,14 +16,13 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  ThemeIcon,
   Tooltip,
   rgba,
   useMantineTheme,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { IconBook2, IconPlus, IconTrashFilled } from '@tabler/icons-react';
+import { IconPlus, IconTrashFilled } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Program } from '../types';
@@ -107,29 +106,19 @@ export default function QualificationSubjectsForm({
 
           return (
             <Card key={index} withBorder padding={0} radius='md'>
-              <Card.Section p='md' bg={rgba(theme.colors[color][6], 0.1)}>
+              <Card.Section p='sm' bg={rgba(theme.colors['gray'][6], 0.1)}>
                 <Group justify='space-between'>
                   <Group>
-                    <ThemeIcon
-                      size={40}
-                      radius='md'
-                      color={color}
-                      variant='light'
-                    >
-                      <IconBook2 style={{ width: '60%', height: '60%' }} />
-                    </ThemeIcon>
-                    <div>
-                      <Text fw={500} size='lg' mb={4}>
-                        {subjectDetails?.name ?? subject.subjectId}
-                      </Text>
-                      <Badge size='sm' color={color} variant='dot'>
-                        {isRequired
-                          ? 'Required'
-                          : isRecommended
-                          ? 'Recommended'
-                          : 'Optional'}
-                      </Badge>
-                    </div>
+                    <Text fw={500} size='lg'>
+                      {subjectDetails?.name ?? subject.subjectId}
+                    </Text>
+                    <Badge size='xs' color={color} variant='outline'>
+                      {isRequired
+                        ? 'Required'
+                        : isRecommended
+                        ? 'Recommended'
+                        : 'Optional'}
+                    </Badge>
                   </Group>
                   <Tooltip label='Remove subject'>
                     <ActionIcon
