@@ -77,51 +77,45 @@ export default function QualificationSubjectsForm({
     );
   }
 
-  const subjects = form.values.programQualifications[qualificationIndex].subjects;
+  const subjects =
+    form.values.programQualifications[qualificationIndex].subjects;
 
   return (
-    <Stack gap="xl">
-      <Group justify="flex-end">
+    <Stack gap='xl'>
+      <Group justify='flex-end'>
         <Button
-          variant="light"
+          variant='light'
           leftSection={<IconPlus style={{ width: rem(16), height: rem(16) }} />}
           onClick={open}
         >
-          Add Subject
+          Subject
         </Button>
       </Group>
 
-      <SimpleGrid
-        cols={{ base: 1, sm: 2, lg: 3 }}
-        spacing="md"
-        verticalSpacing="md"
-      >
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing='md' verticalSpacing='md'>
         {subjects.map((subject, index) => {
           const isRequired = subject.required;
           const isRecommended = subject.recommended;
           const color = isRequired ? 'red' : isRecommended ? 'blue' : 'gray';
 
           return (
-            <Card key={index} withBorder padding={0} radius="md">
-              <Card.Section
-                p="md"
-                bg={rgba(theme.colors[color][6], 0.1)}
-              >
-                <Group justify="space-between">
+            <Card key={index} withBorder padding={0} radius='md'>
+              <Card.Section p='md' bg={rgba(theme.colors[color][6], 0.1)}>
+                <Group justify='space-between'>
                   <Group>
                     <ThemeIcon
                       size={40}
-                      radius="md"
+                      radius='md'
                       color={color}
-                      variant="light"
+                      variant='light'
                     >
                       <IconBook2 style={{ width: '60%', height: '60%' }} />
                     </ThemeIcon>
                     <div>
-                      <Text fw={500} size="lg" mb={4}>
+                      <Text fw={500} size='lg' mb={4}>
                         {subject.subjectId}
                       </Text>
-                      <Badge size="sm" color={color} variant="dot">
+                      <Badge size='sm' color={color} variant='dot'>
                         {isRequired
                           ? 'Required'
                           : isRecommended
@@ -130,24 +124,26 @@ export default function QualificationSubjectsForm({
                       </Badge>
                     </div>
                   </Group>
-                  <Tooltip label="Remove subject">
+                  <Tooltip label='Remove subject'>
                     <ActionIcon
-                      variant="subtle"
-                      color="red"
+                      variant='subtle'
+                      color='red'
                       onClick={() => handleRemove(index)}
                     >
-                      <IconTrashFilled style={{ width: '70%', height: '70%' }} />
+                      <IconTrashFilled
+                        style={{ width: '70%', height: '70%' }}
+                      />
                     </ActionIcon>
                   </Tooltip>
                 </Group>
               </Card.Section>
 
-              <Card.Section p="md">
-                <Group justify="space-between" align="center">
-                  <Text size="sm" c="dimmed">
+              <Card.Section p='md'>
+                <Group justify='space-between' align='center'>
+                  <Text size='sm' c='dimmed'>
                     Minimum Grade
                   </Text>
-                  <Text fw={600} size="xl">
+                  <Text fw={600} size='xl'>
                     {subject.gradeId}
                   </Text>
                 </Group>
@@ -160,23 +156,23 @@ export default function QualificationSubjectsForm({
       <Modal
         opened={opened}
         onClose={close}
-        title="Add Subject Requirement"
-        size="lg"
+        title='Add Subject Requirement'
+        size='lg'
       >
-        <Stack gap="lg">
+        <Stack gap='lg'>
           <SubjectSelect
-            label="Subject"
-            description="Select the required subject"
-            placeholder="Choose a subject"
+            label='Subject'
+            description='Select the required subject'
+            placeholder='Choose a subject'
             value={subjectId}
             onChange={(value) => setSubjectId(value ?? undefined)}
             qualificationId={qualificationId}
           />
 
           <Select
-            label="Minimum Grade"
-            description="Select the minimum required grade"
-            placeholder="Choose a grade"
+            label='Minimum Grade'
+            description='Select the minimum required grade'
+            placeholder='Choose a grade'
             value={gradeId}
             onChange={(value) => setGradeId(value ?? undefined)}
             data={
@@ -191,10 +187,10 @@ export default function QualificationSubjectsForm({
             }
           />
 
-          <Stack gap="xs">
+          <Stack gap='xs'>
             <Checkbox
-              label="Required Subject"
-              description="Student must have this subject"
+              label='Required Subject'
+              description='Student must have this subject'
               checked={required}
               onChange={(e) => {
                 setRequired(e.currentTarget.checked);
@@ -204,8 +200,8 @@ export default function QualificationSubjectsForm({
               }}
             />
             <Checkbox
-              label="Recommended Subject"
-              description="Subject is recommended but not required"
+              label='Recommended Subject'
+              description='Subject is recommended but not required'
               checked={recommended}
               onChange={(e) => {
                 setRecommended(e.currentTarget.checked);
@@ -216,8 +212,8 @@ export default function QualificationSubjectsForm({
             />
           </Stack>
 
-          <Group justify="flex-end" mt="md">
-            <Button variant="subtle" onClick={close}>
+          <Group justify='flex-end' mt='md'>
+            <Button variant='subtle' onClick={close}>
               Cancel
             </Button>
             <Button onClick={handleAdd} disabled={!subjectId || !gradeId}>

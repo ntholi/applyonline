@@ -3,17 +3,16 @@
 import { Form } from '@/components/adease';
 import { programs } from '@/db/schema';
 import {
+  Container,
+  Paper,
   Select,
-  Textarea,
+  Stack,
   Tabs,
   TabsList,
-  TabsTab,
   TabsPanel,
-  Paper,
+  TabsTab,
+  Textarea,
   Title,
-  Container,
-  Stack,
-  Text,
   rem,
 } from '@mantine/core';
 import { IconBooks, IconInfoSquare } from '@tabler/icons-react';
@@ -125,15 +124,7 @@ export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
                     </Stack>
                   </TabsPanel>
                   <TabsPanel value='qualifications'>
-                    <Stack gap='md'>
-                      <Title order={3} fw={500} c='dimmed' mb='xs'>
-                        Program Qualifications
-                      </Title>
-                      <Text size='sm' c='dimmed'>
-                        Manage the qualification requirements for this program
-                      </Text>
-                      <ProgramQualificationsForm form={form} />
-                    </Stack>
+                    <ProgramQualificationsForm form={form} />
                   </TabsPanel>
                 </Paper>
               </Tabs>
