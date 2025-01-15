@@ -12,7 +12,6 @@ import {
   TableTh,
   TableThead,
   TableTr,
-  TextInput,
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -27,11 +26,10 @@ type Props = {
 };
 
 export function ProgramQualificationsForm({ form }: Props) {
-  const [name, setName] = useState<string>();
   const [qualificationId, setQualificationId] = useState<string>();
 
   function handleAdd() {
-    if (!name || !qualificationId) return;
+    if (!qualificationId) return;
 
     form.insertListItem('programQualifications', {
       name,
@@ -39,7 +37,6 @@ export function ProgramQualificationsForm({ form }: Props) {
       subjects: [],
     });
 
-    setName(undefined);
     setQualificationId(undefined);
   }
 
@@ -50,13 +47,6 @@ export function ProgramQualificationsForm({ form }: Props) {
   return (
     <Stack>
       <Grid align='flex-end'>
-        <Grid.Col span={{ base: 6, md: 5 }}>
-          <TextInput
-            label='Name'
-            value={name}
-            onChange={(e) => setName(e.currentTarget.value)}
-          />
-        </Grid.Col>
         <Grid.Col span={{ base: 6, md: 5 }}>
           <QualificationSelect
             label='Qualification'
@@ -77,7 +67,6 @@ export function ProgramQualificationsForm({ form }: Props) {
       <Table withTableBorder>
         <TableThead>
           <TableTr>
-            <TableTh>Name</TableTh>
             <TableTh>Qualification</TableTh>
             <TableTh>Subjects</TableTh>
             <TableTh></TableTh>
@@ -86,7 +75,6 @@ export function ProgramQualificationsForm({ form }: Props) {
         <TableTbody>
           {form.values.programQualifications?.map((qualification, index) => (
             <TableTr key={index}>
-              <TableTd>{qualification.name}</TableTd>
               <TableTd>{qualification.qualificationId}</TableTd>
               <TableTd>
                 <QualificationSubjectsForm
