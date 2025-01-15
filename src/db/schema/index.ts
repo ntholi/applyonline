@@ -105,6 +105,8 @@ export const programQualifications = sqliteTable(
     qualificationId: integer()
       .notNull()
       .references(() => qualifications.id, { onDelete: 'cascade' }),
+    minCredits: integer().notNull(),
+    minPasses: integer().notNull(),
     createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
     updatedAt: integer({ mode: 'timestamp' }),
   },
