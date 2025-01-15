@@ -1,11 +1,12 @@
 'use client';
 
-import { programs } from '@/db/schema';
 import { Form } from '@/components/adease';
-import { Select, Textarea, TextInput } from '@mantine/core';
+import { programs } from '@/db/schema';
+import { Select, Textarea } from '@mantine/core';
 import { createInsertSchema } from 'drizzle-zod';
 import { useRouter } from 'next/navigation';
-import { faculties } from './faculties';
+import { faculties } from './types/faculties';
+import { getProgramByFaculty } from './types/programs';
 
 type Program = typeof programs.$inferInsert;
 
@@ -35,11 +36,18 @@ export default function ProgramForm({ onSubmit, defaultValues, title }: Props) {
     >
       {(form) => (
         <>
-          <TextInput label='Name' {...form.getInputProps('name')} />
           <Select
             label='Faculty'
             {...form.getInputProps('faculty')}
             data={faculties.map((f) => ({ value: f.code, label: f.name }))}
+          />
+          <Select
+            label='Name'
+            {...form.getInputProps('name')}
+            data={getProgramByFaculty(form?.values?.faculty ?? '').map((p) => ({
+              value: p.name,
+              label: p.name,
+            }))}
           />
           <Textarea
             label='Description'
