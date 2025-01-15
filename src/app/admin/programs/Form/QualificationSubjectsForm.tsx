@@ -1,6 +1,9 @@
 'use client';
 
-import { getQualificationGrades } from '@/server/qualifications/actions';
+import {
+  getQualificationGrades,
+  getQualificationSubjects,
+} from '@/server/qualifications/actions';
 import {
   ActionIcon,
   Badge,
@@ -51,6 +54,12 @@ export default function QualificationSubjectsForm({
     enabled: Boolean(qualificationId),
   });
 
+  const { data: subjects } = useQuery({
+    queryKey: ['qualification-subjects', qualificationId],
+    queryFn: () => getQualificationSubjects(qualificationId),
+    enabled: Boolean(qualificationId),
+  });
+
   function handleAdd() {
     if (!subjectId || !gradeId) return;
     form.insertListItem(
@@ -76,7 +85,7 @@ export default function QualificationSubjectsForm({
     );
   }
 
-  const subjects =
+  const formSubjects =
     form.values.programQualifications[qualificationIndex].subjects;
 
   return (
@@ -88,10 +97,13 @@ export default function QualificationSubjectsForm({
         </ActionIcon>
       </Group>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing='md' verticalSpacing='md'>
-        {subjects.map((subject, index) => {
+        {formSubjects.map((subject, index) => {
           const isRequired = subject.required;
           const isRecommended = subject.recommended;
           const color = isRequired ? 'red' : isRecommended ? 'blue' : 'gray';
+          const subjectDetails = subjects?.find(
+            (s) => s.id === subject.subjectId
+          );
 
           return (
             <Card key={index} withBorder padding={0} radius='md'>
@@ -108,7 +120,7 @@ export default function QualificationSubjectsForm({
                     </ThemeIcon>
                     <div>
                       <Text fw={500} size='lg' mb={4}>
-                        {subject.subjectId}
+                        {subjectDetails?.name ?? subject.subjectId}
                       </Text>
                       <Badge size='sm' color={color} variant='dot'>
                         {isRequired
@@ -139,7 +151,8 @@ export default function QualificationSubjectsForm({
                     Minimum Grade
                   </Text>
                   <Text fw={600} size='xl'>
-                    {subject.gradeId}
+                    {grades?.find((g) => g.id === subject.gradeId)?.name ??
+                      subject.gradeId}
                   </Text>
                 </Group>
               </Card.Section>
