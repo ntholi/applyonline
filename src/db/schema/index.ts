@@ -6,7 +6,7 @@ import {
   integer,
   index,
 } from 'drizzle-orm/sqlite-core';
-
+import { nanoid } from 'nanoid';
 export const qualifications = sqliteTable(
   'qualifications',
   {
@@ -78,3 +78,14 @@ export const qualificationGradesRelations = relations(
     }),
   })
 );
+
+export const programs = sqliteTable('programs', {
+  id: text({ length: 21 })
+    .$defaultFn(() => nanoid())
+    .primaryKey(),
+  name: text(),
+  faculty: text(),
+  description: text(),
+  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+  updatedAt: integer({ mode: 'timestamp' }),
+});
