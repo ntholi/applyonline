@@ -3,6 +3,7 @@
 import { Container } from '@/components/ui/container';
 import { Progress } from '@/components/ui/progress';
 import { usePathname } from 'next/navigation';
+import { PropsWithChildren } from 'react';
 
 const steps = [
   { id: 1, name: 'Personal Details', path: '/apply/student-details' },
@@ -12,14 +13,9 @@ const steps = [
   { id: 5, name: 'Review & Submit', path: '/apply/review' },
 ];
 
-export default function ApplyLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ApplyLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();
 
-  // Get current step from pathname
   const currentStep = steps.findIndex((step) => step.path === pathname) + 1;
   const progress = (currentStep / steps.length) * 100;
 
@@ -32,20 +28,17 @@ export default function ApplyLayout({
         </p>
       </div>
 
-      <div className='max-w-3xl mx-auto space-y-8'>
-        <div className='space-y-2'>
-          <div className='flex justify-between text-sm'>
-            <span>
-              Step {currentStep} of {steps.length}:{' '}
-              {steps[currentStep - 1].name}
-            </span>
-            <span>{Math.round(progress)}%</span>
-          </div>
-          <Progress value={progress} className='h-2' />
+      <div className='space-y-2'>
+        <div className='flex justify-between text-sm'>
+          <span>
+            Step {currentStep} of {steps.length}: {steps[currentStep - 1].name}
+          </span>
+          <span>{Math.round(progress)}%</span>
         </div>
-
-        {children}
+        <Progress value={progress} className='h-2' />
       </div>
+
+      <div className='mt-8'>{children}</div>
     </Container>
   );
 }
