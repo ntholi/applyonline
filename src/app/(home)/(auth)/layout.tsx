@@ -1,6 +1,11 @@
-import { SessionProvider } from 'next-auth/react';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 import { PropsWithChildren } from 'react';
 
-export default function AuthLayout({ children }: PropsWithChildren) {
-  return <SessionProvider>{children}</SessionProvider>;
+export default async function AuthLayout({ children }: PropsWithChildren) {
+  const session = await auth();
+  if (!session) {
+    redirect('/api/auth/signin');
+  }
+  return <>{children}</>;
 }
