@@ -44,13 +44,11 @@ import { cn } from '@/lib/utils';
 import { createStudent } from '@/server/students/actions';
 import { createInsertSchema } from 'drizzle-zod';
 
-const formSchema = createInsertSchema(students);
+const formSchema = createInsertSchema(students).extend({
+  userId: z.string().optional(),
+});
 
-type Props = {
-  userId: string;
-};
-
-export default function StudentApplicationForm({ userId }: Props) {
+export default function StudentApplicationForm() {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -58,12 +56,8 @@ export default function StudentApplicationForm({ userId }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       phone2: '',
-      userId,
     },
   });
-
-  console.log('UserId:', userId);
-  console.log('Form state:', form.formState);
 
   const mutation = useMutation({
     mutationFn: createStudent,
