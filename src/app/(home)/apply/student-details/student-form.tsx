@@ -6,6 +6,7 @@ import { CalendarIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { useMutation } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -41,6 +42,7 @@ import {
 } from '@/db/schema';
 import { createSelectSchema } from 'drizzle-zod';
 import { useToast } from '@/hooks/use-toast';
+import { createStudent } from '@/server/students/actions';
 
 const formSchema = createSelectSchema(students);
 
@@ -55,33 +57,26 @@ export default function StudentApplicationForm() {
     },
   });
 
-  async function handleSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const response = await fetch('/api/apply/student', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save student details');
-      }
-
+  const mutation = useMutation({
+    mutationFn: createStudent,
+    onSuccess: () => {
       toast({
         title: 'Success',
         description: 'Your personal details have been saved',
       });
-
       router.push('/apply/qualifications');
-    } catch {
+    },
+    onError: () => {
       toast({
         title: 'Error',
         description: 'Failed to save your details. Please try again.',
         variant: 'destructive',
       });
-    }
+    },
+  });
+
+  function handleSubmit(values: z.infer<typeof formSchema>) {
+    mutation.mutate(values);
   }
 
   return (
