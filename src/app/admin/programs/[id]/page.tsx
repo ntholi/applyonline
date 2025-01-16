@@ -78,27 +78,12 @@ export default async function ProgramDetails({ params }: Props) {
                       <Text fw={600} size='lg'>
                         {qual.qualification.name}
                       </Text>
-                      <Badge
-                        variant='light'
-                        color='blue'
-                        leftSection={<IconCertificate size='0.9rem' />}
-                      >
-                        Qualification
-                      </Badge>
                     </Group>
-                    <Group gap="xl">
-                      <Badge 
-                        variant="dot" 
-                        color="blue"
-                        leftSection={<IconCircleCheck size="0.9rem" />}
-                      >
+                    <Group>
+                      <Badge variant='default'>
                         Min Credits: {qual.minCredits}
                       </Badge>
-                      <Badge 
-                        variant="dot" 
-                        color="green"
-                        leftSection={<IconCircleCheck size="0.9rem" />}
-                      >
+                      <Badge variant='default'>
                         Min Passes: {qual.minPasses}
                       </Badge>
                     </Group>

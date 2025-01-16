@@ -3,6 +3,7 @@
 import { PropsWithChildren } from 'react';
 import { ListItem, ListLayout, NewLink } from '@/components/adease';
 import { findAllPrograms } from '@/server/programs/actions';
+import { Text } from '@mantine/core';
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
@@ -14,7 +15,7 @@ export default function Layout({ children }: PropsWithChildren) {
       renderItem={(it) => (
         <ListItem
           id={it.id}
-          label={it.name}
+          label={<Text size='0.8rem'>{it.name}</Text>}
           description={it.faculty?.toUpperCase()}
         />
       )}
