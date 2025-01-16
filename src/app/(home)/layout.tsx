@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@/components/theme/provider';
 import { PropsWithChildren } from 'react';
+import Navbar from './base/Navbar';
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
@@ -9,6 +10,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       enableSystem
       disableTransitionOnChange
     >
+      <Navbar />
       {children}
     </ThemeProvider>
   );
