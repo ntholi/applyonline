@@ -194,7 +194,7 @@ export const maritalStatuses = [
   'Other',
 ] as const;
 
-export const genders = ['Male', 'Female', 'Other'] as const;
+export const genders = ['Male', 'Female'] as const;
 export const religions = [
   'Christian',
   'Muslim',

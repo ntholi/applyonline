@@ -32,7 +32,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { students } from '@/db/schema';
+import {
+  genders,
+  maritalStatuses,
+  nextOfKinRelationships,
+  religions,
+  students,
+} from '@/db/schema';
 import { createSelectSchema } from 'drizzle-zod';
 import { useToast } from '@/hooks/use-toast';
 
@@ -163,9 +169,79 @@ export default function StudentApplicationForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Religion</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select religion' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {religions.map((religion) => (
+                          <SelectItem key={religion} value={religion}>
+                            {religion}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='gender'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gender</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select gender' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {genders.map((gender) => (
+                          <SelectItem key={gender} value={gender}>
+                            {gender}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='maritalStatus'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marital Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select marital status' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {maritalStatuses.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -208,58 +284,6 @@ export default function StudentApplicationForm() {
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='gender'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value='male'>Male</SelectItem>
-                        <SelectItem value='female'>Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='maritalStatus'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Marital Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value='single'>Single</SelectItem>
-                        <SelectItem value='married'>Married</SelectItem>
-                        <SelectItem value='divorced'>Divorced</SelectItem>
-                        <SelectItem value='widowed'>Widowed</SelectItem>
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -345,9 +369,23 @@ export default function StudentApplicationForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Relationship to Next of Kin</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select relationship' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {nextOfKinRelationships.map((relationship) => (
+                            <SelectItem key={relationship} value={relationship}>
+                              {relationship}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
