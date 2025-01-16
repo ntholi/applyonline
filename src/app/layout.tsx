@@ -3,9 +3,19 @@ import './globals.css';
 import Providers from './providers';
 
 export const metadata: Metadata = {
-  title: 'Apply Limkokwing',
+  title: 'Online Application | Limkokwing University Lesotho',
   description:
-    'Limkokwing University of Creative Technology Online Application',
+    'Apply online to Limkokwing University of Creative Technology Lesotho. Start your journey in creative education today.',
+  keywords:
+    'Limkokwing University, Lesotho, online application, university admission, creative technology, higher education',
+  openGraph: {
+    title: 'Apply to Limkokwing University Lesotho',
+    description:
+      'Begin your creative journey at Limkokwing University of Creative Technology Lesotho. Apply online today.',
+    type: 'website',
+    locale: 'en_LS',
+    siteName: 'Limkokwing University Lesotho',
+  },
 };
 
 export default function RootLayout({
