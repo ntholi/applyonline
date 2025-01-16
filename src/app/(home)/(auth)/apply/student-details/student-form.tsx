@@ -40,13 +40,15 @@ import {
   religions,
   students,
 } from '@/db/schema';
-import { createSelectSchema } from 'drizzle-zod';
+import { createInsertSchema } from 'drizzle-zod';
 import { useToast } from '@/hooks/use-toast';
 import { createStudent } from '@/server/students/actions';
+import { useSession } from 'next-auth/react';
 
-const formSchema = createSelectSchema(students);
+const formSchema = createInsertSchema(students);
 
 export default function StudentApplicationForm() {
+  const session = useSession();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -54,6 +56,7 @@ export default function StudentApplicationForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       phone2: '',
+      userId: session.data?.user?.id,
     },
   });
 
