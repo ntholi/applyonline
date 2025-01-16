@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  getQualification,
   getQualificationGrades,
   getQualificationSubjects,
 } from '@/server/qualifications/actions';
@@ -11,6 +10,7 @@ import {
   Button,
   Card,
   Checkbox,
+  Divider,
   Group,
   Modal,
   Select,
@@ -83,15 +83,18 @@ export default function SubjectsForm({ form, qualificationIndex }: Props) {
     form.values.programQualifications[qualificationIndex].subjects;
 
   return (
-    <Stack gap='xl'>
-      <Group justify='space-between'>
-        <Stack gap={0}>
-          <Text>Subjects</Text>
-        </Stack>
-        <ActionIcon variant='outline' onClick={open}>
-          <IconPlus size={'1rem'} />
-        </ActionIcon>
-      </Group>
+    <Stack>
+      <div>
+        <Group justify='space-between'>
+          <Stack gap={0}>
+            <Text>Subjects</Text>
+          </Stack>
+          <ActionIcon variant='light' onClick={open}>
+            <IconPlus size={'1rem'} />
+          </ActionIcon>
+        </Group>
+        <Divider mt='xs' />
+      </div>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing='md' verticalSpacing='md'>
         {formSubjects.map((subject, index) => {
           const color = subject.mandatory ? 'red' : 'gray';
