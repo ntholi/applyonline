@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -33,17 +34,14 @@ import {
 import { cn } from '@/lib/utils';
 import { students } from '@/db/schema';
 import { createSelectSchema } from 'drizzle-zod';
+import { useToast } from '@/hooks/use-toast';
 
-type Student = typeof students.$inferSelect;
 const formSchema = createSelectSchema(students);
 
-interface StudentApplicationFormProps {
-  onSubmit: (values: Student) => void;
-}
+export default function StudentApplicationForm() {
+  const router = useRouter();
+  const { toast } = useToast();
 
-export default function StudentApplicationForm({
-  onSubmit,
-}: StudentApplicationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,8 +49,34 @@ export default function StudentApplicationForm({
     },
   });
 
-  function handleSubmit(values: z.infer<typeof formSchema>) {
-    onSubmit(values);
+  async function handleSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const response = await fetch('/api/apply/student', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save student details');
+      }
+
+      toast({
+        title: 'Success',
+        description: 'Your personal details have been saved',
+      });
+
+      // Navigate to the next step
+      router.push('/apply/qualifications');
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to save your details. Please try again.',
+        variant: 'destructive',
+      });
+    }
   }
 
   return (
