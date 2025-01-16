@@ -9,7 +9,6 @@ import {
   Grid,
   Group,
   NumberInput,
-  rem,
   rgba,
   ScrollArea,
   Stack,
@@ -19,11 +18,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import {
-  IconCertificate,
-  IconPlus,
-  IconTrashFilled,
-} from '@tabler/icons-react';
+import { IconCertificate, IconTrashFilled } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Program } from '../types';
@@ -85,14 +80,7 @@ export default function QualificationsForm({ form }: Props) {
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 2 }}>
-          <Button
-            fullWidth
-            onClick={handleAdd}
-            disabled={!qualificationId}
-            leftSection={
-              <IconPlus style={{ width: rem(18), height: rem(18) }} />
-            }
-          >
+          <Button fullWidth onClick={handleAdd} disabled={!qualificationId}>
             Add
           </Button>
         </Grid.Col>
