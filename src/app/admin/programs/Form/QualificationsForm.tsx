@@ -171,7 +171,7 @@ function QualificationCard({
   return (
     <Card key={index} withBorder radius='md' padding='lg'>
       <Card.Section withBorder inheritPadding py='xs'>
-        <Group justify='space-between' align='flex-start' wrap='nowrap'>
+        <Group justify='space-between' align='center' wrap='nowrap'>
           <Group wrap='nowrap'>
             <ThemeIcon
               size={42}
@@ -188,25 +188,18 @@ function QualificationCard({
               <Text fw={600} size='lg'>
                 {data?.name}
               </Text>
-              <Text size='sm' c='dimmed'>
-                {qualification.subjects.length} Subject
-                {qualification.subjects.length !== 1 ? 's' : ''}
-              </Text>
             </div>
           </Group>
-          <Stack>
-            <Tooltip label='Remove Qualification'>
-              <ActionIcon
-                variant='light'
-                color='red'
-                size='lg'
-                radius='md'
-                onClick={() => onRemove(index)}
-              >
-                <IconTrashFilled style={{ width: '60%', height: '60%' }} />
-              </ActionIcon>
-            </Tooltip>
-          </Stack>
+          <Tooltip label='Remove Qualification'>
+            <ActionIcon
+              variant='light'
+              color='red'
+              radius='md'
+              onClick={() => onRemove(index)}
+            >
+              <IconTrashFilled size={'1rem'} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       </Card.Section>
       <Card.Section withBorder inheritPadding py='xs'>
