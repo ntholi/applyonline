@@ -174,3 +174,43 @@ export const qualificationSubjectsRelations = relations(
     }),
   })
 );
+
+export const students = sqliteTable(
+  'students',
+  {
+    id: text({ length: 21 })
+      .$defaultFn(() => nanoid())
+      .primaryKey(),
+    nationalId: text().notNull(),
+    name: text().notNull(),
+    email: text().notNull().unique(),
+    phone1: text().notNull(),
+    phone2: text(),
+    religion: text().notNull(),
+    dateOfBirth: integer({ mode: 'timestamp' }).notNull(),
+    gender: text().notNull(),
+    maritalStatus: text().notNull(),
+    birthPlace: text().notNull(),
+    homeTown: text().notNull(),
+    highSchool: text().notNull(),
+    programId: text()
+      .notNull()
+      .references(() => programs.id, { onDelete: 'cascade' }),
+    nextOfKinNames: text().notNull(),
+    nextOfKinPhone: text().notNull(),
+    nextOfKinRelationship: text().notNull(),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    emailIdx: index('student_email_idx').on(table.email),
+    nationalIdIdx: index('student_national_id_idx').on(table.nationalId),
+  })
+);
+
+export const studentsRelations = relations(students, ({ one }) => ({
+  program: one(programs, {
+    fields: [students.programId],
+    references: [programs.id],
+  }),
+}));
