@@ -176,6 +176,33 @@ export const qualificationSubjectsRelations = relations(
   })
 );
 
+export const nextOfKinRelationships = [
+  'Father',
+  'Mother',
+  'Brother',
+  'Sister',
+  'Spouse',
+  'Child',
+  'Other',
+] as const;
+
+export const maritalStatuses = [
+  'Single',
+  'Married',
+  'Divorced',
+  'Widowed',
+  'Other',
+] as const;
+
+export const genders = ['Male', 'Female', 'Other'] as const;
+export const religions = [
+  'Christian',
+  'Muslim',
+  'Hindu',
+  'Buddhist',
+  'Other',
+] as const;
+
 export const students = sqliteTable(
   'students',
   {
@@ -190,16 +217,16 @@ export const students = sqliteTable(
     email: text().notNull().unique(),
     phone1: text().notNull(),
     phone2: text(),
-    religion: text().notNull(),
+    religion: text({ enum: religions }).notNull(),
     dateOfBirth: integer({ mode: 'timestamp' }).notNull(),
-    gender: text().notNull(),
-    maritalStatus: text().notNull(),
+    gender: text({ enum: genders }).notNull(),
+    maritalStatus: text({ enum: maritalStatuses }).notNull(),
     birthPlace: text().notNull(),
     homeTown: text().notNull(),
     highSchool: text().notNull(),
     nextOfKinNames: text().notNull(),
     nextOfKinPhone: text().notNull(),
-    nextOfKinRelationship: text().notNull(),
+    nextOfKinRelationship: text({ enum: nextOfKinRelationships }).notNull(),
     createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
     updatedAt: integer({ mode: 'timestamp' }),
   },
