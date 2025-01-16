@@ -188,6 +188,10 @@ function QualificationCard({
               <Text fw={600} size='lg'>
                 {data?.name}
               </Text>
+              <Text size='sm' c='dimmed'>
+                Min Credits: {qualification.minCredits} | Min Passes:{' '}
+                {qualification.minPasses}
+              </Text>
             </div>
           </Group>
           <Tooltip label='Remove Qualification'>
