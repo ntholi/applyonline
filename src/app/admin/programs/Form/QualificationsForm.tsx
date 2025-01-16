@@ -34,6 +34,8 @@ interface Props {
 
 export default function QualificationsForm({ form }: Props) {
   const [qualificationId, setQualificationId] = useState<string>();
+  const [minCredits, setMinCredits] = useState<number>(0);
+  const [minPasses, setMinPasses] = useState<number>(0);
   const theme = useMantineTheme();
 
   function handleAdd() {
@@ -42,10 +44,12 @@ export default function QualificationsForm({ form }: Props) {
     form.insertListItem('programQualifications', {
       qualificationId: parseInt(qualificationId),
       subjects: [],
-      minCredits: 0,
-      minPasses: 0,
+      minCredits,
+      minPasses,
     });
     setQualificationId(undefined);
+    setMinCredits(0);
+    setMinPasses(0);
   }
 
   function handleRemove(index: number) {
@@ -65,42 +69,16 @@ export default function QualificationsForm({ form }: Props) {
         <Grid.Col span={{ base: 12, md: 2 }}>
           <NumberInput
             label='Min Credits'
-            value={
-              form.values.programQualifications?.[
-                form.values.programQualifications.length - 1
-              ]?.minCredits ?? 0
-            }
-            onChange={(value) => {
-              if (form.values.programQualifications?.length) {
-                form.setFieldValue(
-                  `programQualifications.${
-                    form.values.programQualifications.length - 1
-                  }.minCredits`,
-                  value
-                );
-              }
-            }}
+            value={minCredits}
+            onChange={(value) => setMinCredits(Number(value))}
             min={0}
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 2 }}>
           <NumberInput
             label='Min Passes'
-            value={
-              form.values.programQualifications?.[
-                form.values.programQualifications.length - 1
-              ]?.minPasses ?? 0
-            }
-            onChange={(value) => {
-              if (form.values.programQualifications?.length) {
-                form.setFieldValue(
-                  `programQualifications.${
-                    form.values.programQualifications.length - 1
-                  }.minPasses`,
-                  value
-                );
-              }
-            }}
+            value={minPasses}
+            onChange={(value) => setMinPasses(Number(value))}
             min={0}
           />
         </Grid.Col>
