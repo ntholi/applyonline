@@ -21,12 +21,9 @@ export interface FindAllParams<T extends SQLiteTable> {
 
 class BaseRepository<
   T extends SQLiteTable,
-  PK extends keyof T & keyof ModelSelect<T>,
+  PK extends keyof T & keyof ModelSelect<T>
 > {
-  constructor(
-    private table: T,
-    private primaryKey: PK,
-  ) {}
+  constructor(private table: T, private primaryKey: PK) {}
 
   async findFirst(): Promise<ModelSelect<T> | undefined> {
     return await db
@@ -52,9 +49,7 @@ class BaseRepository<
     return await db.select().from(this.table);
   }
 
-  async findAll(
-    params: FindAllParams<T>,
-  ): Promise<{ items: ModelSelect<T>[]; pages: number }> {
+  protected async queryExpressions(params: FindAllParams<T>) {
     const {
       page = 1,
       search,
@@ -68,7 +63,9 @@ class BaseRepository<
 
     let orderByExpressions = orderBy.map((order) => {
       const column = this.table[order.field] as SQLiteColumn;
-      return sql`${column} ${order.direction === 'desc' ? sql`DESC` : sql`ASC`}`;
+      return sql`${column} ${
+        order.direction === 'desc' ? sql`DESC` : sql`ASC`
+      }`;
     });
 
     if (orderByExpressions.length === 0 && 'createdAt' in this.table) {
@@ -80,8 +77,8 @@ class BaseRepository<
     if (search && searchProperties.length > 0) {
       const searchCondition = or(
         ...searchProperties.map((property) =>
-          like(this.table[property as keyof T] as SQLiteColumn, `%${search}%`),
-        ),
+          like(this.table[property as keyof T] as SQLiteColumn, `%${search}%`)
+        )
       );
 
       whereCondition = condition
@@ -91,20 +88,41 @@ class BaseRepository<
       whereCondition = condition;
     }
 
-    const query = db
-      .select()
-      .from(this.table)
-      .orderBy(...orderByExpressions)
-      .limit(pageSize)
-      .offset(offset);
+    return {
+      orderByExpressions,
+      whereCondition,
+      offset,
+      pageSize,
+    };
+  }
 
-    const data = await (whereCondition ? query.where(whereCondition) : query);
-
+  protected async paginatedResults(
+    data: ModelSelect<T>[],
+    whereCondition: SQL | undefined,
+    pageSize: number
+  ) {
     const totalCount = await this.count(whereCondition);
     return {
       items: data,
       pages: Math.ceil(totalCount / pageSize),
     };
+  }
+
+  async findAll(
+    params: FindAllParams<T>
+  ): Promise<{ items: ModelSelect<T>[]; pages: number }> {
+    const { orderByExpressions, whereCondition, offset, pageSize } =
+      await this.queryExpressions(params);
+
+    const data = await db
+      .select()
+      .from(this.table)
+      .orderBy(...orderByExpressions)
+      .where(whereCondition)
+      .limit(pageSize)
+      .offset(offset);
+
+    return await this.paginatedResults(data, whereCondition, pageSize);
   }
 
   async exists(id: ModelSelect<T>[PK]): Promise<boolean> {
@@ -123,7 +141,7 @@ class BaseRepository<
 
   async update(
     id: ModelSelect<T>[PK],
-    data: Partial<ModelInsert<T>>,
+    data: Partial<ModelInsert<T>>
   ): Promise<ModelSelect<T>> {
     const [updated] = (await db
       .update(this.table)
