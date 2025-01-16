@@ -19,6 +19,10 @@ export default function ApplyLayout({ children }: PropsWithChildren) {
   const currentStep = steps.findIndex((step) => step.path === pathname) + 1;
   const progress = (currentStep / steps.length) * 100;
 
+  if (currentStep === 0) {
+    return <>{children}</>;
+  }
+
   return (
     <Container>
       <div className='my-8'>

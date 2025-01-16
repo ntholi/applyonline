@@ -8,7 +8,9 @@ type Student = Omit<typeof students.$inferInsert, 'userId'> & {
   userId?: string;
 };
 
-export async function getStudent(id: string) {
+export async function getStudent(id: string | undefined) {
+  console.log('getStudent', id);
+  if (!id) return null;
   return service.get(id);
 }
 
