@@ -68,9 +68,8 @@ export default function StudentApplicationForm() {
         description: 'Your personal details have been saved',
       });
 
-      // Navigate to the next step
       router.push('/apply/qualifications');
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to save your details. Please try again.',

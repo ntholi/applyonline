@@ -8,6 +8,7 @@ import {
   primaryKey,
 } from 'drizzle-orm/sqlite-core';
 import { nanoid } from 'nanoid';
+import { users } from './auth';
 
 export const qualifications = sqliteTable(
   'qualifications',
@@ -182,6 +183,9 @@ export const students = sqliteTable(
       .$defaultFn(() => nanoid())
       .primaryKey(),
     nationalId: text().notNull(),
+    userId: text()
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
     name: text().notNull(),
     email: text().notNull().unique(),
     phone1: text().notNull(),
@@ -193,9 +197,6 @@ export const students = sqliteTable(
     birthPlace: text().notNull(),
     homeTown: text().notNull(),
     highSchool: text().notNull(),
-    programId: text()
-      .notNull()
-      .references(() => programs.id, { onDelete: 'cascade' }),
     nextOfKinNames: text().notNull(),
     nextOfKinPhone: text().notNull(),
     nextOfKinRelationship: text().notNull(),
@@ -207,10 +208,3 @@ export const students = sqliteTable(
     nationalIdIdx: index('student_national_id_idx').on(table.nationalId),
   })
 );
-
-export const studentsRelations = relations(students, ({ one }) => ({
-  program: one(programs, {
-    fields: [students.programId],
-    references: [programs.id],
-  }),
-}));
