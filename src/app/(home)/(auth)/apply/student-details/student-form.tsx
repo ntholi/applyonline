@@ -1,12 +1,12 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { useMutation } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -32,7 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 import {
   genders,
   maritalStatuses,
@@ -40,15 +39,18 @@ import {
   religions,
   students,
 } from '@/db/schema';
-import { createInsertSchema } from 'drizzle-zod';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 import { createStudent } from '@/server/students/actions';
-import { useSession } from 'next-auth/react';
+import { createInsertSchema } from 'drizzle-zod';
 
 const formSchema = createInsertSchema(students);
 
-export default function StudentApplicationForm() {
-  const session = useSession();
+type Props = {
+  userId: string;
+};
+
+export default function StudentApplicationForm({ userId }: Props) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -56,9 +58,12 @@ export default function StudentApplicationForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       phone2: '',
-      userId: session.data?.user?.id,
+      userId,
     },
   });
+
+  console.log('UserId:', userId);
+  console.log('Form state:', form.formState);
 
   const mutation = useMutation({
     mutationFn: createStudent,
