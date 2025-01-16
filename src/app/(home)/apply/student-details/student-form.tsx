@@ -150,7 +150,7 @@ export default function StudentApplicationForm() {
                   <FormItem>
                     <FormLabel>Alternative Phone Number (Optional)</FormLabel>
                     <FormControl>
-                      <Input type='tel' {...field} />
+                      <Input type='tel' {...field} value={field.value ?? ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
