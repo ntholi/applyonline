@@ -44,12 +44,6 @@ export default function SubjectsForm({ form, qualificationIndex }: Props) {
   const qualificationId =
     form.values.programQualifications[qualificationIndex].qualificationId;
 
-  const { data: qualification } = useQuery({
-    queryKey: ['qualification', qualificationId],
-    queryFn: () => getQualification(qualificationId),
-    enabled: Boolean(qualificationId),
-  });
-
   const { data: grades, isLoading } = useQuery({
     queryKey: ['qualification-grades', qualificationId],
     queryFn: () => getQualificationGrades(qualificationId),
@@ -93,11 +87,6 @@ export default function SubjectsForm({ form, qualificationIndex }: Props) {
       <Group justify='space-between'>
         <Stack gap={0}>
           <Text>Subjects</Text>
-          {qualification && (
-            <Text size='sm' c='dimmed'>
-              {qualification.name}
-            </Text>
-          )}
         </Stack>
         <ActionIcon variant='outline' onClick={open}>
           <IconPlus size={'1rem'} />

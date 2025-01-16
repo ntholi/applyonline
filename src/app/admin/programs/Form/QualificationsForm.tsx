@@ -1,5 +1,6 @@
 'use client';
 
+import { getQualification } from '@/server/qualifications/actions';
 import {
   ActionIcon,
   Button,
@@ -8,13 +9,13 @@ import {
   Grid,
   Group,
   NumberInput,
+  rem,
+  rgba,
   ScrollArea,
   Stack,
   Text,
   ThemeIcon,
   Tooltip,
-  rem,
-  rgba,
   useMantineTheme,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -23,6 +24,7 @@ import {
   IconPlus,
   IconTrashFilled,
 } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Program } from '../types';
 import QualificationSelect from './QualificationSelect';
@@ -102,58 +104,13 @@ export default function QualificationsForm({ form }: Props) {
         {form.values.programQualifications?.length > 0 ? (
           <Stack gap='md'>
             {form.values.programQualifications?.map((qualification, index) => (
-              <Card key={index} withBorder radius='md' padding='lg'>
-                <Card.Section withBorder inheritPadding py='xs'>
-                  <Group
-                    justify='space-between'
-                    align='flex-start'
-                    wrap='nowrap'
-                  >
-                    <Group wrap='nowrap'>
-                      <ThemeIcon
-                        size={42}
-                        radius='md'
-                        variant='light'
-                        color='blue'
-                        style={{
-                          backgroundColor: rgba(theme.colors.blue[6], 0.1),
-                        }}
-                      >
-                        <IconCertificate
-                          style={{ width: '60%', height: '60%' }}
-                        />
-                      </ThemeIcon>
-                      <div>
-                        <Text fw={600} size='lg'>
-                          Qualification {qualification.qualificationId}
-                        </Text>
-                        <Text size='sm' c='dimmed'>
-                          {qualification.subjects.length} Subject
-                          {qualification.subjects.length !== 1 ? 's' : ''}
-                        </Text>
-                      </div>
-                    </Group>
-                    <Stack>
-                      <Tooltip label='Remove Qualification'>
-                        <ActionIcon
-                          variant='light'
-                          color='red'
-                          size='lg'
-                          radius='md'
-                          onClick={() => handleRemove(index)}
-                        >
-                          <IconTrashFilled
-                            style={{ width: '60%', height: '60%' }}
-                          />
-                        </ActionIcon>
-                      </Tooltip>
-                    </Stack>
-                  </Group>
-                </Card.Section>
-                <Card.Section withBorder inheritPadding py='xs'>
-                  <SubjectsForm form={form} qualificationIndex={index} />
-                </Card.Section>
-              </Card>
+              <QualificationCard
+                key={index}
+                qualification={qualification}
+                index={index}
+                onRemove={handleRemove}
+                form={form}
+              />
             ))}
           </Stack>
         ) : (
@@ -189,5 +146,72 @@ export default function QualificationsForm({ form }: Props) {
         )}
       </ScrollArea.Autosize>
     </Stack>
+  );
+}
+
+interface QualificationCardProps {
+  qualification: Program['programQualifications'][number];
+  index: number;
+  onRemove: (index: number) => void;
+  form: ReturnType<typeof useForm<Program>>;
+}
+
+function QualificationCard({
+  qualification,
+  index,
+  onRemove,
+  form,
+}: QualificationCardProps) {
+  const theme = useMantineTheme();
+  const { data } = useQuery({
+    queryKey: ['qualification', qualification.qualificationId],
+    queryFn: () => getQualification(qualification.qualificationId),
+    enabled: Boolean(qualification.qualificationId),
+  });
+  return (
+    <Card key={index} withBorder radius='md' padding='lg'>
+      <Card.Section withBorder inheritPadding py='xs'>
+        <Group justify='space-between' align='flex-start' wrap='nowrap'>
+          <Group wrap='nowrap'>
+            <ThemeIcon
+              size={42}
+              radius='md'
+              variant='light'
+              color='blue'
+              style={{
+                backgroundColor: rgba(theme.colors.blue[6], 0.1),
+              }}
+            >
+              <IconCertificate style={{ width: '60%', height: '60%' }} />
+            </ThemeIcon>
+            <div>
+              <Text fw={600} size='lg'>
+                {data?.name}
+              </Text>
+              <Text size='sm' c='dimmed'>
+                {qualification.subjects.length} Subject
+                {qualification.subjects.length !== 1 ? 's' : ''}
+              </Text>
+            </div>
+          </Group>
+          <Stack>
+            <Tooltip label='Remove Qualification'>
+              <ActionIcon
+                variant='light'
+                color='red'
+                size='lg'
+                radius='md'
+                onClick={() => onRemove(index)}
+              >
+                <IconTrashFilled style={{ width: '60%', height: '60%' }} />
+              </ActionIcon>
+            </Tooltip>
+          </Stack>
+        </Group>
+      </Card.Section>
+      <Card.Section withBorder inheritPadding py='xs'>
+        <SubjectsForm form={form} qualificationIndex={index} />
+      </Card.Section>
+    </Card>
   );
 }
