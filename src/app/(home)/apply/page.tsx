@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import StudentApplicationForm from './student-form';
 import { Container } from '@/components/ui/container';
+import MultiStepForm from './MultiStepForm';
 
 export const metadata: Metadata = {
   title: 'Apply | Limkokwing University',
@@ -16,7 +16,9 @@ export default function ApplyPage() {
           Fill in your details to start your application process
         </p>
       </div>
-      <StudentApplicationForm />
+      <div className="max-w-3xl mx-auto">
+        <MultiStepForm />
+      </div>
     </Container>
   );
 }

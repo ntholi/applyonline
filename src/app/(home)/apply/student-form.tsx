@@ -31,34 +31,19 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { students } from '@/db/schema';
+import { createSelectSchema } from 'drizzle-zod';
 
-const formSchema = z.object({
-  nationalId: z.string().min(1, 'National ID is required'),
-  name: z.string().min(1, 'Full name is required'),
-  email: z.string().email('Invalid email address'),
-  phone1: z.string().min(1, 'Primary phone number is required'),
-  phone2: z.string().optional(),
-  religion: z.string().min(1, 'Religion is required'),
-  dateOfBirth: z.date({
-    required_error: 'Date of birth is required',
-  }),
-  gender: z.enum(['male', 'female'], {
-    required_error: 'Please select your gender',
-  }),
-  maritalStatus: z.enum(['single', 'married', 'divorced', 'widowed'], {
-    required_error: 'Please select your marital status',
-  }),
-  birthPlace: z.string().min(1, 'Birth place is required'),
-  homeTown: z.string().min(1, 'Home town is required'),
-  highSchool: z.string().min(1, 'High school is required'),
-  nextOfKinNames: z.string().min(1, 'Next of kin names are required'),
-  nextOfKinPhone: z.string().min(1, 'Next of kin phone number is required'),
-  nextOfKinRelationship: z
-    .string()
-    .min(1, 'Next of kin relationship is required'),
-});
+type Student = typeof students.$inferSelect;
+const formSchema = createSelectSchema(students);
 
-export default function StudentApplicationForm() {
+interface StudentApplicationFormProps {
+  onSubmit: (values: Student) => void;
+}
+
+export default function StudentApplicationForm({
+  onSubmit,
+}: StudentApplicationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,15 +51,18 @@ export default function StudentApplicationForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function handleSubmit(values: z.infer<typeof formSchema>) {
+    onSubmit(values);
   }
 
   return (
     <Card>
       <CardContent className='pt-6'>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className='space-y-8'
+          >
             <div className='grid gap-6 md:grid-cols-2'>
               <FormField
                 control={form.control}
@@ -345,9 +333,7 @@ export default function StudentApplicationForm() {
             </div>
 
             <div className='flex justify-end'>
-              <Button type='submit' size='lg'>
-                Continue to Program Selection
-              </Button>
+              <Button type='submit'>Next</Button>
             </div>
           </form>
         </Form>
