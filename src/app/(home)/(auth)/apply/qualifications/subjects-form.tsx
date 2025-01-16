@@ -122,7 +122,7 @@ export default function SubjectsForm() {
               >
                 Previous
               </Button>
-              <Button type='submit'>Next</Button>
+              <Button type='submit'>Save & Continue</Button>
             </div>
           </form>
         </Form>

@@ -68,10 +68,11 @@ export default function StudentApplicationForm() {
       });
       router.push('/apply/qualifications');
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: 'Error',
-        description: 'Failed to save your details. Please try again.',
+        description:
+          error.message || 'Failed to save your details. Please try again.',
         variant: 'destructive',
       });
     },
@@ -391,7 +392,7 @@ export default function StudentApplicationForm() {
             </div>
 
             <div className='flex justify-end'>
-              <Button type='submit'>Next</Button>
+              <Button type='submit'>Save & Continue</Button>
             </div>
           </form>
         </Form>
