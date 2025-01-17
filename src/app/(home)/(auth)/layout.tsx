@@ -5,7 +5,7 @@ import { PropsWithChildren } from 'react';
 export default async function AuthLayout({ children }: PropsWithChildren) {
   const session = await auth();
   if (!session) {
-    redirect('/api/auth/signin');
+    redirect('/login');
   }
   return <>{children}</>;
 }

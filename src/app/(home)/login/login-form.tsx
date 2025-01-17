@@ -1,6 +1,5 @@
 'use client';
 
-import { signIn } from '@/auth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,34 +9,33 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { FcGoogle } from 'react-icons/fc';
 import { BsFacebook } from 'react-icons/bs';
+import { FcGoogle } from 'react-icons/fc';
+import { facebookLogin, googleLogin } from './actions';
 
 export default function LoginForm() {
   return (
     <Card className='w-full max-w-md p-6'>
       <CardHeader className='space-y-1'>
-        <CardTitle className='text-2xl text-center font-bold'>
-          Welcome back
-        </CardTitle>
+        <CardTitle className='text-3xl text-center'>Login</CardTitle>
         <CardDescription className='text-center'>
           Sign in to access your account
         </CardDescription>
       </CardHeader>
       <CardContent className='space-y-4'>
         <Button
-          onClick={async () => await signIn('google')}
+          onClick={googleLogin}
           variant='outline'
           className='w-full flex items-center justify-center space-x-2'
         >
-          <FcGoogle className='w-5 h-5' />
+          <FcGoogle className='size-5' />
           <span>Continue with Google</span>
         </Button>
         <Button
-          onClick={async () => await signIn('facebook')}
+          onClick={facebookLogin}
           className='w-full flex items-center justify-center space-x-2'
         >
-          <BsFacebook className='w-5 h-5' />
+          <BsFacebook className='size-5 text-[#1877F2]' />
           <span>Continue with Facebook</span>
         </Button>
       </CardContent>
