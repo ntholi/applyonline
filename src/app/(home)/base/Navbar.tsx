@@ -11,18 +11,20 @@ export default function Navbar() {
       <Container as='nav' className='flex items-center justify-between py-1.5'>
         <div className='flex items-center'>
           <div className='mr-6'>
-            <Logo />
+            <Link href='/'>
+              <Logo />
+            </Link>
           </div>
           <div className='hidden md:flex'>
-            <Link href='/' passHref>
-              <Button variant='ghost'>Home</Button>
-            </Link>
-            <Link href='/apply' passHref>
-              <Button variant='ghost'>Apply</Button>
-            </Link>
-            <Link href='/courses' passHref>
-              <Button variant='ghost'>Courses</Button>
-            </Link>
+            <Button variant='ghost' asChild>
+              <Link href='/'>Home</Link>
+            </Button>
+            <Button variant='ghost' asChild>
+              <Link href='/apply'>Apply</Link>
+            </Button>
+            <Button variant='ghost' asChild>
+              <Link href='/courses'>Courses</Link>
+            </Button>
           </div>
         </div>
         <AccountButton />
