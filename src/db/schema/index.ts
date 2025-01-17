@@ -1,13 +1,12 @@
 import { relations, sql } from 'drizzle-orm';
 import {
+  index,
   int,
+  integer,
+  primaryKey,
   sqliteTable,
   text,
-  integer,
-  index,
-  primaryKey,
 } from 'drizzle-orm/sqlite-core';
-import { nanoid } from 'nanoid';
 import { users } from './auth';
 
 export const qualifications = sqliteTable(
@@ -83,9 +82,7 @@ export const qualificationGradesRelations = relations(
 );
 
 export const programs = sqliteTable('programs', {
-  id: text({ length: 21 })
-    .$defaultFn(() => nanoid())
-    .primaryKey(),
+  id: integer().primaryKey({ autoIncrement: true }),
   name: text(),
   faculty: text(),
   description: text(),
@@ -100,7 +97,7 @@ export const programsRelations = relations(programs, ({ many }) => ({
 export const programQualifications = sqliteTable(
   'program_qualifications',
   {
-    programId: text()
+    programId: integer()
       .notNull()
       .references(() => programs.id, { onDelete: 'cascade' }),
     qualificationId: integer()
@@ -206,9 +203,7 @@ export const religions = [
 export const students = sqliteTable(
   'students',
   {
-    id: text({ length: 21 })
-      .$defaultFn(() => nanoid())
-      .primaryKey(),
+    id: integer().primaryKey({ autoIncrement: true }),
     nationalId: text().notNull(),
     userId: text()
       .notNull()
@@ -233,5 +228,108 @@ export const students = sqliteTable(
   (table) => ({
     emailIdx: index('student_email_idx').on(table.email),
     nationalIdIdx: index('student_national_id_idx').on(table.nationalId),
+  })
+);
+
+export const applications = sqliteTable(
+  'applications',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    studentId: text()
+      .notNull()
+      .references(() => students.id, { onDelete: 'cascade' }),
+    firstChoiceId: integer()
+      .notNull()
+      .references(() => programs.id, { onDelete: 'cascade' }),
+    secondChoiceId: integer()
+      .notNull()
+      .references(() => programs.id, { onDelete: 'cascade' }),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    studentProgramIdx: index('student_program_idx').on(
+      table.studentId,
+      table.firstChoiceId,
+      table.secondChoiceId
+    ),
+  })
+);
+
+export const studentQualifications = sqliteTable(
+  'student_qualifications',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    studentId: text()
+      .notNull()
+      .references(() => students.id, { onDelete: 'cascade' }),
+    qualificationId: integer()
+      .notNull()
+      .references(() => qualifications.id, { onDelete: 'cascade' }),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    studentQualificationIdx: index('student_qualification_idx').on(
+      table.studentId,
+      table.qualificationId
+    ),
+  })
+);
+
+export const studentQualificationsRelations = relations(
+  studentQualifications,
+  ({ one, many }) => ({
+    student: one(students, {
+      fields: [studentQualifications.studentId],
+      references: [students.id],
+    }),
+    qualification: one(qualifications, {
+      fields: [studentQualifications.qualificationId],
+      references: [qualifications.id],
+    }),
+    subjects: many(studentSubjects),
+  })
+);
+
+export const studentSubjects = sqliteTable(
+  'student_subjects',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    studentQualificationId: text()
+      .notNull()
+      .references(() => studentQualifications.id, { onDelete: 'cascade' }),
+    subjectId: integer()
+      .notNull()
+      .references(() => subjects.id, { onDelete: 'cascade' }),
+    gradeId: integer()
+      .notNull()
+      .references(() => qualificationGrades.id, { onDelete: 'cascade' }),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    studentSubjectIdx: index('student_subject_idx').on(
+      table.studentQualificationId,
+      table.subjectId
+    ),
+  })
+);
+
+export const studentSubjectsRelations = relations(
+  studentSubjects,
+  ({ one }) => ({
+    studentQualification: one(studentQualifications, {
+      fields: [studentSubjects.studentQualificationId],
+      references: [studentQualifications.id],
+    }),
+    subject: one(subjects, {
+      fields: [studentSubjects.subjectId],
+      references: [subjects.id],
+    }),
+    grade: one(qualificationGrades, {
+      fields: [studentSubjects.gradeId],
+      references: [qualificationGrades.id],
+    }),
   })
 );
