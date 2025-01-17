@@ -14,10 +14,12 @@ import {
   getQualificationGrades,
   getQualificationSubjects,
 } from '@/server/qualifications/actions';
+import { saveStudentQualification } from '@/server/students/actions';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 type SubjectEntry = {
   subjectId: number;
@@ -27,6 +29,8 @@ type SubjectEntry = {
 export default function SubjectsForm() {
   const [selectedQualification, setSelectedQualification] = useState<number>();
   const [subjects, setSubjects] = useState<SubjectEntry[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
 
   const { data: qualifications } = useQuery({
     queryKey: ['qualifications'],
@@ -35,13 +39,19 @@ export default function SubjectsForm() {
 
   const { data: qualificationSubjects } = useQuery({
     queryKey: ['qualification-subjects', selectedQualification],
-    queryFn: () => selectedQualification ? getQualificationSubjects(selectedQualification) : Promise.resolve([]),
+    queryFn: () =>
+      selectedQualification
+        ? getQualificationSubjects(selectedQualification)
+        : Promise.resolve([]),
     enabled: !!selectedQualification,
   });
 
   const { data: qualificationGrades } = useQuery({
     queryKey: ['qualification-grades', selectedQualification],
-    queryFn: () => selectedQualification ? getQualificationGrades(selectedQualification) : Promise.resolve([]),
+    queryFn: () =>
+      selectedQualification
+        ? getQualificationGrades(selectedQualification)
+        : Promise.resolve([]),
     enabled: !!selectedQualification,
   });
 
@@ -53,7 +63,11 @@ export default function SubjectsForm() {
     setSubjects(subjects.filter((_, i) => i !== index));
   }
 
-  function updateSubject(index: number, field: keyof SubjectEntry, value: number) {
+  function updateSubject(
+    index: number,
+    field: keyof SubjectEntry,
+    value: number
+  ) {
     setSubjects(
       subjects.map((subject, i) =>
         i === index ? { ...subject, [field]: value } : subject
@@ -61,16 +75,60 @@ export default function SubjectsForm() {
     );
   }
 
+  async function handleSave() {
+    if (!selectedQualification) return;
+
+    const invalidSubjects = subjects.some(
+      (subject) => subject.subjectId === 0 || subject.gradeId === 0
+    );
+
+    if (invalidSubjects) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid subjects',
+        description: 'Please select both subject and grade for all entries',
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await saveStudentQualification({
+        qualificationId: selectedQualification,
+        studentSubjects: subjects.map((subject) => ({
+          subjectId: subject.subjectId,
+          gradeId: subject.gradeId,
+        })),
+      });
+
+      toast({
+        title: 'Success',
+        description: 'Qualification saved successfully',
+      });
+
+      setSubjects([]);
+      setSelectedQualification(undefined);
+    } catch (error: Error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error.message || 'Failed to save qualification',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return (
-    <Card className="p-6 space-y-6">
-      <div className="space-y-4">
-        <label className="text-sm font-medium">Select Qualification</label>
+    <Card className='p-6 space-y-6'>
+      <div className='space-y-4'>
+        <label className='text-sm font-medium'>Select Qualification</label>
         <Select
           value={selectedQualification?.toString()}
           onValueChange={(value) => setSelectedQualification(Number(value))}
         >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Choose a qualification" />
+          <SelectTrigger className='w-full'>
+            <SelectValue placeholder='Choose a qualification' />
           </SelectTrigger>
           <SelectContent>
             {qualifications?.items.map((qualification) => (
@@ -86,28 +144,28 @@ export default function SubjectsForm() {
       </div>
 
       {selectedQualification && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Subjects and Grades</h3>
+        <div className='space-y-4'>
+          <div className='flex items-center justify-between'>
+            <h3 className='text-lg font-semibold'>Subjects and Grades</h3>
             <Button
               onClick={addSubject}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
+              variant='outline'
+              size='sm'
+              className='flex items-center gap-2'
             >
-              <Plus className="w-4 h-4" />
+              <Plus className='w-4 h-4' />
               Add Subject
             </Button>
           </div>
 
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {subjects.map((subject, index) => (
               <div
                 key={index}
-                className="grid grid-cols-[1fr,1fr,auto] gap-4 items-start"
+                className='grid grid-cols-[1fr,1fr,auto] gap-4 items-start'
               >
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Subject</label>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Subject</label>
                   <Select
                     value={subject.subjectId.toString()}
                     onValueChange={(value) =>
@@ -115,7 +173,7 @@ export default function SubjectsForm() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select subject" />
+                      <SelectValue placeholder='Select subject' />
                     </SelectTrigger>
                     <SelectContent>
                       {qualificationSubjects?.map((subject) => (
@@ -130,8 +188,8 @@ export default function SubjectsForm() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Grade</label>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Grade</label>
                   <Select
                     value={subject.gradeId.toString()}
                     onValueChange={(value) =>
@@ -139,7 +197,7 @@ export default function SubjectsForm() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select grade" />
+                      <SelectValue placeholder='Select grade' />
                     </SelectTrigger>
                     <SelectContent>
                       {qualificationGrades?.map((grade) => (
@@ -152,18 +210,33 @@ export default function SubjectsForm() {
                 </div>
 
                 <Button
-                  variant="ghost"
-                  size="icon"
+                  variant='ghost'
+                  size='icon'
                   className={cn(
                     'mt-8 hover:bg-destructive hover:text-destructive-foreground'
                   )}
                   onClick={() => removeSubject(index)}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className='w-4 h-4' />
                 </Button>
               </div>
             ))}
           </div>
+
+          <Button
+            onClick={handleSave}
+            disabled={isSaving || subjects.length === 0}
+            className='w-full mt-6'
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                Saving...
+              </>
+            ) : (
+              'Save Qualification'
+            )}
+          </Button>
         </div>
       )}
     </Card>

@@ -203,7 +203,7 @@ export const students = sqliteTable(
   'students',
   {
     id: integer().primaryKey({ autoIncrement: true }),
-    nationalId: integer().notNull(),
+    nationalId: text().notNull(),
     userId: text()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
