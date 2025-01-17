@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -41,7 +41,7 @@ import {
 } from '@/db/schema';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { createStudent, getStudentByUserId } from '@/server/students/actions';
+import { createStudent } from '@/server/students/actions';
 import { createInsertSchema } from 'drizzle-zod';
 import { useSession } from 'next-auth/react';
 
@@ -49,34 +49,24 @@ const formSchema = createInsertSchema(students).extend({
   userId: z.string().optional(),
 });
 
-export default function StudentApplicationForm() {
+type StudentFormProps = {
+  initialData?: z.infer<typeof formSchema> | null;
+};
+
+export default function StudentForm({ initialData }: StudentFormProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const { toast } = useToast();
 
   const userId = session?.user?.id;
 
-  const { data: existingStudent, isLoading } = useQuery({
-    queryKey: ['student', userId],
-    queryFn: async () => {
-      if (!userId) return null;
-      const student = await getStudentByUserId(userId);
-      return student || null;
-    },
-    enabled: !!userId,
-  });
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: existingStudent
-      ? existingStudent
-      : {
-          phone2: '',
-          userId,
-        },
+    defaultValues: initialData || {
+      phone2: '',
+      userId,
+    },
   });
-
-  console.log('formValues', form.formState);
 
   const mutation = useMutation({
     mutationFn: createStudent,
@@ -99,18 +89,6 @@ export default function StudentApplicationForm() {
 
   function handleSubmit(values: z.infer<typeof formSchema>) {
     mutation.mutate(values);
-  }
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className='pt-6'>
-          <div className='flex items-center justify-center py-6'>
-            <span className='text-muted-foreground'>Loading...</span>
-          </div>
-        </CardContent>
-      </Card>
-    );
   }
 
   return (
