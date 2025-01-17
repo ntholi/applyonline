@@ -41,7 +41,7 @@ import {
 } from '@/db/schema';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { createStudent, getStudent } from '@/server/students/actions';
+import { createStudent, getStudentByUserId } from '@/server/students/actions';
 import { createInsertSchema } from 'drizzle-zod';
 import { useSession } from 'next-auth/react';
 
@@ -60,7 +60,7 @@ export default function StudentApplicationForm() {
     queryKey: ['student', userId],
     queryFn: async () => {
       if (!userId) return null;
-      const student = await getStudent(userId);
+      const student = await getStudentByUserId(userId);
       return student || null;
     },
     enabled: !!userId,
@@ -68,17 +68,15 @@ export default function StudentApplicationForm() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      phone2: '',
-      userId,
-      ...(existingStudent && {
-        ...existingStudent,
-        dateOfBirth: existingStudent.dateOfBirth
-          ? new Date(existingStudent.dateOfBirth)
-          : undefined,
-      }),
-    },
+    defaultValues: existingStudent
+      ? existingStudent
+      : {
+          phone2: '',
+          userId,
+        },
   });
+
+  console.log('formValues', form.formState);
 
   const mutation = useMutation({
     mutationFn: createStudent,
