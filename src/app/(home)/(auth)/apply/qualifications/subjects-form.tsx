@@ -1,20 +1,6 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Card } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -22,111 +8,164 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
+import {
+  findAllQualifications,
+  getQualificationGrades,
+  getQualificationSubjects,
+} from '@/server/qualifications/actions';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Plus, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const subjectSchema = z.object({
-  subjectId: z.number(),
-  gradeId: z.number(),
-});
-
-const formSchema = z.object({
-  qualificationId: z.number({
-    required_error: 'Please select your qualification',
-  }),
-  subjects: z.array(subjectSchema).min(1, 'Please add at least one subject'),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type SubjectEntry = {
+  subjectId: number;
+  gradeId: number;
+};
 
 export default function SubjectsForm() {
-  const router = useRouter();
-  const { toast } = useToast();
+  const [selectedQualification, setSelectedQualification] = useState<number>();
+  const [subjects, setSubjects] = useState<SubjectEntry[]>([]);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      subjects: [{ subjectId: 0, gradeId: 0 }],
-    },
+  const { data: qualifications } = useQuery({
+    queryKey: ['qualifications'],
+    queryFn: () => findAllQualifications(),
   });
 
-  async function handleSubmit(values: FormValues) {
-    try {
-      const response = await fetch('/api/apply/qualifications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
+  const { data: qualificationSubjects } = useQuery({
+    queryKey: ['qualification-subjects', selectedQualification],
+    queryFn: () => selectedQualification ? getQualificationSubjects(selectedQualification) : Promise.resolve([]),
+    enabled: !!selectedQualification,
+  });
 
-      if (!response.ok) {
-        throw new Error('Failed to save qualification details');
-      }
+  const { data: qualificationGrades } = useQuery({
+    queryKey: ['qualification-grades', selectedQualification],
+    queryFn: () => selectedQualification ? getQualificationGrades(selectedQualification) : Promise.resolve([]),
+    enabled: !!selectedQualification,
+  });
 
-      toast({
-        title: 'Success',
-        description: 'Your qualification details have been saved',
-      });
+  function addSubject() {
+    setSubjects([...subjects, { subjectId: 0, gradeId: 0 }]);
+  }
 
-      // Navigate to the next step
-      router.push('/apply/program');
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to save your qualifications. Please try again.',
-        variant: 'destructive',
-      });
-    }
+  function removeSubject(index: number) {
+    setSubjects(subjects.filter((_, i) => i !== index));
+  }
+
+  function updateSubject(index: number, field: keyof SubjectEntry, value: number) {
+    setSubjects(
+      subjects.map((subject, i) =>
+        i === index ? { ...subject, [field]: value } : subject
+      )
+    );
   }
 
   return (
-    <Card>
-      <CardContent className='pt-6'>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className='space-y-8'
-          >
-            <FormField
-              control={form.control}
-              name='qualificationId'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Qualification Type</FormLabel>
+    <Card className="p-6 space-y-6">
+      <div className="space-y-4">
+        <label className="text-sm font-medium">Select Qualification</label>
+        <Select
+          value={selectedQualification?.toString()}
+          onValueChange={(value) => setSelectedQualification(Number(value))}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Choose a qualification" />
+          </SelectTrigger>
+          <SelectContent>
+            {qualifications?.items.map((qualification) => (
+              <SelectItem
+                key={qualification.id}
+                value={qualification.id.toString()}
+              >
+                {qualification.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {selectedQualification && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Subjects and Grades</h3>
+            <Button
+              onClick={addSubject}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Subject
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {subjects.map((subject, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-[1fr,1fr,auto] gap-4 items-start"
+              >
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Subject</label>
                   <Select
-                    onValueChange={(value) => field.onChange(parseInt(value))}
-                    defaultValue={field.value?.toString()}
+                    value={subject.subjectId.toString()}
+                    onValueChange={(value) =>
+                      updateSubject(index, 'subjectId', Number(value))
+                    }
                   >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select your qualification' />
-                      </SelectTrigger>
-                    </FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select subject" />
+                    </SelectTrigger>
                     <SelectContent>
-                      {/* We'll fetch these from the database */}
-                      <SelectItem value='1'>IGCSE</SelectItem>
-                      <SelectItem value='2'>BGCSE</SelectItem>
+                      {qualificationSubjects?.map((subject) => (
+                        <SelectItem
+                          key={subject.id}
+                          value={subject.id.toString()}
+                        >
+                          {subject.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                </div>
 
-            {/* Subject fields will be dynamically added here */}
-            <div className='flex justify-between'>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() => router.back()}
-              >
-                Previous
-              </Button>
-              <Button type='submit'>Save & Continue</Button>
-            </div>
-          </form>
-        </Form>
-      </CardContent>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Grade</label>
+                  <Select
+                    value={subject.gradeId.toString()}
+                    onValueChange={(value) =>
+                      updateSubject(index, 'gradeId', Number(value))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select grade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {qualificationGrades?.map((grade) => (
+                        <SelectItem key={grade.id} value={grade.id.toString()}>
+                          {grade.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'mt-8 hover:bg-destructive hover:text-destructive-foreground'
+                  )}
+                  onClick={() => removeSubject(index)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
