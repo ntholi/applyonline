@@ -98,12 +98,11 @@ export default function SubjectsForm({ studentId }: Props) {
     setIsSaving(true);
     try {
       await saveStudentQualification({
+        studentId,
         qualificationId: selectedQualification,
-        studentId: studentId,
         studentSubjects: subjects.map((subject) => ({
           subjectId: subject.subjectId,
           gradeId: subject.gradeId,
-          studentQualificationId: 0,
         })),
       });
 

@@ -1,5 +1,5 @@
-import { studentQualifications, studentSubjects } from '@/db/schema';
+import { studentQualifications } from '@/db/schema';
 
 export type StudentQualification = typeof studentQualifications.$inferInsert & {
-  studentSubjects: (typeof studentSubjects.$inferInsert)[];
+  studentSubjects: { subjectId: number; gradeId: number }[];
 };
