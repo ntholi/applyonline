@@ -25,6 +25,16 @@ export async function createStudent(student: Student) {
   if (!session?.user?.id) {
     throw new Error('User not found');
   }
+
+  const existingStudent = await service.getByUserId(session.user.id);
+
+  if (existingStudent) {
+    return service.update(existingStudent.id, {
+      ...student,
+      userId: session.user.id,
+    });
+  }
+
   return service.create({ ...student, userId: session.user.id });
 }
 
