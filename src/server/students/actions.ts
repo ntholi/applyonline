@@ -3,6 +3,7 @@
 import { students } from '@/db/schema';
 import { studentsService as service } from './service';
 import { auth } from '@/auth';
+import { StudentQualification } from './types';
 
 type Student = Omit<typeof students.$inferInsert, 'userId'> & {
   userId?: string;
@@ -26,15 +27,13 @@ export async function createStudent(student: Student) {
     throw new Error('User not found');
   }
 
-  const existingStudent = await service.getByUserId(session.user.id);
-
-  if (existingStudent) {
-    return service.update(existingStudent.id, {
+  const existing = await service.getByUserId(session.user.id);
+  if (existing) {
+    return service.update(existing.id, {
       ...student,
       userId: session.user.id,
     });
   }
-
   return service.create({ ...student, userId: session.user.id });
 }
 
@@ -44,6 +43,10 @@ export async function updateStudent(id: number, student: Student) {
     throw new Error('User not found');
   }
   return service.update(id, { ...student, userId: session.user.id });
+}
+
+export async function saveStudentQualification(value: StudentQualification) {
+  return service.saveQualification(value);
 }
 
 export async function deleteStudent(id: number) {

@@ -2,6 +2,7 @@ import { students } from '@/db/schema';
 import StudentRepository from './repository';
 import withAuth from '@/server/base/withAuth';
 import { FindAllParams } from '../base/BaseRepository';
+import { StudentQualification } from './types';
 
 type Student = typeof students.$inferInsert;
 
@@ -38,6 +39,10 @@ class StudentService {
 
   async count() {
     return withAuth(async () => this.repository.count(), []);
+  }
+
+  async saveQualification(value: StudentQualification) {
+    return withAuth(async () => this.repository.saveQualification(value), []);
   }
 }
 

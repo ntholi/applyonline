@@ -1,6 +1,7 @@
-import BaseRepository from '@/server/base/BaseRepository';
-import { students } from '@/db/schema';
 import { db } from '@/db';
+import { studentQualifications, students, studentSubjects } from '@/db/schema';
+import BaseRepository from '@/server/base/BaseRepository';
+import { StudentQualification } from './types';
 
 export default class StudentRepository extends BaseRepository<
   typeof students,
@@ -28,6 +29,33 @@ export default class StudentRepository extends BaseRepository<
         applications: true,
         qualifications: true,
       },
+    });
+  }
+
+  async saveQualification(qualification: StudentQualification) {
+    const { studentSubjects: subjects } = qualification;
+    return await db.transaction(async (tx) => {
+      const [saved] = await tx
+        .insert(studentQualifications)
+        .values({
+          studentId: qualification.studentId,
+          qualificationId: qualification.qualificationId,
+        })
+        .returning();
+
+      if (subjects.length > 0) {
+        await tx
+          .insert(studentSubjects)
+          .values(
+            subjects.map((s) => ({
+              ...s,
+              studentQualificationId: saved.id,
+            }))
+          )
+          .returning();
+      }
+
+      return saved;
     });
   }
 }
