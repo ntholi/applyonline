@@ -3,9 +3,9 @@
 import { signIn } from '@/auth';
 
 export async function facebookLogin() {
-  await signIn('facebook');
+  await signIn('facebook', { redirectTo: '/apply' });
 }
 
 export async function googleLogin() {
-  await signIn('google');
+  await signIn('google', { redirectTo: '/apply' });
 }
