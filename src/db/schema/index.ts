@@ -319,9 +319,6 @@ export const studentSubjects = sqliteTable(
   'student_subjects',
   {
     id: integer().primaryKey({ autoIncrement: true }),
-    studentQualificationId: integer()
-      .notNull()
-      .references(() => studentQualifications.id, { onDelete: 'cascade' }),
     subjectId: integer()
       .notNull()
       .references(() => subjects.id, { onDelete: 'cascade' }),
@@ -333,8 +330,8 @@ export const studentSubjects = sqliteTable(
   },
   (table) => ({
     studentSubjectIdx: index('student_subject_idx').on(
-      table.studentQualificationId,
-      table.subjectId
+      table.subjectId,
+      table.gradeId
     ),
   })
 );
@@ -342,10 +339,6 @@ export const studentSubjects = sqliteTable(
 export const studentSubjectsRelations = relations(
   studentSubjects,
   ({ one }) => ({
-    studentQualification: one(studentQualifications, {
-      fields: [studentSubjects.studentQualificationId],
-      references: [studentQualifications.id],
-    }),
     subject: one(subjects, {
       fields: [studentSubjects.subjectId],
       references: [subjects.id],
