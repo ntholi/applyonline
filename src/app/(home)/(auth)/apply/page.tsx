@@ -4,11 +4,18 @@ import { Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
 
 export default async function ApplyPage() {
-  const session = await auth();
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <SessionComponent />
+    </Suspense>
+  );
+}
 
+async function SessionComponent() {
+  const session = await auth();
   if (!session) {
     return (
-      <div className='flex min-h-screen flex-col items-center justify-center p-4'>
+      <div className='flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4'>
         <div className='text-center space-y-4'>
           <h1 className='text-2xl font-semibold'>Access Restricted</h1>
           <p>Please sign in to access the application form.</p>
@@ -17,16 +24,12 @@ export default async function ApplyPage() {
     );
   }
 
-  return (
-    <Suspense fallback={<LoadingState />}>
-      {redirect('/apply/student-details')}
-    </Suspense>
-  );
+  return redirect('/apply/student-details');
 }
 
 function LoadingState() {
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center p-4'>
+    <div className='flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-4'>
       <Loader2 className='h-6 w-6 animate-spin text-primary' />
       <p className='mt-2 text-sm text-muted-foreground'>Loading...</p>
     </div>
