@@ -6,6 +6,7 @@ import {
 } from '@/components/adease';
 import { notFound } from 'next/navigation';
 import { getStudent, deleteStudent } from '@/server/students/actions';
+import { formatDate } from '@/lib/utils';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -13,20 +14,20 @@ type Props = {
 
 export default async function StudentDetails({ params }: Props) {
   const { id } = await params;
-  const student = await getStudent(id);
-  
+  const student = await getStudent(Number(id));
+
   if (!student) {
     return notFound();
   }
 
   return (
     <DetailsView>
-      <DetailsViewHeader 
-        title={'Student'} 
+      <DetailsViewHeader
+        title={'Student'}
         queryKey={['students']}
         handleDelete={async () => {
           'use server';
-          await deleteStudent(id);
+          await deleteStudent(Number(id));
         }}
       />
       <DetailsViewBody>
@@ -36,15 +37,23 @@ export default async function StudentDetails({ params }: Props) {
         <FieldView label='Phone1'>{student.phone1}</FieldView>
         <FieldView label='Phone2'>{student.phone2}</FieldView>
         <FieldView label='Religion'>{student.religion}</FieldView>
-        <FieldView label='Date Of Birth'>{student.dateOfBirth}</FieldView>
+        <FieldView label='Date Of Birth'>
+          {formatDate(student.dateOfBirth)}
+        </FieldView>
         <FieldView label='Gender'>{student.gender}</FieldView>
         <FieldView label='Marital Status'>{student.maritalStatus}</FieldView>
         <FieldView label='Birth Place'>{student.birthPlace}</FieldView>
         <FieldView label='Home Town'>{student.homeTown}</FieldView>
         <FieldView label='High School'>{student.highSchool}</FieldView>
-        <FieldView label='Next Of Kin Names'>{student.nextOfKinNames}</FieldView>
-        <FieldView label='Next Of Kin Phone'>{student.nextOfKinPhone}</FieldView>
-        <FieldView label='Next Of Kin Relationship'>{student.nextOfKinRelationship}</FieldView>
+        <FieldView label='Next Of Kin Names'>
+          {student.nextOfKinNames}
+        </FieldView>
+        <FieldView label='Next Of Kin Phone'>
+          {student.nextOfKinPhone}
+        </FieldView>
+        <FieldView label='Next Of Kin Relationship'>
+          {student.nextOfKinRelationship}
+        </FieldView>
       </DetailsViewBody>
     </DetailsView>
   );

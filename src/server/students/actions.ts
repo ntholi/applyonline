@@ -8,7 +8,7 @@ type Student = Omit<typeof students.$inferInsert, 'userId'> & {
   userId?: string;
 };
 
-export async function getStudent(id: string) {
+export async function getStudent(id: number) {
   return service.get(id);
 }
 
@@ -38,7 +38,7 @@ export async function createStudent(student: Student) {
   return service.create({ ...student, userId: session.user.id });
 }
 
-export async function updateStudent(id: string, student: Student) {
+export async function updateStudent(id: number, student: Student) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error('User not found');
@@ -46,6 +46,6 @@ export async function updateStudent(id: string, student: Student) {
   return service.update(id, { ...student, userId: session.user.id });
 }
 
-export async function deleteStudent(id: string) {
+export async function deleteStudent(id: number) {
   return service.delete(id);
 }
