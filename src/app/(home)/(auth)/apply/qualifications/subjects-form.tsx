@@ -26,7 +26,11 @@ type SubjectEntry = {
   gradeId: number;
 };
 
-export default function SubjectsForm() {
+type Props = {
+  studentId: number;
+};
+
+export default function SubjectsForm({ studentId }: Props) {
   const [selectedQualification, setSelectedQualification] = useState<number>();
   const [subjects, setSubjects] = useState<SubjectEntry[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -95,9 +99,11 @@ export default function SubjectsForm() {
     try {
       await saveStudentQualification({
         qualificationId: selectedQualification,
+        studentId: studentId,
         studentSubjects: subjects.map((subject) => ({
           subjectId: subject.subjectId,
           gradeId: subject.gradeId,
+          studentQualificationId: 0,
         })),
       });
 
