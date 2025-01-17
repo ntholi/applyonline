@@ -1,7 +1,6 @@
 import { relations, sql } from 'drizzle-orm';
 import {
   index,
-  int,
   integer,
   primaryKey,
   sqliteTable,
@@ -33,7 +32,7 @@ export const qualificationsRelations = relations(
 export const subjects = sqliteTable(
   'subjects',
   {
-    id: int().primaryKey({ autoIncrement: true }),
+    id: integer().primaryKey({ autoIncrement: true }),
     name: text().notNull(),
     code: text().notNull(),
     qualificationId: integer()
@@ -133,7 +132,7 @@ export const programQualificationsRelations = relations(
 export const requiredSubjects = sqliteTable(
   'required_subjects',
   {
-    programId: text().notNull(),
+    programId: integer().notNull(),
     qualificationId: integer().notNull(),
     subjectId: integer()
       .notNull()
@@ -204,8 +203,8 @@ export const students = sqliteTable(
   'students',
   {
     id: integer().primaryKey({ autoIncrement: true }),
-    nationalId: text().notNull(),
-    userId: text()
+    nationalId: integer().notNull(),
+    userId: integer()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     name: text().notNull(),
@@ -244,7 +243,7 @@ export const applications = sqliteTable(
   'applications',
   {
     id: integer().primaryKey({ autoIncrement: true }),
-    studentId: text()
+    studentId: integer()
       .notNull()
       .references(() => students.id, { onDelete: 'cascade' }),
     firstChoiceId: integer()
@@ -284,7 +283,7 @@ export const studentQualifications = sqliteTable(
   'student_qualifications',
   {
     id: integer().primaryKey({ autoIncrement: true }),
-    studentId: text()
+    studentId: integer()
       .notNull()
       .references(() => students.id, { onDelete: 'cascade' }),
     qualificationId: integer()
@@ -320,7 +319,7 @@ export const studentSubjects = sqliteTable(
   'student_subjects',
   {
     id: integer().primaryKey({ autoIncrement: true }),
-    studentQualificationId: text()
+    studentQualificationId: integer()
       .notNull()
       .references(() => studentQualifications.id, { onDelete: 'cascade' }),
     subjectId: integer()
