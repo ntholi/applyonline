@@ -231,6 +231,15 @@ export const students = sqliteTable(
   })
 );
 
+export const studentsRelations = relations(students, ({ one, many }) => ({
+  user: one(users, {
+    fields: [students.userId],
+    references: [users.id],
+  }),
+  applications: many(applications),
+  qualifications: many(studentQualifications),
+}));
+
 export const applications = sqliteTable(
   'applications',
   {
@@ -255,6 +264,21 @@ export const applications = sqliteTable(
     ),
   })
 );
+
+export const applicationsRelations = relations(applications, ({ one }) => ({
+  student: one(students, {
+    fields: [applications.studentId],
+    references: [students.id],
+  }),
+  firstChoice: one(programs, {
+    fields: [applications.firstChoiceId],
+    references: [programs.id],
+  }),
+  secondChoice: one(programs, {
+    fields: [applications.secondChoiceId],
+    references: [programs.id],
+  }),
+}));
 
 export const studentQualifications = sqliteTable(
   'student_qualifications',
@@ -329,6 +353,16 @@ export const studentSubjectsRelations = relations(
     }),
     grade: one(qualificationGrades, {
       fields: [studentSubjects.gradeId],
+      references: [qualificationGrades.id],
+    }),
+  })
+);
+
+export const requiredSubjectsRelations = relations(
+  requiredSubjects,
+  ({ one }) => ({
+    grade: one(qualificationGrades, {
+      fields: [requiredSubjects.gradeId],
       references: [qualificationGrades.id],
     }),
   })
