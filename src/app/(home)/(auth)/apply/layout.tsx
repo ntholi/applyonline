@@ -26,9 +26,9 @@ export default function ApplyLayout({ children }: PropsWithChildren) {
   return (
     <Container>
       <div className='my-8'>
-        <h1 className='text-3xl font-bold tracking-tight'>Apply Now</h1>
-        <p className='text-muted-foreground mt-2'>
-          Fill in your details to start your application process
+        <h1 className='text-2xl font-bold tracking-tight'>Apply Now</h1>
+        <p className='mt-2 text-sm text-muted-foreground'>
+          Fill in your details and complete your application
         </p>
       </div>
 

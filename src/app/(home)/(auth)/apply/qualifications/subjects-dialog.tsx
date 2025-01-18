@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
-import { Plus } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 
 type Props = {
@@ -59,7 +59,7 @@ export default function SubjectsDialog({
 
   const SubjectsButton = (
     <Button variant='outline' className='text-sm'>
-      <Plus className='mr-2 h-4 w-4' />
+      <PlusCircle className='mr-2 h-4 w-4' />
       Add Subject
     </Button>
   );
