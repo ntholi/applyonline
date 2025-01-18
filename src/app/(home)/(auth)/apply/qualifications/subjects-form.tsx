@@ -48,7 +48,7 @@ export default function SubjectsForm({ studentId }: Props) {
   });
 
   const selectedQualificationData = qualifications?.find(
-    (q) => q.id === selectedQualification
+    (q) => q.id === selectedQualification,
   );
 
   const qualificationSubjects = selectedQualificationData?.subjects ?? [];
@@ -66,7 +66,7 @@ export default function SubjectsForm({ studentId }: Props) {
     if (!selectedQualification) return;
 
     const invalidSubjects = subjects.some(
-      (subject) => subject.subjectId === 0 || subject.gradeId === 0
+      (subject) => subject.subjectId === 0 || subject.gradeId === 0,
     );
 
     if (invalidSubjects) {
@@ -121,7 +121,7 @@ export default function SubjectsForm({ studentId }: Props) {
 
   return (
     <Card
-      className={`p-6 md:p-8 space-y-6 md:space-y-8 bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-background/60`}
+      className={`space-y-6 bg-card/50 p-6 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:space-y-8 md:p-8`}
     >
       <div className='space-y-4'>
         <div className='space-y-2'>
@@ -174,13 +174,13 @@ export default function SubjectsForm({ studentId }: Props) {
 
             {subjects.length > 0 && (
               <div className='rounded-lg border bg-card'>
-                <Table className='min-w-[300px] overflow-x-auto block md:table [&_tr:last-child]:border-0'>
+                <Table className='block min-w-[300px] overflow-x-auto md:table [&_tr:last-child]:border-0'>
                   <TableHeader>
                     <TableRow className='hover:bg-transparent'>
-                      <TableHead className='w-full md:w-auto font-medium'>
+                      <TableHead className='w-full font-medium md:w-auto'>
                         Subject
                       </TableHead>
-                      <TableHead className='w-full md:w-auto font-medium'>
+                      <TableHead className='w-full font-medium md:w-auto'>
                         Grade
                       </TableHead>
                       <TableHead className='w-[100px] text-right md:text-left'>
@@ -191,10 +191,10 @@ export default function SubjectsForm({ studentId }: Props) {
                   <TableBody>
                     {subjects.map((subject, index) => {
                       const selectedSubject = qualificationSubjects.find(
-                        (s) => s.id === subject.subjectId
+                        (s) => s.id === subject.subjectId,
                       );
                       const selectedGrade = qualificationGrades.find(
-                        (g) => g.id === subject.gradeId
+                        (g) => g.id === subject.gradeId,
                       );
 
                       if (!selectedSubject || !selectedGrade) return null;
@@ -217,7 +217,7 @@ export default function SubjectsForm({ studentId }: Props) {
                               className='hover:bg-destructive/10 hover:text-destructive'
                               onClick={() => removeSubject(index)}
                             >
-                              <Trash2 className='w-4 h-4' />
+                              <Trash2 className='h-4 w-4' />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -232,15 +232,15 @@ export default function SubjectsForm({ studentId }: Props) {
           <Button
             onClick={handleSave}
             disabled={isSaving || subjects.length === 0}
-            className='w-full font-medium shadow-sm hover:shadow-md transition-shadow'
+            className='ml-auto block w-full font-medium shadow-sm transition-shadow hover:shadow-md sm:w-auto'
           >
             {isSaving ? (
               <>
-                <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                 Saving...
               </>
             ) : (
-              'Save Qualification'
+              'Save Qualification & Continue'
             )}
           </Button>
         </div>
