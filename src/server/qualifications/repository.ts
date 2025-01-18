@@ -1,7 +1,7 @@
 import { Qualification } from '@/app/admin/qualifications/types';
 import { db } from '@/db';
 import { qualifications, subjects, qualificationGrades } from '@/db/schema';
-import BaseRepository from '@/server/base/BaseRepository';
+import BaseRepository, { FindAllParams } from '@/server/base/BaseRepository';
 import { eq } from 'drizzle-orm';
 
 export default class QualificationRepository extends BaseRepository<
@@ -22,9 +22,31 @@ export default class QualificationRepository extends BaseRepository<
     });
   }
 
+  override async findAll(params: FindAllParams<typeof qualifications>) {
+    const { orderByExpressions, whereCondition, offset, pageSize } =
+      await this.queryExpressions(params);
+
+    const data = await db.query.qualifications.findMany({
+      with: {
+        subjects: true,
+        grades: true,
+      },
+      orderBy: orderByExpressions,
+      where: whereCondition,
+      limit: pageSize,
+      offset,
+    });
+
+    return await this.paginatedResults(data, whereCondition, pageSize);
+  }
+
   override async create(data: Qualification) {
     const inserted = await db.transaction(async (tx) => {
-      const { subjects: subjectsData, grades: gradesData, ...qualification } = data;
+      const {
+        subjects: subjectsData,
+        grades: gradesData,
+        ...qualification
+      } = data;
       const [inserted] = await tx
         .insert(qualifications)
         .values(qualification)
@@ -55,7 +77,11 @@ export default class QualificationRepository extends BaseRepository<
 
   async update(id: number, data: Qualification) {
     return db.transaction(async (tx) => {
-      const { subjects: subjectsData, grades: gradesData, ...qualification } = data;
+      const {
+        subjects: subjectsData,
+        grades: gradesData,
+        ...qualification
+      } = data;
 
       const [updated] = await tx
         .update(qualifications)
@@ -75,7 +101,9 @@ export default class QualificationRepository extends BaseRepository<
         );
       }
 
-      await tx.delete(qualificationGrades).where(eq(qualificationGrades.qualificationId, id));
+      await tx
+        .delete(qualificationGrades)
+        .where(eq(qualificationGrades.qualificationId, id));
 
       if (gradesData && gradesData.length > 0) {
         await tx.insert(qualificationGrades).values(
