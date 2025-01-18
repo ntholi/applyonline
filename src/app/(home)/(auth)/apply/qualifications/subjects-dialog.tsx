@@ -59,7 +59,7 @@ export default function SubjectsDialog({
 
   const SubjectsButton = (
     <Button variant='outline' className='text-sm'>
-      <Plus className='h-4 w-4 mr-2' />
+      <Plus className='mr-2 h-4 w-4' />
       Add Subject
     </Button>
   );
@@ -104,7 +104,7 @@ export default function SubjectsDialog({
         <Button
           onClick={handleAdd}
           disabled={!selectedSubject || !selectedGrade}
-          className='w-full mt-4'
+          className='mt-4 w-full'
         >
           Add Subject
         </Button>

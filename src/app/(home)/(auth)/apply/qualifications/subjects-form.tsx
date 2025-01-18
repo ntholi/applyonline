@@ -124,13 +124,13 @@ export default function SubjectsForm({ studentId }: Props) {
       <div className='space-y-3 sm:space-y-4'>
         <div className='space-y-2'>
           <label className='text-sm font-medium leading-none text-muted-foreground'>
-            Qualification Type
+            Your Qualification
           </label>
           <Select
             value={selectedQualification?.toString()}
             onValueChange={(value) => setSelectedQualification(Number(value))}
           >
-            <SelectTrigger className='w-full max-w-[600px]'>
+            <SelectTrigger className='w-full'>
               <SelectValue placeholder='Choose your qualification type' />
             </SelectTrigger>
             <SelectContent>
