@@ -134,7 +134,7 @@ export default function SubjectsForm({ studentId }: Props) {
   }
 
   return (
-    <Card className='p-6 space-y-6'>
+    <Card className='p-4 md:p-6 space-y-4 md:space-y-6'>
       <div className='space-y-4'>
         <label className='text-sm font-medium'>Select Qualification</label>
         <Select
@@ -162,7 +162,7 @@ export default function SubjectsForm({ studentId }: Props) {
           <div className='space-y-4'>
             <h3 className='text-lg font-semibold'>Add Subjects and Grades</h3>
 
-            <div className='grid grid-cols-[1fr,1fr,auto] gap-4 items-start'>
+            <div className='grid grid-cols-1 sm:grid-cols-[1fr,1fr,auto] gap-4 items-start'>
               <div className='space-y-2'>
                 <label className='text-sm font-medium'>Subject</label>
                 <Select
@@ -210,7 +210,7 @@ export default function SubjectsForm({ studentId }: Props) {
 
               <Button
                 variant='outline'
-                className='mt-8 flex items-center gap-2 text-sm'
+                className='w-full sm:w-auto mt-0 sm:mt-8 flex items-center gap-2 text-sm justify-center'
                 onClick={addSubject}
                 disabled={
                   currentSubject.subjectId === 0 || currentSubject.gradeId === 0
@@ -225,11 +225,11 @@ export default function SubjectsForm({ studentId }: Props) {
           {subjects.length > 0 && (
             <div className='space-y-4'>
               <h3 className='text-lg font-semibold'>Selected Subjects</h3>
-              <Table>
+              <Table className='min-w-[300px] overflow-x-auto block md:table'>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Grade</TableHead>
+                    <TableHead className='w-full md:w-auto'>Subject</TableHead>
+                    <TableHead className='w-full md:w-auto'>Grade</TableHead>
                     <TableHead className='w-[100px]'>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -245,10 +245,10 @@ export default function SubjectsForm({ studentId }: Props) {
                     if (!selectedSubject || !selectedGrade) return null;
 
                     return (
-                      <TableRow key={index}>
-                        <TableCell>{selectedSubject.name}</TableCell>
-                        <TableCell>{selectedGrade.name}</TableCell>
-                        <TableCell>
+                      <TableRow key={index} className='flex flex-col md:table-row'>
+                        <TableCell className='flex-1'>{selectedSubject.name}</TableCell>
+                        <TableCell className='flex-1'>{selectedGrade.name}</TableCell>
+                        <TableCell className='flex justify-end md:table-cell'>
                           <Button
                             variant='ghost'
                             size='icon'
