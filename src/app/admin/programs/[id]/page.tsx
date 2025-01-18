@@ -25,7 +25,7 @@ type Props = {
 
 export default async function ProgramDetails({ params }: Props) {
   const { id } = await params;
-  const program = await getProgram(id);
+  const program = await getProgram(Number(id));
 
   if (!program) {
     return notFound();
@@ -38,7 +38,7 @@ export default async function ProgramDetails({ params }: Props) {
         queryKey={['programs']}
         handleDelete={async () => {
           'use server';
-          await deleteProgram(id);
+          await deleteProgram(Number(id));
         }}
       />
       <Box p='sm'>

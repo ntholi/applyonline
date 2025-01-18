@@ -12,7 +12,7 @@ export default class ProgramRepository extends BaseRepository<
     super(programs, 'id');
   }
 
-  override async findById(id: string) {
+  override async findById(id: number) {
     return db.query.programs.findFirst({
       where: (programs, { eq }) => eq(programs.id, id),
       with: {
@@ -68,7 +68,7 @@ export default class ProgramRepository extends BaseRepository<
     return inserted;
   }
 
-  async update(id: string, data: Program) {
+  async update(id: number, data: Program) {
     return db.transaction(async (tx) => {
       const { programQualifications: qualificationsData, ...program } = data;
 
