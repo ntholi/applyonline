@@ -17,22 +17,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
 import { useToast } from '@/hooks/use-toast';
 import { findAllQualifications } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import SubjectsDialog from './subjects-dialog';
 
 type SubjectEntry = {
   subjectId: number;
@@ -46,11 +37,7 @@ type Props = {
 export default function SubjectsForm({ studentId }: Props) {
   const [selectedQualification, setSelectedQualification] = useState<number>();
   const [subjects, setSubjects] = useState<SubjectEntry[]>([]);
-  const [currentSubject, setCurrentSubject] = useState<SubjectEntry>({
-    subjectId: 0,
-    gradeId: 0,
-  });
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
@@ -67,19 +54,12 @@ export default function SubjectsForm({ studentId }: Props) {
   const qualificationSubjects = selectedQualificationData?.subjects ?? [];
   const qualificationGrades = selectedQualificationData?.grades ?? [];
 
-  function addSubject() {
-    if (currentSubject.subjectId === 0 || currentSubject.gradeId === 0) return;
-    setSubjects([...subjects, currentSubject]);
-    setCurrentSubject({ subjectId: 0, gradeId: 0 });
-    setDrawerOpen(false);
+  function addSubject(subjectId: number, gradeId: number) {
+    setSubjects([...subjects, { subjectId, gradeId }]);
   }
 
   function removeSubject(index: number) {
     setSubjects(subjects.filter((_, i) => i !== index));
-  }
-
-  function updateCurrentSubject(field: keyof SubjectEntry, value: number) {
-    setCurrentSubject((prev) => ({ ...prev, [field]: value }));
   }
 
   async function handleSave() {
@@ -94,6 +74,15 @@ export default function SubjectsForm({ studentId }: Props) {
         variant: 'destructive',
         title: 'Invalid subjects',
         description: 'Please select both subject and grade for all entries',
+      });
+      return;
+    }
+
+    if (subjects.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'No subjects',
+        description: 'Please add at least one subject',
       });
       return;
     }
@@ -115,7 +104,6 @@ export default function SubjectsForm({ studentId }: Props) {
       });
 
       setSubjects([]);
-      setCurrentSubject({ subjectId: 0, gradeId: 0 });
       setSelectedQualification(undefined);
     } catch (error) {
       toast({
@@ -132,10 +120,14 @@ export default function SubjectsForm({ studentId }: Props) {
   }
 
   return (
-    <Card className='p-6 md:p-8 space-y-6 md:space-y-8 bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+    <Card
+      className={`p-6 md:p-8 space-y-6 md:space-y-8 bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-background/60`}
+    >
       <div className='space-y-4'>
         <div className='space-y-2'>
-          <label className='text-sm font-medium leading-none text-muted-foreground'>Qualification Type</label>
+          <label className='text-sm font-medium leading-none text-muted-foreground'>
+            Qualification Type
+          </label>
           <Select
             value={selectedQualification?.toString()}
             onValueChange={(value) => setSelectedQualification(Number(value))}
@@ -162,85 +154,21 @@ export default function SubjectsForm({ studentId }: Props) {
           <div className='space-y-6'>
             <div className='flex items-center justify-between border-b pb-4'>
               <div>
-                <h3 className='text-lg font-semibold tracking-tight'>Subjects and Grades</h3>
-                <p className='text-sm text-muted-foreground'>Add and manage your subjects below</p>
+                <h3 className='text-lg font-semibold tracking-tight'>
+                  Subjects and Grades
+                </h3>
+                <p className='text-sm text-muted-foreground'>
+                  Add and manage your subjects below
+                </p>
               </div>
-              <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-                <DrawerTrigger asChild>
-                  <Button
-                    variant='secondary'
-                    className='flex items-center gap-2 text-sm hover:shadow-md transition-shadow'
-                  >
-                    <Plus className='w-4 h-4' />
-                    Add Subject
-                  </Button>
-                </DrawerTrigger>
-                <DrawerContent>
-                  <div className="mx-auto w-full max-w-sm">
-                    <DrawerHeader>
-                      <DrawerTitle>Add New Subject</DrawerTitle>
-                      <DrawerDescription>Add a subject and its corresponding grade</DrawerDescription>
-                    </DrawerHeader>
-                    <div className='p-4 space-y-6'>
-                      <div className='space-y-2'>
-                        <label className='text-sm font-medium leading-none text-muted-foreground'>Subject</label>
-                        <Select
-                          value={currentSubject.subjectId.toString()}
-                          onValueChange={(value) =>
-                            updateCurrentSubject('subjectId', Number(value))
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder='Select a subject' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {qualificationSubjects.map((subject) => (
-                              <SelectItem
-                                key={subject.id}
-                                value={subject.id.toString()}
-                              >
-                                {subject.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className='space-y-2'>
-                        <label className='text-sm font-medium leading-none text-muted-foreground'>Grade</label>
-                        <Select
-                          value={currentSubject.gradeId.toString()}
-                          onValueChange={(value) =>
-                            updateCurrentSubject('gradeId', Number(value))
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder='Select your grade' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {qualificationGrades.map((grade) => (
-                              <SelectItem key={grade.id} value={grade.id.toString()}>
-                                {grade.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <DrawerFooter>
-                      <Button
-                        onClick={addSubject}
-                        disabled={currentSubject.subjectId === 0 || currentSubject.gradeId === 0}
-                      >
-                        Add Subject
-                      </Button>
-                      <DrawerClose asChild>
-                        <Button variant="outline">Cancel</Button>
-                      </DrawerClose>
-                    </DrawerFooter>
-                  </div>
-                </DrawerContent>
-              </Drawer>
+              <Button
+                variant='secondary'
+                className='flex items-center gap-2 text-sm hover:shadow-md transition-shadow'
+                onClick={() => setDialogOpen(true)}
+              >
+                <Plus className='w-4 h-4' />
+                Add Subject
+              </Button>
             </div>
 
             {subjects.length > 0 && (
@@ -248,9 +176,15 @@ export default function SubjectsForm({ studentId }: Props) {
                 <Table className='min-w-[300px] overflow-x-auto block md:table [&_tr:last-child]:border-0'>
                   <TableHeader>
                     <TableRow className='hover:bg-transparent'>
-                      <TableHead className='w-full md:w-auto font-medium'>Subject</TableHead>
-                      <TableHead className='w-full md:w-auto font-medium'>Grade</TableHead>
-                      <TableHead className='w-[100px] text-right md:text-left'>Actions</TableHead>
+                      <TableHead className='w-full md:w-auto font-medium'>
+                        Subject
+                      </TableHead>
+                      <TableHead className='w-full md:w-auto font-medium'>
+                        Grade
+                      </TableHead>
+                      <TableHead className='w-[100px] text-right md:text-left'>
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -309,6 +243,15 @@ export default function SubjectsForm({ studentId }: Props) {
             )}
           </Button>
         </div>
+      )}
+      {selectedQualification && (
+        <SubjectsDialog
+          subjects={qualificationSubjects}
+          grades={qualificationGrades}
+          onAdd={addSubject}
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+        />
       )}
     </Card>
   );
