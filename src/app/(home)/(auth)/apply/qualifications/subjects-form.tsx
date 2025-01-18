@@ -18,11 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import {
-  findAllQualifications,
-  getQualificationGrades,
-  getQualificationSubjects,
-} from '@/server/qualifications/actions';
+import { findAllQualifications } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
@@ -50,25 +46,15 @@ export default function SubjectsForm({ studentId }: Props) {
   const { data: qualifications } = useQuery({
     queryKey: ['qualifications'],
     queryFn: () => findAllQualifications(),
+    select: (it) => it.items,
   });
 
-  const { data: qualificationSubjects } = useQuery({
-    queryKey: ['qualification-subjects', selectedQualification],
-    queryFn: () =>
-      selectedQualification
-        ? getQualificationSubjects(selectedQualification)
-        : Promise.resolve([]),
-    enabled: !!selectedQualification,
-  });
+  const selectedQualificationData = qualifications?.find(
+    (q) => q.id === selectedQualification
+  );
 
-  const { data: qualificationGrades } = useQuery({
-    queryKey: ['qualification-grades', selectedQualification],
-    queryFn: () =>
-      selectedQualification
-        ? getQualificationGrades(selectedQualification)
-        : Promise.resolve([]),
-    enabled: !!selectedQualification,
-  });
+  const qualificationSubjects = selectedQualificationData?.subjects ?? [];
+  const qualificationGrades = selectedQualificationData?.grades ?? [];
 
   function addSubject() {
     if (currentSubject.subjectId === 0 || currentSubject.gradeId === 0) return;
@@ -145,7 +131,7 @@ export default function SubjectsForm({ studentId }: Props) {
             <SelectValue placeholder='Choose a qualification' />
           </SelectTrigger>
           <SelectContent>
-            {qualifications?.items.map((qualification) => (
+            {qualifications?.map((qualification) => (
               <SelectItem
                 key={qualification.id}
                 value={qualification.id.toString()}
@@ -175,7 +161,7 @@ export default function SubjectsForm({ studentId }: Props) {
                     <SelectValue placeholder='Select subject' />
                   </SelectTrigger>
                   <SelectContent>
-                    {qualificationSubjects?.map((subject) => (
+                    {qualificationSubjects.map((subject) => (
                       <SelectItem
                         key={subject.id}
                         value={subject.id.toString()}
@@ -199,7 +185,7 @@ export default function SubjectsForm({ studentId }: Props) {
                     <SelectValue placeholder='Select grade' />
                   </SelectTrigger>
                   <SelectContent>
-                    {qualificationGrades?.map((grade) => (
+                    {qualificationGrades.map((grade) => (
                       <SelectItem key={grade.id} value={grade.id.toString()}>
                         {grade.name}
                       </SelectItem>
@@ -235,19 +221,26 @@ export default function SubjectsForm({ studentId }: Props) {
                 </TableHeader>
                 <TableBody>
                   {subjects.map((subject, index) => {
-                    const selectedSubject = qualificationSubjects?.find(
+                    const selectedSubject = qualificationSubjects.find(
                       (s) => s.id === subject.subjectId
                     );
-                    const selectedGrade = qualificationGrades?.find(
+                    const selectedGrade = qualificationGrades.find(
                       (g) => g.id === subject.gradeId
                     );
 
                     if (!selectedSubject || !selectedGrade) return null;
 
                     return (
-                      <TableRow key={index} className='flex flex-col md:table-row'>
-                        <TableCell className='flex-1'>{selectedSubject.name}</TableCell>
-                        <TableCell className='flex-1'>{selectedGrade.name}</TableCell>
+                      <TableRow
+                        key={index}
+                        className='flex flex-col md:table-row'
+                      >
+                        <TableCell className='flex-1'>
+                          {selectedSubject.name}
+                        </TableCell>
+                        <TableCell className='flex-1'>
+                          {selectedGrade.name}
+                        </TableCell>
                         <TableCell className='flex justify-end md:table-cell'>
                           <Button
                             variant='ghost'

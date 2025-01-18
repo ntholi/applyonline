@@ -37,7 +37,11 @@ export default class QualificationRepository extends BaseRepository<
       offset,
     });
 
-    return await this.paginatedResults(data, whereCondition, pageSize);
+    const totalCount = await this.count(whereCondition);
+    return {
+      items: data,
+      pages: Math.ceil(totalCount / pageSize),
+    };
   }
 
   override async create(data: Qualification) {
