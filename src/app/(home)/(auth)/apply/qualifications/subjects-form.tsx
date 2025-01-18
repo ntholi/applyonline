@@ -21,15 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import { findAllQualifications } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
 import { useQuery } from '@tanstack/react-query';
-import {
-  AlertCircle,
-  BookOpen,
-  CheckCircle2,
-  GraduationCap,
-  Loader2,
-  Medal,
-  Trash2,
-} from 'lucide-react';
+import { CheckCircle2, GraduationCap, Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import SubjectsDialog from './subjects-dialog';
 
@@ -63,6 +55,17 @@ export default function SubjectsForm({ studentId }: Props) {
   const qualificationGrades = selectedQualificationData?.grades ?? [];
 
   function addSubject(subjectId: number, gradeId: number) {
+    const exists = subjects.some((subject) => subject.subjectId === subjectId);
+
+    if (exists) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'This subject has already been added',
+      });
+      return;
+    }
+
     setSubjects([...subjects, { subjectId, gradeId }]);
   }
 
@@ -72,29 +75,6 @@ export default function SubjectsForm({ studentId }: Props) {
 
   async function handleSave() {
     if (!selectedQualification) return;
-
-    const invalidSubjects = subjects.some(
-      (subject) => subject.subjectId === 0 || subject.gradeId === 0,
-    );
-
-    if (invalidSubjects) {
-      toast({
-        variant: 'destructive',
-        title: 'Invalid subjects',
-        description: 'Please select both subject and grade for all entries',
-      });
-      return;
-    }
-
-    if (subjects.length === 0) {
-      toast({
-        variant: 'destructive',
-        title: 'No subjects',
-        description: 'Please add at least one subject',
-      });
-      return;
-    }
-
     setIsSaving(true);
     try {
       await saveStudentQualification({
@@ -148,121 +128,106 @@ export default function SubjectsForm({ studentId }: Props) {
             </div>
           </div>
 
-          <div className='relative'>
+          <div className='space-y-2'>
+            <label
+              htmlFor='qualification'
+              className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+            >
+              Qualification
+            </label>
             <Select
               value={selectedQualification?.toString()}
               onValueChange={(value) => setSelectedQualification(Number(value))}
             >
-              <SelectTrigger className='h-11 w-full bg-background pr-12 transition-colors duration-200'>
-                <SelectValue placeholder='Choose your qualification type' />
+              <SelectTrigger id='qualification' className='w-full'>
+                <SelectValue placeholder='Select your qualification' />
               </SelectTrigger>
               <SelectContent>
                 {qualifications?.map((qualification) => (
                   <SelectItem
                     key={qualification.id}
                     value={qualification.id.toString()}
-                    className='transition-colors duration-200'
                   >
                     {qualification.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <BookOpen className='absolute right-12 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground' />
           </div>
         </div>
       </Card>
 
-      {/* Subjects Card */}
       {selectedQualification && (
         <Card className='relative overflow-hidden border bg-card p-6 shadow-sm sm:p-8'>
           <div className='space-y-6'>
-            <div className='flex flex-col space-y-6 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
-              <div className='flex items-start space-x-4'>
-                <div className='rounded-lg bg-muted p-2'>
-                  <Medal className='h-6 w-6 text-muted-foreground' />
-                </div>
-                <div>
-                  <h3 className='text-xl font-semibold tracking-tight'>
-                    Subject Details
-                  </h3>
-                  <p className='text-sm text-muted-foreground'>
-                    Add your subjects and corresponding grades
-                  </p>
-                </div>
+            <div className='flex items-center justify-between'>
+              <div className='space-y-1'>
+                <h3 className='text-lg font-medium leading-6'>Subjects</h3>
+                <p className='text-sm text-muted-foreground'>
+                  Add your subjects and their respective grades below.
+                </p>
               </div>
               <SubjectsDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
                 subjects={qualificationSubjects}
                 grades={qualificationGrades}
                 onAdd={addSubject}
-                open={dialogOpen}
-                onOpenChange={setDialogOpen}
               />
             </div>
 
-            {subjects.length > 0 ? (
-              <div className='overflow-hidden rounded-lg border bg-background/50'>
-                <Table className='w-full'>
-                  <TableHeader>
-                    <TableRow className='hover:bg-transparent'>
-                      <TableHead className='w-[45%] text-base font-medium'>
-                        Subject
-                      </TableHead>
-                      <TableHead className='w-[45%] text-base font-medium'>
-                        Grade
-                      </TableHead>
-                      <TableHead className='w-[10%]'></TableHead>
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Grade</TableHead>
+                    <TableHead className='w-[100px]'>Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {subjects.length === 0 ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={3}
+                        className='h-24 text-center text-muted-foreground'
+                      >
+                        No subjects added. Click the "Add Subject" button to add
+                        your subjects.
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {subjects.map((subject, index) => {
-                      const selectedSubject = qualificationSubjects.find(
-                        (s) => s.id === subject.subjectId,
-                      );
-                      const selectedGrade = qualificationGrades.find(
-                        (g) => g.id === subject.gradeId,
-                      );
-
-                      if (!selectedSubject || !selectedGrade) return null;
-
-                      return (
-                        <TableRow
-                          key={index}
-                          className='group transition-colors duration-200 hover:bg-muted/50'
-                        >
-                          <TableCell className='font-medium'>
-                            {selectedSubject.name}
-                          </TableCell>
-                          <TableCell>{selectedGrade.name}</TableCell>
-                          <TableCell className='text-right'>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              onClick={() => removeSubject(index)}
-                              className='h-8 w-8'
-                            >
-                              <Trash2 className='h-4 w-4 text-destructive' />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className='flex min-h-[200px] items-center justify-center rounded-lg border border-dashed bg-background/50'>
-                <div className='text-center'>
-                  <AlertCircle className='mx-auto h-8 w-8 text-muted-foreground' />
-                  <p className='mt-3 text-sm font-medium text-muted-foreground'>
-                    No subjects added yet
-                  </p>
-                  <p className='mt-1 text-xs text-muted-foreground/70'>
-                    Click the {'"Add Subject"'} button above to get started
-                  </p>
-                </div>
-              </div>
-            )}
+                  ) : (
+                    subjects.map((subject, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          {
+                            qualificationSubjects.find(
+                              (s) => s.id === subject.subjectId,
+                            )?.name
+                          }
+                        </TableCell>
+                        <TableCell>
+                          {
+                            qualificationGrades.find(
+                              (g) => g.id === subject.gradeId,
+                            )?.name
+                          }
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            onClick={() => removeSubject(index)}
+                          >
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
 
             <div className='flex justify-end pt-4'>
               <Button

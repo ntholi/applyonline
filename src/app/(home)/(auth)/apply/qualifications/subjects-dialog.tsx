@@ -67,13 +67,16 @@ export default function SubjectsDialog({
   function SubjectForm({ className }: { className?: string }) {
     return (
       <div className={cn('grid gap-4', className)}>
-        <div className='grid gap-2'>
+        <div className="space-y-2">
+          <label htmlFor="subject" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Subject
+          </label>
           <Select
             value={selectedSubject.toString()}
             onValueChange={(value) => setSelectedSubject(Number(value))}
           >
-            <SelectTrigger>
-              <SelectValue placeholder='Select subject' />
+            <SelectTrigger id="subject">
+              <SelectValue placeholder="Select subject" />
             </SelectTrigger>
             <SelectContent>
               {subjects.map((subject) => (
@@ -84,13 +87,16 @@ export default function SubjectsDialog({
             </SelectContent>
           </Select>
         </div>
-        <div className='grid gap-2'>
+        <div className="space-y-2">
+          <label htmlFor="grade" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Grade
+          </label>
           <Select
             value={selectedGrade.toString()}
             onValueChange={(value) => setSelectedGrade(Number(value))}
           >
-            <SelectTrigger>
-              <SelectValue placeholder='Select grade' />
+            <SelectTrigger id="grade">
+              <SelectValue placeholder="Select grade" />
             </SelectTrigger>
             <SelectContent>
               {grades.map((grade) => (
