@@ -104,7 +104,7 @@ export default function SubjectsDialog({
         <Button
           onClick={handleAdd}
           disabled={!selectedSubject || !selectedGrade}
-          className='w-full'
+          className='w-full mt-4'
         >
           Add Subject
         </Button>
@@ -116,17 +116,17 @@ export default function SubjectsDialog({
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerTrigger asChild>{SubjectsButton}</DrawerTrigger>
-        <DrawerContent>
+        <DrawerContent className='px-2'>
           <DrawerHeader className='text-left'>
             <DrawerTitle>Add Subject</DrawerTitle>
             <DrawerDescription>
               Add a new subject and grade to your qualifications
             </DrawerDescription>
           </DrawerHeader>
-          <div className='px-4 py-2'>
+          <div className='px-4 py-1'>
             <SubjectForm />
           </div>
-          <DrawerFooter className='pt-2'>
+          <DrawerFooter className='pt-1'>
             <DrawerClose asChild>
               <Button variant='outline'>Cancel</Button>
             </DrawerClose>
