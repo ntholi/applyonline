@@ -47,7 +47,7 @@ export default function SubjectsDialog({
   open,
   onOpenChange,
 }: Props) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isDesktop = useMediaQuery('(min-width: 768px)');
   const [selectedSubject, setSelectedSubject] = useState(0);
   const [selectedGrade, setSelectedGrade] = useState(0);
 
@@ -58,16 +58,23 @@ export default function SubjectsDialog({
     onOpenChange(false);
   }
 
+  const SubjectsButton = (
+    <Button variant='outline' className='text-sm'>
+      <Plus className='h-4 w-4 mr-2' />
+      Add Subject
+    </Button>
+  );
+
   function SubjectForm({ className }: { className?: string }) {
     return (
-      <div className={cn("grid gap-4", className)}>
-        <div className="grid gap-2">
+      <div className={cn('grid gap-4', className)}>
+        <div className='grid gap-2'>
           <Select
             value={selectedSubject.toString()}
             onValueChange={(value) => setSelectedSubject(Number(value))}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select subject" />
+              <SelectValue placeholder='Select subject' />
             </SelectTrigger>
             <SelectContent>
               {subjects.map((subject) => (
@@ -78,13 +85,13 @@ export default function SubjectsDialog({
             </SelectContent>
           </Select>
         </div>
-        <div className="grid gap-2">
+        <div className='grid gap-2'>
           <Select
             value={selectedGrade.toString()}
             onValueChange={(value) => setSelectedGrade(Number(value))}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select grade" />
+              <SelectValue placeholder='Select grade' />
             </SelectTrigger>
             <SelectContent>
               {grades.map((grade) => (
@@ -95,10 +102,10 @@ export default function SubjectsDialog({
             </SelectContent>
           </Select>
         </div>
-        <Button 
-          onClick={handleAdd} 
+        <Button
+          onClick={handleAdd}
           disabled={!selectedSubject || !selectedGrade}
-          className="w-full"
+          className='w-full'
         >
           Add Subject
         </Button>
@@ -106,32 +113,23 @@ export default function SubjectsDialog({
     );
   }
 
-  const AddButton = (
-    <Button variant="outline" size="sm">
-      <Plus className="h-4 w-4 mr-2" />
-      Add Subject
-    </Button>
-  );
-
   if (!isDesktop) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerTrigger asChild>
-          {AddButton}
-        </DrawerTrigger>
+        <DrawerTrigger asChild>{SubjectsButton}</DrawerTrigger>
         <DrawerContent>
-          <DrawerHeader className="text-left">
+          <DrawerHeader className='text-left'>
             <DrawerTitle>Add Subject</DrawerTitle>
             <DrawerDescription>
               Add a new subject and grade to your qualifications
             </DrawerDescription>
           </DrawerHeader>
-          <div className="px-4 py-2">
+          <div className='px-4 py-2'>
             <SubjectForm />
           </div>
-          <DrawerFooter className="pt-2">
+          <DrawerFooter className='pt-2'>
             <DrawerClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant='outline'>Cancel</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
@@ -141,19 +139,17 @@ export default function SubjectsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        {AddButton}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogTrigger asChild>{SubjectsButton}</DialogTrigger>
+      <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>Add Subject</DialogTitle>
           <DialogDescription>
             Add a new subject and grade to your qualifications
           </DialogDescription>
         </DialogHeader>
-        <SubjectForm className="py-4" />
+        <SubjectForm className='py-4' />
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant='outline' onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
         </DialogFooter>
