@@ -210,14 +210,14 @@ export default function SubjectsForm({ studentId }: Props) {
 
               <Button
                 variant='outline'
-                size='icon'
-                className='mt-8'
+                className='mt-8 flex items-center gap-2 text-sm'
                 onClick={addSubject}
                 disabled={
                   currentSubject.subjectId === 0 || currentSubject.gradeId === 0
                 }
               >
                 <Plus className='w-4 h-4' />
+                Add Subject
               </Button>
             </div>
           </div>
