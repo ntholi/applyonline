@@ -96,21 +96,21 @@ class BaseRepository<
     };
   }
 
-  protected async paginatedResults(
-    data: ModelSelect<T>[],
+  protected async paginatedResults<E extends ModelSelect<T>>(
+    data: E[],
     whereCondition: SQL | undefined,
     pageSize: number
   ) {
     const totalCount = await this.count(whereCondition);
     return {
-      items: data,
+      data,
       pages: Math.ceil(totalCount / pageSize),
     };
   }
 
   async findAll(
     params: FindAllParams<T>
-  ): Promise<{ items: ModelSelect<T>[]; pages: number }> {
+  ): Promise<{ data: ModelSelect<T>[]; pages: number }> {
     const { orderByExpressions, whereCondition, offset, pageSize } =
       await this.queryExpressions(params);
 

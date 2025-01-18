@@ -22,10 +22,10 @@ import { Pagination } from './Pagination';
 import { SearchField } from './SearchField';
 
 export type ListLayoutProps<T> = {
-  getItems: (
+  getData: (
     page: number,
     search: string,
-  ) => Promise<{ items: T[]; pages: number }>;
+  ) => Promise<{ data: T[]; pages: number }>;
   renderItem: (item: T) => React.ReactNode;
   path: string;
   queryKey: string[];
@@ -34,7 +34,7 @@ export type ListLayoutProps<T> = {
 };
 
 export function ListLayout<T>({
-  getItems,
+  getData,
   renderItem,
   actionIcons,
   children,
@@ -48,13 +48,11 @@ export function ListLayout<T>({
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [view, setView] = useViewSelect();
 
-  const { isLoading, data = { items: [], pages: 0 } } = useQuery({
+  const { isLoading, {data, pages} = { data: [], pages: 0 } } = useQuery({
     queryKey: [...queryKey, page, search],
-    queryFn: () => getItems(page, search),
+    queryFn: () => getData(page, search),
     staleTime: 0,
   });
-
-  const { items, pages } = data;
 
   const renderListItem = (item: T) => {
     const itemElement = renderItem(item);
@@ -115,7 +113,7 @@ export function ListLayout<T>({
                   ))}
                 </>
               ) : (
-                items.map((item: T, index: number) => (
+                data.map((item: T, index: number) => (
                   <React.Fragment key={index}>
                     {renderListItem(item)}
                   </React.Fragment>

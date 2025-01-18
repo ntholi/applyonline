@@ -1,33 +1,16 @@
 'use client';
 
 import { Shell } from '@/components/adease';
-import {
-  ActionIcon,
-  Avatar,
-  Flex,
-  Group,
-  Image,
-  Indicator,
-  LoadingOverlay,
-  NavLink,
-  Stack,
-  Text,
-  useComputedColorScheme,
-} from '@mantine/core';
+import { ActionIcon, Avatar, Flex, Group, Stack, Text, LoadingOverlay, Image } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import {
-  Icon,
-  IconBook,
-  IconChevronRight,
-  IconLogout2,
-  IconSchool,
-  IconUsers,
-} from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
 import { signOut, useSession } from 'next-auth/react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React from 'react';
+import { Icon, IconChevronRight, IconLogout2, IconUsers } from '@tabler/icons-react';
+import { usePathname } from 'next/navigation';
+import { Indicator, NavLink } from '@mantine/core';
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
 
 type NotificationConfig = {
   queryKey: string[];
@@ -48,19 +31,13 @@ const navigation: NavItem[] = [
     href: '/admin/users',
     icon: IconUsers,
   },
-  {
-    label: 'Qualifications',
-    href: '/admin/qualifications',
-    icon: IconBook,
-  },
-  {
-    label: 'Programs',
-    href: '/admin/programs',
-    icon: IconSchool,
-  },
 ];
 
-export default function Dashboard({ children }: { children: React.ReactNode }) {
+export default function Dashboard({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { status } = useSession();
 
   if (status === 'loading') {
@@ -75,7 +52,7 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
     <Shell>
       <Shell.Header>
         <Group>
-          <Logo />
+          <Image src={'/images/logo.png'} height={40} alt='logo' />
         </Group>
       </Shell.Header>
       <Shell.Navigation>
@@ -167,9 +144,7 @@ function ItemDisplay({ item }: { item: NavItem }) {
       href={item.href || ''}
       active={item.href ? pathname.startsWith(item.href) : false}
       leftSection={<Icon size='1.1rem' />}
-      rightSection={
-        item.href ? <IconChevronRight size='0.8rem' stroke={1.5} /> : undefined
-      }
+      rightSection={item.href ? <IconChevronRight size='0.8rem' stroke={1.5} /> : undefined}
       opened={!!item.children}
     >
       {item.children?.map((child, index) => (
@@ -178,16 +153,4 @@ function ItemDisplay({ item }: { item: NavItem }) {
     </NavLink>
   );
   return navLink;
-}
-
-function Logo() {
-  const colorScheme = useComputedColorScheme('dark');
-  return (
-    <Image
-      src={`/images/logo-${colorScheme}.png`}
-      w={'auto'}
-      h={50}
-      alt='logo'
-    />
-  );
 }
