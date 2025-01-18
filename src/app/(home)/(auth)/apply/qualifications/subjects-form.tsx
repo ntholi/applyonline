@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
   Select,
@@ -8,18 +9,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useQuery } from '@tanstack/react-query';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
 import {
   findAllQualifications,
   getQualificationGrades,
   getQualificationSubjects,
 } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 type SubjectEntry = {
   subjectId: number;
@@ -33,6 +40,10 @@ type Props = {
 export default function SubjectsForm({ studentId }: Props) {
   const [selectedQualification, setSelectedQualification] = useState<number>();
   const [subjects, setSubjects] = useState<SubjectEntry[]>([]);
+  const [currentSubject, setCurrentSubject] = useState<SubjectEntry>({
+    subjectId: 0,
+    gradeId: 0,
+  });
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
@@ -60,23 +71,17 @@ export default function SubjectsForm({ studentId }: Props) {
   });
 
   function addSubject() {
-    setSubjects([...subjects, { subjectId: 0, gradeId: 0 }]);
+    if (currentSubject.subjectId === 0 || currentSubject.gradeId === 0) return;
+    setSubjects([...subjects, currentSubject]);
+    setCurrentSubject({ subjectId: 0, gradeId: 0 });
   }
 
   function removeSubject(index: number) {
     setSubjects(subjects.filter((_, i) => i !== index));
   }
 
-  function updateSubject(
-    index: number,
-    field: keyof SubjectEntry,
-    value: number
-  ) {
-    setSubjects(
-      subjects.map((subject, i) =>
-        i === index ? { ...subject, [field]: value } : subject
-      )
-    );
+  function updateCurrentSubject(field: keyof SubjectEntry, value: number) {
+    setCurrentSubject((prev) => ({ ...prev, [field]: value }));
   }
 
   async function handleSave() {
@@ -112,6 +117,7 @@ export default function SubjectsForm({ studentId }: Props) {
       });
 
       setSubjects([]);
+      setCurrentSubject({ subjectId: 0, gradeId: 0 });
       setSelectedQualification(undefined);
     } catch (error) {
       toast({
@@ -152,89 +158,118 @@ export default function SubjectsForm({ studentId }: Props) {
       </div>
 
       {selectedQualification && (
-        <div className='space-y-4'>
-          <div className='flex items-center justify-between'>
-            <h3 className='text-lg font-semibold'>Subjects and Grades</h3>
-            <Button
-              onClick={addSubject}
-              variant='outline'
-              size='sm'
-              className='flex items-center gap-2'
-            >
-              <Plus className='w-4 h-4' />
-              Add Subject
-            </Button>
-          </div>
-
+        <div className='space-y-6'>
           <div className='space-y-4'>
-            {subjects.map((subject, index) => (
-              <div
-                key={index}
-                className='grid grid-cols-[1fr,1fr,auto] gap-4 items-start'
-              >
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Subject</label>
-                  <Select
-                    value={subject.subjectId.toString()}
-                    onValueChange={(value) =>
-                      updateSubject(index, 'subjectId', Number(value))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select subject' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {qualificationSubjects?.map((subject) => (
-                        <SelectItem
-                          key={subject.id}
-                          value={subject.id.toString()}
-                        >
-                          {subject.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            <h3 className='text-lg font-semibold'>Add Subjects and Grades</h3>
 
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Grade</label>
-                  <Select
-                    value={subject.gradeId.toString()}
-                    onValueChange={(value) =>
-                      updateSubject(index, 'gradeId', Number(value))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select grade' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {qualificationGrades?.map((grade) => (
-                        <SelectItem key={grade.id} value={grade.id.toString()}>
-                          {grade.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  className={cn(
-                    'mt-8 hover:bg-destructive hover:text-destructive-foreground'
-                  )}
-                  onClick={() => removeSubject(index)}
+            <div className='grid grid-cols-[1fr,1fr,auto] gap-4 items-start'>
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Subject</label>
+                <Select
+                  value={currentSubject.subjectId.toString()}
+                  onValueChange={(value) =>
+                    updateCurrentSubject('subjectId', Number(value))
+                  }
                 >
-                  <Trash2 className='w-4 h-4' />
-                </Button>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select subject' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {qualificationSubjects?.map((subject) => (
+                      <SelectItem
+                        key={subject.id}
+                        value={subject.id.toString()}
+                      >
+                        {subject.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            ))}
+
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Grade</label>
+                <Select
+                  value={currentSubject.gradeId.toString()}
+                  onValueChange={(value) =>
+                    updateCurrentSubject('gradeId', Number(value))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select grade' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {qualificationGrades?.map((grade) => (
+                      <SelectItem key={grade.id} value={grade.id.toString()}>
+                        {grade.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button
+                variant='outline'
+                size='icon'
+                className='mt-8'
+                onClick={addSubject}
+                disabled={
+                  currentSubject.subjectId === 0 || currentSubject.gradeId === 0
+                }
+              >
+                <Plus className='w-4 h-4' />
+              </Button>
+            </div>
           </div>
+
+          {subjects.length > 0 && (
+            <div className='space-y-4'>
+              <h3 className='text-lg font-semibold'>Selected Subjects</h3>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Subject</TableHead>
+                    <TableHead>Grade</TableHead>
+                    <TableHead className='w-[100px]'>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {subjects.map((subject, index) => {
+                    const selectedSubject = qualificationSubjects?.find(
+                      (s) => s.id === subject.subjectId
+                    );
+                    const selectedGrade = qualificationGrades?.find(
+                      (g) => g.id === subject.gradeId
+                    );
+
+                    if (!selectedSubject || !selectedGrade) return null;
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>{selectedSubject.name}</TableCell>
+                        <TableCell>{selectedGrade.name}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='hover:bg-destructive hover:text-destructive-foreground'
+                            onClick={() => removeSubject(index)}
+                          >
+                            <Trash2 className='w-4 h-4' />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
 
           <Button
             onClick={handleSave}
             disabled={isSaving || subjects.length === 0}
-            className='w-full mt-6'
+            className='w-full'
           >
             {isSaving ? (
               <>
