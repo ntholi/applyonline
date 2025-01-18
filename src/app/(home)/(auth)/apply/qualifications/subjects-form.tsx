@@ -21,7 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import { findAllQualifications } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import SubjectsDialog from './subjects-dialog';
 
@@ -161,14 +161,15 @@ export default function SubjectsForm({ studentId }: Props) {
                   Add and manage your subjects below
                 </p>
               </div>
-              <Button
-                variant='secondary'
-                className='flex items-center gap-2 text-sm hover:shadow-md transition-shadow'
-                onClick={() => setDialogOpen(true)}
-              >
-                <Plus className='w-4 h-4' />
-                Add Subject
-              </Button>
+              {selectedQualification && (
+                <SubjectsDialog
+                  subjects={qualificationSubjects}
+                  grades={qualificationGrades}
+                  onAdd={addSubject}
+                  open={dialogOpen}
+                  onOpenChange={setDialogOpen}
+                />
+              )}
             </div>
 
             {subjects.length > 0 && (
@@ -243,15 +244,6 @@ export default function SubjectsForm({ studentId }: Props) {
             )}
           </Button>
         </div>
-      )}
-      {selectedQualification && (
-        <SubjectsDialog
-          subjects={qualificationSubjects}
-          grades={qualificationGrades}
-          onAdd={addSubject}
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
-        />
       )}
     </Card>
   );
