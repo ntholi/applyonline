@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,14 +11,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import Link from 'next/link';
-import { LogOut, User } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { LogOut, MoonIcon, SunIcon, User } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
+import { useTheme } from 'next-themes';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function AccountButton() {
   const { data: session } = useSession();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
   async function handleLogout() {
     await signOut();
@@ -51,11 +56,20 @@ export default function AccountButton() {
         <DropdownMenuLabel>{session?.user?.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem className='cursor-pointer'>
-          <User className='mr-2 h-4 w-4' />
+          <User className='mr-2 size-4' />
           <Link href='/profile'>My Profile</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={toggleTheme}>
+          {theme === 'light' ? (
+            <MoonIcon className='mr-2 size-4' />
+          ) : (
+            <SunIcon className='mr-2 size-4' />
+          )}
+          <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
-          <LogOut className='mr-2 h-4 w-4' />
+          <LogOut className='mr-2 size-4' />
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>
