@@ -17,6 +17,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
 import { useToast } from '@/hooks/use-toast';
 import { findAllQualifications } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
@@ -40,6 +50,7 @@ export default function SubjectsForm({ studentId }: Props) {
     subjectId: 0,
     gradeId: 0,
   });
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
@@ -60,6 +71,7 @@ export default function SubjectsForm({ studentId }: Props) {
     if (currentSubject.subjectId === 0 || currentSubject.gradeId === 0) return;
     setSubjects([...subjects, currentSubject]);
     setCurrentSubject({ subjectId: 0, gradeId: 0 });
+    setDrawerOpen(false);
   }
 
   function removeSubject(index: number) {
@@ -120,149 +132,172 @@ export default function SubjectsForm({ studentId }: Props) {
   }
 
   return (
-    <Card className='p-4 md:p-6 space-y-4 md:space-y-6'>
+    <Card className='p-6 md:p-8 space-y-6 md:space-y-8 bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
       <div className='space-y-4'>
-        <label className='text-sm font-medium'>Select Qualification</label>
-        <Select
-          value={selectedQualification?.toString()}
-          onValueChange={(value) => setSelectedQualification(Number(value))}
-        >
-          <SelectTrigger className='w-full'>
-            <SelectValue placeholder='Choose a qualification' />
-          </SelectTrigger>
-          <SelectContent>
-            {qualifications?.map((qualification) => (
-              <SelectItem
-                key={qualification.id}
-                value={qualification.id.toString()}
-              >
-                {qualification.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className='space-y-2'>
+          <label className='text-sm font-medium leading-none text-muted-foreground'>Qualification Type</label>
+          <Select
+            value={selectedQualification?.toString()}
+            onValueChange={(value) => setSelectedQualification(Number(value))}
+          >
+            <SelectTrigger className='w-full'>
+              <SelectValue placeholder='Choose your qualification type' />
+            </SelectTrigger>
+            <SelectContent>
+              {qualifications?.map((qualification) => (
+                <SelectItem
+                  key={qualification.id}
+                  value={qualification.id.toString()}
+                >
+                  {qualification.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {selectedQualification && (
-        <div className='space-y-6'>
-          <div className='space-y-4'>
-            <h3 className='text-lg font-semibold'>Add Subjects and Grades</h3>
+        <div className='space-y-8'>
+          <div className='space-y-6'>
+            <div className='flex items-center justify-between border-b pb-4'>
+              <div>
+                <h3 className='text-lg font-semibold tracking-tight'>Subjects and Grades</h3>
+                <p className='text-sm text-muted-foreground'>Add and manage your subjects below</p>
+              </div>
+              <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+                <DrawerTrigger asChild>
+                  <Button
+                    variant='secondary'
+                    className='flex items-center gap-2 text-sm hover:shadow-md transition-shadow'
+                  >
+                    <Plus className='w-4 h-4' />
+                    Add Subject
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <div className="mx-auto w-full max-w-sm">
+                    <DrawerHeader>
+                      <DrawerTitle>Add New Subject</DrawerTitle>
+                      <DrawerDescription>Add a subject and its corresponding grade</DrawerDescription>
+                    </DrawerHeader>
+                    <div className='p-4 space-y-6'>
+                      <div className='space-y-2'>
+                        <label className='text-sm font-medium leading-none text-muted-foreground'>Subject</label>
+                        <Select
+                          value={currentSubject.subjectId.toString()}
+                          onValueChange={(value) =>
+                            updateCurrentSubject('subjectId', Number(value))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select a subject' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {qualificationSubjects.map((subject) => (
+                              <SelectItem
+                                key={subject.id}
+                                value={subject.id.toString()}
+                              >
+                                {subject.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-            <div className='grid grid-cols-1 sm:grid-cols-[1fr,1fr,auto] gap-4 items-start'>
-              <div className='space-y-2'>
-                <label className='text-sm font-medium'>Subject</label>
-                <Select
-                  value={currentSubject.subjectId.toString()}
-                  onValueChange={(value) =>
-                    updateCurrentSubject('subjectId', Number(value))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select subject' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {qualificationSubjects.map((subject) => (
-                      <SelectItem
-                        key={subject.id}
-                        value={subject.id.toString()}
+                      <div className='space-y-2'>
+                        <label className='text-sm font-medium leading-none text-muted-foreground'>Grade</label>
+                        <Select
+                          value={currentSubject.gradeId.toString()}
+                          onValueChange={(value) =>
+                            updateCurrentSubject('gradeId', Number(value))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select your grade' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {qualificationGrades.map((grade) => (
+                              <SelectItem key={grade.id} value={grade.id.toString()}>
+                                {grade.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DrawerFooter>
+                      <Button
+                        onClick={addSubject}
+                        disabled={currentSubject.subjectId === 0 || currentSubject.gradeId === 0}
                       >
-                        {subject.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className='space-y-2'>
-                <label className='text-sm font-medium'>Grade</label>
-                <Select
-                  value={currentSubject.gradeId.toString()}
-                  onValueChange={(value) =>
-                    updateCurrentSubject('gradeId', Number(value))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select grade' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {qualificationGrades.map((grade) => (
-                      <SelectItem key={grade.id} value={grade.id.toString()}>
-                        {grade.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                variant='outline'
-                className='w-full sm:w-auto mt-0 sm:mt-8 flex items-center gap-2 text-sm justify-center'
-                onClick={addSubject}
-                disabled={
-                  currentSubject.subjectId === 0 || currentSubject.gradeId === 0
-                }
-              >
-                <Plus className='w-4 h-4' />
-                Add Subject
-              </Button>
+                        Add Subject
+                      </Button>
+                      <DrawerClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </div>
+                </DrawerContent>
+              </Drawer>
             </div>
+
+            {subjects.length > 0 && (
+              <div className='rounded-lg border bg-card'>
+                <Table className='min-w-[300px] overflow-x-auto block md:table [&_tr:last-child]:border-0'>
+                  <TableHeader>
+                    <TableRow className='hover:bg-transparent'>
+                      <TableHead className='w-full md:w-auto font-medium'>Subject</TableHead>
+                      <TableHead className='w-full md:w-auto font-medium'>Grade</TableHead>
+                      <TableHead className='w-[100px] text-right md:text-left'>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {subjects.map((subject, index) => {
+                      const selectedSubject = qualificationSubjects.find(
+                        (s) => s.id === subject.subjectId
+                      );
+                      const selectedGrade = qualificationGrades.find(
+                        (g) => g.id === subject.gradeId
+                      );
+
+                      if (!selectedSubject || !selectedGrade) return null;
+
+                      return (
+                        <TableRow
+                          key={index}
+                          className='flex flex-col md:table-row'
+                        >
+                          <TableCell className='flex-1 font-medium'>
+                            {selectedSubject.name}
+                          </TableCell>
+                          <TableCell className='flex-1'>
+                            {selectedGrade.name}
+                          </TableCell>
+                          <TableCell className='flex justify-end md:table-cell'>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              className='hover:bg-destructive/10 hover:text-destructive'
+                              onClick={() => removeSubject(index)}
+                            >
+                              <Trash2 className='w-4 h-4' />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </div>
-
-          {subjects.length > 0 && (
-            <div className='space-y-4'>
-              <h3 className='text-lg font-semibold'>Selected Subjects</h3>
-              <Table className='min-w-[300px] overflow-x-auto block md:table'>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className='w-full md:w-auto'>Subject</TableHead>
-                    <TableHead className='w-full md:w-auto'>Grade</TableHead>
-                    <TableHead className='w-[100px]'>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {subjects.map((subject, index) => {
-                    const selectedSubject = qualificationSubjects.find(
-                      (s) => s.id === subject.subjectId
-                    );
-                    const selectedGrade = qualificationGrades.find(
-                      (g) => g.id === subject.gradeId
-                    );
-
-                    if (!selectedSubject || !selectedGrade) return null;
-
-                    return (
-                      <TableRow
-                        key={index}
-                        className='flex flex-col md:table-row'
-                      >
-                        <TableCell className='flex-1'>
-                          {selectedSubject.name}
-                        </TableCell>
-                        <TableCell className='flex-1'>
-                          {selectedGrade.name}
-                        </TableCell>
-                        <TableCell className='flex justify-end md:table-cell'>
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            className='hover:bg-destructive hover:text-destructive-foreground'
-                            onClick={() => removeSubject(index)}
-                          >
-                            <Trash2 className='w-4 h-4' />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
 
           <Button
             onClick={handleSave}
             disabled={isSaving || subjects.length === 0}
-            className='w-full'
+            className='w-full font-medium shadow-sm hover:shadow-md transition-shadow'
           >
             {isSaving ? (
               <>
