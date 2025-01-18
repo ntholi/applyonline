@@ -46,7 +46,7 @@ export default function SubjectsForm({ studentId }: Props) {
   const { data: qualifications } = useQuery({
     queryKey: ['qualifications'],
     queryFn: () => findAllQualifications(),
-    select: (it) => it.items,
+    select: (it) => it.data,
   });
 
   const selectedQualificationData = qualifications?.find(

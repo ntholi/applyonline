@@ -24,7 +24,7 @@ import { SearchField } from './SearchField';
 export type ListLayoutProps<T> = {
   getData: (
     page: number,
-    search: string,
+    search: string
   ) => Promise<{ data: T[]; pages: number }>;
   renderItem: (item: T) => React.ReactNode;
   path: string;
@@ -48,11 +48,12 @@ export function ListLayout<T>({
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [view, setView] = useViewSelect();
 
-  const { isLoading, {data, pages} = { data: [], pages: 0 } } = useQuery({
-    queryKey: [...queryKey, page, search],
-    queryFn: () => getData(page, search),
-    staleTime: 0,
-  });
+  const { isLoading, data: { data, pages } = { data: [], pages: 0 } } =
+    useQuery({
+      queryKey: [...queryKey, page, search],
+      queryFn: () => getData(page, search),
+      staleTime: 0,
+    });
 
   const renderListItem = (item: T) => {
     const itemElement = renderItem(item);
@@ -73,7 +74,7 @@ export function ListLayout<T>({
             const url = `${path}/${itemId}?${newSearchParams.toString()}`;
             router.push(url);
           },
-        },
+        }
       );
     }
     return itemElement;
