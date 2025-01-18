@@ -27,7 +27,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useDeviceDetect } from '@/hooks/useDeviceDetect';
+import { useMediaQuery } from '@/hooks/use-media-query';
+import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -46,7 +47,7 @@ export default function SubjectsDialog({
   open,
   onOpenChange,
 }: Props) {
-  const { isMobile } = useDeviceDetect();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
   const [selectedSubject, setSelectedSubject] = useState(0);
   const [selectedGrade, setSelectedGrade] = useState(0);
 
@@ -54,18 +55,19 @@ export default function SubjectsDialog({
     onAdd(selectedSubject, selectedGrade);
     setSelectedSubject(0);
     setSelectedGrade(0);
+    onOpenChange(false);
   }
 
-  const Content = (
-    <>
-      <div className='grid gap-4 py-4'>
-        <div className='grid gap-2'>
+  function SubjectForm({ className }: { className?: string }) {
+    return (
+      <div className={cn("grid gap-4", className)}>
+        <div className="grid gap-2">
           <Select
             value={selectedSubject.toString()}
             onValueChange={(value) => setSelectedSubject(Number(value))}
           >
             <SelectTrigger>
-              <SelectValue placeholder='Select subject' />
+              <SelectValue placeholder="Select subject" />
             </SelectTrigger>
             <SelectContent>
               {subjects.map((subject) => (
@@ -76,13 +78,13 @@ export default function SubjectsDialog({
             </SelectContent>
           </Select>
         </div>
-        <div className='grid gap-2'>
+        <div className="grid gap-2">
           <Select
             value={selectedGrade.toString()}
             onValueChange={(value) => setSelectedGrade(Number(value))}
           >
             <SelectTrigger>
-              <SelectValue placeholder='Select grade' />
+              <SelectValue placeholder="Select grade" />
             </SelectTrigger>
             <SelectContent>
               {grades.map((grade) => (
@@ -93,31 +95,43 @@ export default function SubjectsDialog({
             </SelectContent>
           </Select>
         </div>
+        <Button 
+          onClick={handleAdd} 
+          disabled={!selectedSubject || !selectedGrade}
+          className="w-full"
+        >
+          Add Subject
+        </Button>
       </div>
-      <Button onClick={handleAdd} disabled={!selectedSubject || !selectedGrade}>
-        Add Subject
-      </Button>
-    </>
+    );
+  }
+
+  const AddButton = (
+    <Button variant="outline" size="sm">
+      <Plus className="h-4 w-4 mr-2" />
+      Add Subject
+    </Button>
   );
 
-  if (isMobile) {
+  if (!isDesktop) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerTrigger asChild>
-          <Button variant='outline' size='sm'>
-            <Plus className='h-4 w-4 mr-2' />
-            Add Subject
-          </Button>
+          {AddButton}
         </DrawerTrigger>
         <DrawerContent>
-          <DrawerHeader>
+          <DrawerHeader className="text-left">
             <DrawerTitle>Add Subject</DrawerTitle>
-            <DrawerDescription>Add a new subject and grade</DrawerDescription>
+            <DrawerDescription>
+              Add a new subject and grade to your qualifications
+            </DrawerDescription>
           </DrawerHeader>
-          {Content}
-          <DrawerFooter>
+          <div className="px-4 py-2">
+            <SubjectForm />
+          </div>
+          <DrawerFooter className="pt-2">
             <DrawerClose asChild>
-              <Button variant='outline'>Cancel</Button>
+              <Button variant="outline">Cancel</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
@@ -128,19 +142,18 @@ export default function SubjectsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button variant='outline' size='sm'>
-          <Plus className='h-4 w-4 mr-2' />
-          Add Subject
-        </Button>
+        {AddButton}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add Subject</DialogTitle>
-          <DialogDescription>Add a new subject and grade</DialogDescription>
+          <DialogDescription>
+            Add a new subject and grade to your qualifications
+          </DialogDescription>
         </DialogHeader>
-        {Content}
+        <SubjectForm className="py-4" />
         <DialogFooter>
-          <Button variant='outline' onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
         </DialogFooter>
