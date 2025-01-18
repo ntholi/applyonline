@@ -120,10 +120,8 @@ export default function SubjectsForm({ studentId }: Props) {
   }
 
   return (
-    <Card
-      className={`space-y-6 bg-card/50 p-6 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:space-y-8 md:p-8`}
-    >
-      <div className='space-y-4'>
+    <Card className='space-y-4 bg-card/50 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:space-y-5 sm:p-6 md:space-y-6 md:p-8 lg:space-y-8'>
+      <div className='space-y-3 sm:space-y-4'>
         <div className='space-y-2'>
           <label className='text-sm font-medium leading-none text-muted-foreground'>
             Qualification Type
@@ -132,7 +130,7 @@ export default function SubjectsForm({ studentId }: Props) {
             value={selectedQualification?.toString()}
             onValueChange={(value) => setSelectedQualification(Number(value))}
           >
-            <SelectTrigger className='w-full'>
+            <SelectTrigger className='w-full max-w-[600px]'>
               <SelectValue placeholder='Choose your qualification type' />
             </SelectTrigger>
             <SelectContent>
@@ -150,89 +148,74 @@ export default function SubjectsForm({ studentId }: Props) {
       </div>
 
       {selectedQualification && (
-        <div className='space-y-8'>
-          <div className='space-y-6'>
-            <div className='flex items-center justify-between border-b pb-4'>
-              <div>
-                <h3 className='text-lg font-semibold tracking-tight'>
-                  Subjects and Grades
-                </h3>
-                <p className='text-sm text-muted-foreground'>
-                  Add and manage your subjects below
-                </p>
-              </div>
-              {selectedQualification && (
-                <SubjectsDialog
-                  subjects={qualificationSubjects}
-                  grades={qualificationGrades}
-                  onAdd={addSubject}
-                  open={dialogOpen}
-                  onOpenChange={setDialogOpen}
-                />
-              )}
+        <div className='space-y-4'>
+          <div className='flex flex-col space-y-2 pb-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
+            <div>
+              <h3 className='text-lg font-semibold tracking-tight'>Subjects</h3>
+              <p className='text-sm text-muted-foreground'>
+                Add your subjects and grades below
+              </p>
             </div>
-
-            {subjects.length > 0 && (
-              <div className='rounded-lg border bg-card'>
-                <Table className='block min-w-[300px] overflow-x-auto md:table [&_tr:last-child]:border-0'>
-                  <TableHeader>
-                    <TableRow className='hover:bg-transparent'>
-                      <TableHead className='w-full font-medium md:w-auto'>
-                        Subject
-                      </TableHead>
-                      <TableHead className='w-full font-medium md:w-auto'>
-                        Grade
-                      </TableHead>
-                      <TableHead className='w-[100px] text-right md:text-left'>
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {subjects.map((subject, index) => {
-                      const selectedSubject = qualificationSubjects.find(
-                        (s) => s.id === subject.subjectId,
-                      );
-                      const selectedGrade = qualificationGrades.find(
-                        (g) => g.id === subject.gradeId,
-                      );
-
-                      if (!selectedSubject || !selectedGrade) return null;
-
-                      return (
-                        <TableRow
-                          key={index}
-                          className='flex flex-col md:table-row'
-                        >
-                          <TableCell className='flex-1 font-medium'>
-                            {selectedSubject.name}
-                          </TableCell>
-                          <TableCell className='flex-1'>
-                            {selectedGrade.name}
-                          </TableCell>
-                          <TableCell className='flex justify-end md:table-cell'>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              className='hover:bg-destructive/10 hover:text-destructive'
-                              onClick={() => removeSubject(index)}
-                            >
-                              <Trash2 className='h-4 w-4' />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+            {selectedQualification && (
+              <SubjectsDialog
+                subjects={qualificationSubjects}
+                grades={qualificationGrades}
+                onAdd={addSubject}
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+              />
             )}
           </div>
+
+          {subjects.length > 0 && (
+            <div className='rounded-lg border bg-card'>
+              <Table className='w-full min-w-[300px] overflow-x-auto md:min-w-0'>
+                <TableHeader>
+                  <TableRow className='hover:bg-transparent'>
+                    <TableHead className='w-[40%] font-medium'>
+                      Subject
+                    </TableHead>
+                    <TableHead className='w-[40%] font-medium'>Grade</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {subjects.map((subject, index) => {
+                    const selectedSubject = qualificationSubjects.find(
+                      (s) => s.id === subject.subjectId,
+                    );
+                    const selectedGrade = qualificationGrades.find(
+                      (g) => g.id === subject.gradeId,
+                    );
+
+                    if (!selectedSubject || !selectedGrade) return null;
+
+                    return (
+                      <TableRow key={index} className='group'>
+                        <TableCell className='font-medium'>
+                          {selectedSubject.name}
+                        </TableCell>
+                        <TableCell>{selectedGrade.name}</TableCell>
+                        <TableCell className='text-right'>
+                          <Button
+                            variant='destructive'
+                            size='icon'
+                            onClick={() => removeSubject(index)}
+                          >
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
 
           <Button
             onClick={handleSave}
             disabled={isSaving || subjects.length === 0}
-            className='ml-auto block w-full font-medium shadow-sm transition-shadow hover:shadow-md sm:w-auto'
+            className='ml-auto block w-full sm:w-auto'
           >
             {isSaving ? (
               <>
@@ -240,7 +223,7 @@ export default function SubjectsForm({ studentId }: Props) {
                 Saving...
               </>
             ) : (
-              'Save Qualification & Continue'
+              'Save & Continue'
             )}
           </Button>
         </div>
