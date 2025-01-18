@@ -113,11 +113,14 @@ export default function SubjectsForm({ studentId }: Props) {
 
       setSubjects([]);
       setSelectedQualification(undefined);
-    } catch (error: Error) {
+    } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: error.message || 'Failed to save qualification',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to save qualification',
       });
     } finally {
       setIsSaving(false);
