@@ -30,3 +30,7 @@ export const faculties: { code: string; name: string; shortName: string }[] = [
     shortName: 'Design',
   },
 ];
+
+export function getFacultyByCode(code: string | null) {
+  return faculties.find((faculty) => faculty.code === code);
+}
