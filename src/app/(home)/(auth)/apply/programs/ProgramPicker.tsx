@@ -16,6 +16,7 @@ import { faculties } from '@/app/admin/programs/data/faculties';
 import { cn } from '@/lib/utils';
 import { findAllPrograms } from '@/server/programs/actions';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Program = typeof programs.$inferSelect;
 
@@ -28,7 +29,7 @@ export default function ProgramPicker({ label, onSelect }: Props) {
   const [open, setOpen] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['programs'],
     queryFn: () => findAllPrograms(),
   });
@@ -85,29 +86,44 @@ export default function ProgramPicker({ label, onSelect }: Props) {
           </div>
 
           <div className='min-h-[50vh]'>
-            <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
-              {filteredPrograms.map((program) => (
-                <button
-                  key={program.id}
-                  className={cn(
-                    'flex h-auto flex-col items-start p-4 text-start hover:bg-muted/40',
-                    'rounded-md border shadow-sm',
-                  )}
-                  onClick={() => {
-                    onSelect(program);
-                    setOpen(false);
-                  }}
-                >
-                  <span className='font-semibold'>{program.name}</span>
-                  <span className='text-sm text-muted-foreground'>
-                    {
-                      faculties.find((f) => f.code === program.faculty)
-                        ?.shortName
-                    }
-                  </span>
-                </button>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+                {[...Array(6)].map((_, index) => (
+                  <Skeleton key={index} className='h-20 w-full' />
+                ))}
+              </div>
+            ) : filteredPrograms.length === 0 ? (
+              <div className='flex h-full items-center justify-center'>
+                <p className='text-sm text-muted-foreground'>
+                  You don&apos;t qualify for any program{' '}
+                  {selectedFaculty && 'in this faculty'}
+                </p>
+              </div>
+            ) : (
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+                {filteredPrograms.map((program) => (
+                  <button
+                    key={program.id}
+                    className={cn(
+                      'flex h-auto flex-col items-start p-4 text-start hover:bg-muted/40',
+                      'rounded-md border shadow-sm',
+                    )}
+                    onClick={() => {
+                      onSelect(program);
+                      setOpen(false);
+                    }}
+                  >
+                    <span className='font-semibold'>{program.name}</span>
+                    <span className='text-sm text-muted-foreground'>
+                      {
+                        faculties.find((f) => f.code === program.faculty)
+                          ?.shortName
+                      }
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
