@@ -1,14 +1,16 @@
 'use server';
 
-
 import { applications } from '@/db/schema';
-import { applicationsService as service} from './service';
+import { applicationsService as service } from './service';
 
 type Application = typeof applications.$inferInsert;
 
-
 export async function getApplication(id: number) {
   return service.get(id);
+}
+
+export async function getApplicationByStudentId(studentId: number) {
+  return service.findByStudentId(studentId);
 }
 
 export async function findAllApplications(page: number = 1, search = '') {

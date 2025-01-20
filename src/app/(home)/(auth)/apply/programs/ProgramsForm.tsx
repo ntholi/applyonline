@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,7 +16,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { findAllPrograms } from '@/server/programs/actions';
-import { Program } from '@/app/admin/programs/types';
 import { useQuery } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import {
@@ -24,6 +23,9 @@ import {
   getApplicationByStudentId,
 } from '@/server/applications/actions';
 import { useToast } from '@/hooks/use-toast';
+import { programs } from '@/db/schema';
+
+type Program = typeof programs.$inferSelect;
 
 type Props = {
   studentId: number;
@@ -44,13 +46,14 @@ export default function ProgramsForm({ studentId }: Props) {
   const { data: existingApplication } = useQuery({
     queryKey: ['application', studentId],
     queryFn: () => getApplicationByStudentId(studentId),
-    onSuccess: (data) => {
-      if (data) {
-        setFirstChoice(data.firstChoice);
-        setSecondChoice(data.secondChoice);
-      }
-    },
   });
+
+  useEffect(() => {
+    if (existingApplication) {
+      setFirstChoice(existingApplication.firstChoice);
+      setSecondChoice(existingApplication.secondChoice);
+    }
+  }, [existingApplication]);
 
   async function handleSave() {
     if (!firstChoice || !secondChoice) {
@@ -76,7 +79,10 @@ export default function ProgramsForm({ studentId }: Props) {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to save your program choices',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to save your program choices',
         variant: 'destructive',
       });
     }

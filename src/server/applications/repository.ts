@@ -10,6 +10,17 @@ export default class ApplicationRepository extends BaseRepository<
     super(applications, 'id');
   }
 
+  findByStudentId(studentId: number) {
+    return db.query.applications.findFirst({
+      where: (applications, { eq }) => eq(applications.studentId, studentId),
+      with: {
+        student: true,
+        firstChoice: true,
+        secondChoice: true,
+      },
+    });
+  }
+
   override findById(id: number) {
     return db.query.applications.findFirst({
       where: (applications, { eq }) => eq(applications.id, id),
