@@ -35,10 +35,30 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import SubjectsDialog from './subjects-dialog';
 
-type SubjectEntry = {
-  subjectId: number;
-  gradeId: number;
-};
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form';
+
+const formSchema = z.object({
+  qualificationId: z.string().min(1, 'Please select a qualification'),
+  subjects: z
+    .array(
+      z.object({
+        subjectId: z.number(),
+        gradeId: z.number(),
+      }),
+    )
+    .min(1, 'Please add at least one subject'),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 type Props = {
   studentId: number;
@@ -46,11 +66,17 @@ type Props = {
 };
 
 export default function SubjectsForm({ studentId }: Props) {
-  const [selectedQualification, setSelectedQualification] = useState<number>();
-  const [subjects, setSubjects] = useState<SubjectEntry[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      qualificationId: '',
+      subjects: [],
+    },
+  });
 
   const { data: qualifications } = useQuery({
     queryKey: ['qualifications'],
@@ -59,7 +85,7 @@ export default function SubjectsForm({ studentId }: Props) {
   });
 
   const selectedQualificationData = qualifications?.find(
-    (q) => q.id === selectedQualification,
+    (q) => q.id === Number(form.watch('qualificationId')),
   );
 
   const qualificationSubjects = selectedQualificationData?.subjects ?? [];
@@ -72,8 +98,7 @@ export default function SubjectsForm({ studentId }: Props) {
         title: 'Success',
         description: 'Qualification saved successfully',
       });
-      setSubjects([]);
-      setSelectedQualification(undefined);
+      form.reset();
       router.push('/apply/programs');
     },
     onError: (error) => {
@@ -89,6 +114,7 @@ export default function SubjectsForm({ studentId }: Props) {
   });
 
   function addSubject(subjectId: number, gradeId: number) {
+    const subjects = form.getValues('subjects');
     const exists = subjects.some((subject) => subject.subjectId === subjectId);
 
     if (exists) {
@@ -100,159 +126,171 @@ export default function SubjectsForm({ studentId }: Props) {
       return;
     }
 
-    setSubjects([...subjects, { subjectId, gradeId }]);
+    form.setValue('subjects', [...subjects, { subjectId, gradeId }], {
+      shouldValidate: true,
+    });
   }
 
   function removeSubject(index: number) {
-    setSubjects(subjects.filter((_, i) => i !== index));
+    const subjects = form.getValues('subjects');
+    form.setValue(
+      'subjects',
+      subjects.filter((_, i) => i !== index),
+      { shouldValidate: true },
+    );
   }
 
-  function handleSave() {
-    if (!selectedQualification) return;
+  function onSubmit(data: FormValues) {
     saveMutation.mutate({
       studentId,
-      qualificationId: selectedQualification,
-      studentSubjects: subjects.map((subject) => ({
-        subjectId: subject.subjectId,
-        gradeId: subject.gradeId,
-      })),
+      qualificationId: Number(data.qualificationId),
+      studentSubjects: data.subjects,
     });
   }
 
   return (
-    <div className='space-y-6'>
-      <Card className='relative overflow-hidden'>
-        <div className='absolute right-0 top-0 h-32 w-32 -translate-y-8 translate-x-8 opacity-5'>
-          <GraduationCap className='h-full w-full' />
-        </div>
-        <CardHeader className='flex flex-row items-start gap-4'>
-          <div className='rounded-lg bg-muted p-2'>
-            <GraduationCap className='h-6 w-6 text-muted-foreground' />
-          </div>
-          <div>
-            <CardTitle>Qualification Type</CardTitle>
-            <CardDescription>
-              Select your qualification to proceed with subject entry
-            </CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Select
-            value={selectedQualification?.toString()}
-            onValueChange={(value) => setSelectedQualification(Number(value))}
-          >
-            <SelectTrigger className='w-full'>
-              <SelectValue placeholder='Select your qualification' />
-            </SelectTrigger>
-            <SelectContent>
-              {qualifications?.map((qualification) => (
-                <SelectItem
-                  key={qualification.id}
-                  value={qualification.id.toString()}
-                >
-                  {qualification.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
-
-      {selectedQualification && (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
         <Card className='relative overflow-hidden'>
-          <CardHeader className='flex flex-col items-stretch justify-between gap-2 md:flex-row md:items-center'>
-            <div className='flex flex-row items-start gap-4'>
-              <div className='rounded-lg bg-muted p-2'>
-                <GraduationCap className='h-6 w-6 text-muted-foreground' />
-              </div>
-              <div>
-                <CardTitle>Subjects</CardTitle>
-                <CardDescription>
-                  Add your subjects and their respective grades below.
-                </CardDescription>
-              </div>
+          <div className='absolute right-0 top-0 h-32 w-32 -translate-y-8 translate-x-8 opacity-5'>
+            <GraduationCap className='h-full w-full' />
+          </div>
+          <CardHeader className='flex flex-row items-start gap-4'>
+            <div className='rounded-lg bg-muted p-2'>
+              <GraduationCap className='h-6 w-6 text-muted-foreground' />
             </div>
-            <SubjectsDialog
-              open={dialogOpen}
-              onOpenChange={setDialogOpen}
-              subjects={qualificationSubjects}
-              grades={qualificationGrades}
-              onAdd={addSubject}
-            />
+            <div>
+              <CardTitle>Qualification Type</CardTitle>
+              <CardDescription>
+                Select your qualification to proceed with subject entry
+              </CardDescription>
+            </div>
           </CardHeader>
-          <CardContent className='space-y-6'>
-            <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Grade</TableHead>
-                    <TableHead className='w-[100px]'>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {subjects.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={3}
-                        className='h-24 text-center text-muted-foreground'
-                      >
-                        No subjects added. Click the {'"Add Subject"'} button to
-                        add your subjects.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    subjects.map((subject, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          {
-                            qualificationSubjects.find(
-                              (s) => s.id === subject.subjectId,
-                            )?.name
-                          }
-                        </TableCell>
-                        <TableCell>
-                          {
-                            qualificationGrades.find(
-                              (g) => g.id === subject.gradeId,
-                            )?.name
-                          }
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            onClick={() => removeSubject(index)}
+          <CardContent>
+            <FormField
+              control={form.control}
+              name='qualificationId'
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className='w-full'>
+                        <SelectValue placeholder='Select your qualification' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {qualifications?.map((qualification) => (
+                          <SelectItem
+                            key={qualification.id}
+                            value={qualification.id.toString()}
                           >
-                            <Trash2 className='h-4 w-4 text-destructive' />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </Card>
-
-            <div className='flex justify-end'>
-              <Button
-                onClick={handleSave}
-                disabled={saveMutation.isPending || subjects.length === 0}
-                className='min-w-[140px]'
-              >
-                {saveMutation.isPending ? (
-                  <>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                    Saving...
-                  </>
-                ) : (
-                  'Save & Continue'
-                )}
-              </Button>
-            </div>
+                            {qualification.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
         </Card>
-      )}
-    </div>
+
+        {form.watch('qualificationId') && (
+          <Card className='relative overflow-hidden'>
+            <CardHeader className='flex flex-col items-stretch justify-between gap-2 md:flex-row md:items-center'>
+              <div className='flex flex-row items-start gap-4'>
+                <div className='rounded-lg bg-muted p-2'>
+                  <GraduationCap className='h-6 w-6 text-muted-foreground' />
+                </div>
+                <div>
+                  <CardTitle>Subjects</CardTitle>
+                  <CardDescription>
+                    Add your subjects and their respective grades below.
+                  </CardDescription>
+                </div>
+              </div>
+              <SubjectsDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                subjects={qualificationSubjects}
+                grades={qualificationGrades}
+                onAdd={addSubject}
+              />
+            </CardHeader>
+            <CardContent className='space-y-6'>
+              <FormField
+                control={form.control}
+                name='subjects'
+                render={() => (
+                  <FormItem>
+                    <Card>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Subject</TableHead>
+                            <TableHead>Grade</TableHead>
+                            <TableHead className='w-[100px]'>Action</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {form.watch('subjects').length === 0 ? (
+                            <TableRow>
+                              <TableCell
+                                colSpan={3}
+                                className='h-24 text-center text-muted-foreground'
+                              >
+                                No subjects added. Click the {'"Add Subject"'}{' '}
+                                button to add your subjects.
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            form.watch('subjects').map((subject, index) => {
+                              const subjectData = qualificationSubjects.find(
+                                (s) => s.id === subject.subjectId,
+                              );
+                              const gradeData = qualificationGrades.find(
+                                (g) => g.id === subject.gradeId,
+                              );
+
+                              return (
+                                <TableRow key={index}>
+                                  <TableCell>{subjectData?.name}</TableCell>
+                                  <TableCell>{gradeData?.name}</TableCell>
+                                  <TableCell>
+                                    <Button
+                                      variant='ghost'
+                                      size='icon'
+                                      onClick={() => removeSubject(index)}
+                                    >
+                                      <Trash2 className='h-4 w-4' />
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })
+                          )}
+                        </TableBody>
+                      </Table>
+                    </Card>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type='submit'
+                className='w-full'
+                disabled={saveMutation.isPending}
+              >
+                {saveMutation.isPending && (
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                )}
+                Save Qualification
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </form>
+    </Form>
   );
 }

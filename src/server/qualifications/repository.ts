@@ -23,7 +23,7 @@ export default class QualificationRepository extends BaseRepository<
   }
 
   async findByStudentId(studentId: number) {
-    return db.query.studentQualifications.findMany({
+    return db.query.studentQualifications.findFirst({
       where: (qualifications, { eq }) =>
         eq(qualifications.studentId, studentId),
       with: {

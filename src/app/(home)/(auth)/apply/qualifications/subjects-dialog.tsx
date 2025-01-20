@@ -29,7 +29,17 @@ import {
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from '@/lib/utils';
 import { PlusCircle } from 'lucide-react';
-import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 type Props = {
   subjects: { id: number; name: string }[];
@@ -39,6 +49,13 @@ type Props = {
   onOpenChange: (open: boolean) => void;
 };
 
+const formSchema = z.object({
+  subject: z.string().min(1, 'Please select a subject'),
+  grade: z.string().min(1, 'Please select a grade'),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
 export default function SubjectsDialog({
   subjects,
   grades,
@@ -47,13 +64,18 @@ export default function SubjectsDialog({
   onOpenChange,
 }: Props) {
   const isDesktop = useMediaQuery('(min-width: 768px)');
-  const [selectedSubject, setSelectedSubject] = useState(0);
-  const [selectedGrade, setSelectedGrade] = useState(0);
 
-  function handleAdd() {
-    onAdd(selectedSubject, selectedGrade);
-    setSelectedSubject(0);
-    setSelectedGrade(0);
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      subject: '',
+      grade: '',
+    },
+  });
+
+  function onSubmit(data: FormValues) {
+    onAdd(Number(data.subject), Number(data.grade));
+    form.reset();
     onOpenChange(false);
   }
 
@@ -66,55 +88,69 @@ export default function SubjectsDialog({
 
   function SubjectForm({ className }: { className?: string }) {
     return (
-      <div className={cn('grid gap-4', className)}>
-        <div className="space-y-2">
-          <label htmlFor="subject" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Subject
-          </label>
-          <Select
-            value={selectedSubject.toString()}
-            onValueChange={(value) => setSelectedSubject(Number(value))}
-          >
-            <SelectTrigger id="subject">
-              <SelectValue placeholder="Select subject" />
-            </SelectTrigger>
-            <SelectContent>
-              {subjects.map((subject) => (
-                <SelectItem key={subject.id} value={subject.id.toString()}>
-                  {subject.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="grade" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Grade
-          </label>
-          <Select
-            value={selectedGrade.toString()}
-            onValueChange={(value) => setSelectedGrade(Number(value))}
-          >
-            <SelectTrigger id="grade">
-              <SelectValue placeholder="Select grade" />
-            </SelectTrigger>
-            <SelectContent>
-              {grades.map((grade) => (
-                <SelectItem key={grade.id} value={grade.id.toString()}>
-                  {grade.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <Button
-          onClick={handleAdd}
-          disabled={!selectedSubject || !selectedGrade}
-          className='mt-4 w-full'
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className={cn('grid gap-4', className)}
         >
-          Add Subject
-        </Button>
-      </div>
+          <FormField
+            control={form.control}
+            name='subject'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Subject</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select subject' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subjects.map((subject) => (
+                        <SelectItem
+                          key={subject.id}
+                          value={subject.id.toString()}
+                        >
+                          {subject.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='grade'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Grade</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select grade' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {grades.map((grade) => (
+                        <SelectItem key={grade.id} value={grade.id.toString()}>
+                          {grade.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button type='submit' className='w-full'>
+            Add Subject
+          </Button>
+        </form>
+      </Form>
     );
   }
 
