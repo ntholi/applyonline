@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 interface LogoProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
@@ -19,16 +20,25 @@ const sizesMap = {
 };
 
 export default function Logo({ size = 'xs', className }: LogoProps) {
-  const { theme } = useTheme();
-  const logoSrc =
-    theme === 'dark' ? '/images/logo-dark.png' : '/images/logo-light.png';
+  const { theme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { pixels, tailwind } = sizesMap[size];
+
+  const currentTheme = !mounted
+    ? 'light'
+    : theme === 'system'
+      ? systemTheme
+      : theme;
 
   return (
     <div className={cn(tailwind, className)}>
       <Image
-        src={logoSrc}
+        src={`/images/logo-${currentTheme}.png`}
         alt='Logo'
         width={pixels * 1.7}
         height={pixels * 1.7}
