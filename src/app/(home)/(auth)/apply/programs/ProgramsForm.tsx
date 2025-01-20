@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { programs } from '@/db/schema';
 import { getApplicationByStudentId } from '@/server/applications/actions';
-import { XIcon, BookOpen, School } from 'lucide-react';
+import { XIcon, BookOpen, School, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import ProgramPicker from './ProgramPicker';
 
@@ -19,46 +19,6 @@ type Props = {
 export default function ProgramsForm({ studentId, application }: Props) {
   const [firstChoice, setFirstChoice] = useState<Program | null>(null);
   const [secondChoice, setSecondChoice] = useState<Program | null>(null);
-
-  function SelectedProgram({
-    program,
-    label,
-    onDelete,
-  }: {
-    program: Program;
-    label: string;
-    onDelete: () => void;
-  }) {
-    return (
-      <Card className='w-full max-w-md'>
-        <CardHeader className='relative'>
-          <CardTitle className='text-lg font-semibold'>{label}</CardTitle>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='absolute right-2 top-2 h-8 w-8 hover:bg-destructive/10 hover:text-destructive'
-            onClick={onDelete}
-          >
-            <XIcon className='h-4 w-4' />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className='space-y-4'>
-            <div className='flex items-center space-x-2'>
-              <BookOpen className='h-5 w-5 text-primary' />
-              <h4 className='font-medium'>{program.name}</h4>
-            </div>
-            <div className='flex items-center space-x-2'>
-              <School className='h-5 w-5 text-primary' />
-              <p className='text-sm text-muted-foreground'>
-                {getFacultyByCode(program.faculty)?.name}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <div className='container mx-auto mt-14 px-4'>
@@ -87,5 +47,37 @@ export default function ProgramsForm({ studentId, application }: Props) {
         )}
       </div>
     </div>
+  );
+}
+
+function SelectedProgram({
+  program,
+  label,
+  onDelete,
+}: {
+  program: Program;
+  label: string;
+  onDelete: () => void;
+}) {
+  return (
+    <Card className='w-full max-w-md'>
+      <CardHeader className='relative'>
+        <CardTitle className='font-semibold'>{label}</CardTitle>
+        <Button
+          variant='ghost'
+          size='icon'
+          className='absolute right-2 top-2 h-8 w-8 hover:bg-destructive/10 hover:text-destructive'
+          onClick={onDelete}
+        >
+          <Trash2Icon className='h-4 w-4 text-destructive' />
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <h4 className='text-xl font-medium'>{program.name}</h4>
+        <p className='mt-2 text-sm text-muted-foreground'>
+          {getFacultyByCode(program.faculty)?.name}
+        </p>
+      </CardContent>
+    </Card>
   );
 }
