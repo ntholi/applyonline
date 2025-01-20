@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { findAllPrograms } from '@/server/programs/actions';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Program = typeof programs.$inferSelect;
 
@@ -43,7 +44,7 @@ export default function ProgramPicker({ label, onSelect }: Props) {
     <>
       <Button
         variant='outline'
-        className='group relative flex min-h-[180px] min-w-[200px] flex-col items-center justify-center gap-3 border-2 border-dashed p-8 transition-all hover:border-solid hover:border-primary/40 hover:bg-primary/5'
+        className='group relative flex min-h-[180px] min-w-[200px] flex-col items-center justify-center gap-3 border-2 border-dashed p-8 transition-all hover:border-solid hover:border-primary/50 hover:bg-primary/5'
         onClick={() => setOpen(true)}
       >
         <div className='rounded-full bg-primary/10 p-3 transition-colors group-hover:bg-primary/20'>
@@ -59,33 +60,36 @@ export default function ProgramPicker({ label, onSelect }: Props) {
           <DialogHeader>
             <DialogTitle>Select a Program</DialogTitle>
             <DialogDescription>
-              Select a program from the list below
+              Please note that only programs you qualify for have been listed
+              bellow
             </DialogDescription>
           </DialogHeader>
-          <div className='flex flex-wrap gap-2'>
-            <Button
-              variant={selectedFaculty === null ? 'default' : 'outline'}
-              onClick={() => setSelectedFaculty(null)}
-              size={'sm'}
-              className='rounded-full text-sm'
-            >
-              All Faculties
-            </Button>
-            {faculties.map((faculty) => (
+          <ScrollArea>
+            <div className='flex w-max space-x-2'>
               <Button
-                key={faculty.code}
-                variant={
-                  selectedFaculty === faculty.code ? 'default' : 'outline'
-                }
-                onClick={() => setSelectedFaculty(faculty.code)}
+                variant={selectedFaculty === null ? 'default' : 'outline'}
+                onClick={() => setSelectedFaculty(null)}
                 size={'sm'}
-                className='rounded-full text-sm'
+                className='mr-2 rounded-full text-sm'
               >
-                {faculty.shortName}
+                All Faculties
               </Button>
-            ))}
-            <Separator />
-          </div>
+              {faculties.map((faculty) => (
+                <Button
+                  key={faculty.code}
+                  variant={
+                    selectedFaculty === faculty.code ? 'default' : 'outline'
+                  }
+                  onClick={() => setSelectedFaculty(faculty.code)}
+                  size={'sm'}
+                  className='mr-2 rounded-full text-sm'
+                >
+                  {faculty.shortName}
+                </Button>
+              ))}
+            </div>
+            <Separator className='mt-2' />
+          </ScrollArea>
 
           <div className='min-h-[50vh]'>
             {isLoading ? (
