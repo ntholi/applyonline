@@ -4,8 +4,8 @@ import {
   sqliteTable,
   text,
 } from 'drizzle-orm/sqlite-core';
-import type { AdapterAccountType } from 'next-auth/adapters';
 import { nanoid } from 'nanoid';
+import type { AdapterAccountType } from 'next-auth/adapters';
 
 export const userRoles = ['user', 'marketing', 'registry', 'admin'] as const;
 export type UserRole = (typeof userRoles)[number];
@@ -14,6 +14,7 @@ export const users = sqliteTable('users', {
   id: text()
     .primaryKey()
     .$defaultFn(() => nanoid()),
+  studentId: integer(),
   role: text({ enum: userRoles }).notNull().default('user'),
   name: text(),
   email: text().unique(),
@@ -42,7 +43,7 @@ export const accounts = sqliteTable(
     compoundKey: primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
-  })
+  }),
 );
 
 export const sessions = sqliteTable('session', {
@@ -64,7 +65,7 @@ export const verificationTokens = sqliteTable(
     compositePk: primaryKey({
       columns: [verificationToken.identifier, verificationToken.token],
     }),
-  })
+  }),
 );
 
 export const authenticators = sqliteTable(
@@ -87,5 +88,5 @@ export const authenticators = sqliteTable(
     compositePK: primaryKey({
       columns: [authenticator.userId, authenticator.credentialID],
     }),
-  })
+  }),
 );
