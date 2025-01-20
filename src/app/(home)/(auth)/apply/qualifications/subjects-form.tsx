@@ -47,7 +47,7 @@ import {
 } from '@/components/ui/form';
 
 const formSchema = z.object({
-  qualificationId: z.string().min(1, 'Please select a qualification'),
+  qualificationId: z.coerce.number().min(1, 'Please select a qualification'),
   subjects: z
     .array(
       z.object({
@@ -65,15 +65,15 @@ type Props = {
   qualification: Awaited<ReturnType<typeof getQualificationByStudentId>>;
 };
 
-export default function SubjectsForm({ studentId }: Props) {
+export default function SubjectsForm({ studentId, qualification }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      qualificationId: '',
+    defaultValues: qualification ?? {
+      qualificationId: 0,
       subjects: [],
     },
   });
@@ -173,7 +173,10 @@ export default function SubjectsForm({ studentId }: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value?.toString()}
+                    >
                       <SelectTrigger className='w-full'>
                         <SelectValue placeholder='Select your qualification' />
                       </SelectTrigger>
