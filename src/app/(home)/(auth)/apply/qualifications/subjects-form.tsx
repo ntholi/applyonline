@@ -26,10 +26,11 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { findAllQualifications } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { GraduationCap, Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import SubjectsDialog from './subjects-dialog';
+import { useRouter } from 'next/navigation';
 
 type SubjectEntry = {
   subjectId: number;
@@ -44,8 +45,8 @@ export default function SubjectsForm({ studentId }: Props) {
   const [selectedQualification, setSelectedQualification] = useState<number>();
   const [subjects, setSubjects] = useState<SubjectEntry[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const { data: qualifications } = useQuery({
     queryKey: ['qualifications'],
@@ -59,6 +60,29 @@ export default function SubjectsForm({ studentId }: Props) {
 
   const qualificationSubjects = selectedQualificationData?.subjects ?? [];
   const qualificationGrades = selectedQualificationData?.grades ?? [];
+
+  const saveMutation = useMutation({
+    mutationFn: saveStudentQualification,
+    onSuccess: () => {
+      toast({
+        title: 'Success',
+        description: 'Qualification saved successfully',
+      });
+      setSubjects([]);
+      setSelectedQualification(undefined);
+      router.push('/apply/programs');
+    },
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to save qualification',
+      });
+    },
+  });
 
   function addSubject(subjectId: number, gradeId: number) {
     const exists = subjects.some((subject) => subject.subjectId === subjectId);
@@ -79,38 +103,16 @@ export default function SubjectsForm({ studentId }: Props) {
     setSubjects(subjects.filter((_, i) => i !== index));
   }
 
-  async function handleSave() {
+  function handleSave() {
     if (!selectedQualification) return;
-    setIsSaving(true);
-    try {
-      await saveStudentQualification({
-        studentId,
-        qualificationId: selectedQualification,
-        studentSubjects: subjects.map((subject) => ({
-          subjectId: subject.subjectId,
-          gradeId: subject.gradeId,
-        })),
-      });
-
-      toast({
-        title: 'Success',
-        description: 'Qualification saved successfully',
-      });
-
-      setSubjects([]);
-      setSelectedQualification(undefined);
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description:
-          error instanceof Error
-            ? error.message
-            : 'Failed to save qualification',
-      });
-    } finally {
-      setIsSaving(false);
-    }
+    saveMutation.mutate({
+      studentId,
+      qualificationId: selectedQualification,
+      studentSubjects: subjects.map((subject) => ({
+        subjectId: subject.subjectId,
+        gradeId: subject.gradeId,
+      })),
+    });
   }
 
   return (
@@ -231,10 +233,10 @@ export default function SubjectsForm({ studentId }: Props) {
             <div className='flex justify-end'>
               <Button
                 onClick={handleSave}
-                disabled={isSaving || subjects.length === 0}
+                disabled={saveMutation.isPending || subjects.length === 0}
                 className='min-w-[140px]'
               >
-                {isSaving ? (
+                {saveMutation.isPending ? (
                   <>
                     <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                     Saving...
