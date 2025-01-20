@@ -1,19 +1,21 @@
 'use client';
 
+import { useState } from 'react';
+import { PlusIcon } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { PlusIcon } from 'lucide-react';
-import { useState } from 'react';
 import { programs } from '@/db/schema';
 import { faculties } from '@/app/admin/programs/data/faculties';
 import { cn } from '@/lib/utils';
 import { findAllPrograms } from '@/server/programs/actions';
-import { useQuery } from '@tanstack/react-query';
+import { Separator } from '@/components/ui/separator';
 
 type Program = typeof programs.$inferSelect;
 
@@ -52,12 +54,14 @@ export default function ProgramPicker({ label, onSelect }: Props) {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className='h-[80vh] max-w-4xl overflow-y-auto'>
+        <DialogContent className='max-h-[80vh] max-w-4xl overflow-y-auto'>
           <DialogHeader>
             <DialogTitle>Select a Program</DialogTitle>
+            <DialogDescription>
+              Select a program from the list below
+            </DialogDescription>
           </DialogHeader>
-
-          <div className='mb-6 flex flex-wrap gap-2'>
+          <div className='flex flex-wrap gap-2'>
             <Button
               variant={selectedFaculty === null ? 'default' : 'outline'}
               onClick={() => setSelectedFaculty(null)}
@@ -77,27 +81,33 @@ export default function ProgramPicker({ label, onSelect }: Props) {
                 {faculty.shortName}
               </Button>
             ))}
+            <Separator />
           </div>
 
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
-            {filteredPrograms.map((program) => (
-              <button
-                key={program.id}
-                className={cn(
-                  'flex h-auto flex-col items-start p-4 text-start hover:bg-muted/40',
-                  'rounded-md border shadow-sm',
-                )}
-                onClick={() => {
-                  onSelect(program);
-                  setOpen(false);
-                }}
-              >
-                <span className='font-semibold'>{program.name}</span>
-                <span className='text-sm text-muted-foreground'>
-                  {faculties.find((f) => f.code === program.faculty)?.shortName}
-                </span>
-              </button>
-            ))}
+          <div className='min-h-[50vh]'>
+            <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+              {filteredPrograms.map((program) => (
+                <button
+                  key={program.id}
+                  className={cn(
+                    'flex h-auto flex-col items-start p-4 text-start hover:bg-muted/40',
+                    'rounded-md border shadow-sm',
+                  )}
+                  onClick={() => {
+                    onSelect(program);
+                    setOpen(false);
+                  }}
+                >
+                  <span className='font-semibold'>{program.name}</span>
+                  <span className='text-sm text-muted-foreground'>
+                    {
+                      faculties.find((f) => f.code === program.faculty)
+                        ?.shortName
+                    }
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
