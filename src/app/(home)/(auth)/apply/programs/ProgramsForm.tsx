@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { programs } from '@/db/schema';
 import { getApplicationByStudentId } from '@/server/applications/actions';
-import { XIcon, BookOpen, School, Trash2Icon } from 'lucide-react';
+import { Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import ProgramPicker from './ProgramPicker';
 
@@ -45,6 +45,9 @@ export default function ProgramsForm({ studentId, application }: Props) {
         ) : (
           <ProgramPicker label='Second Choice' onSelect={setSecondChoice} />
         )}
+      </div>
+      <div className='mt-10 flex justify-end'>
+        <Button type='submit'>Save & Continue</Button>
       </div>
     </div>
   );
