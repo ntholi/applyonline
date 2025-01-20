@@ -21,7 +21,7 @@ export default function ProgramsForm({ studentId, application }: Props) {
       </Button>
       <Button variant='outline' className='flex flex-col p-24'>
         <div>
-          <PlusIcon className='size-10' />
+          <PlusIcon />
         </div>
         <span>Second Choice</span>
       </Button>
