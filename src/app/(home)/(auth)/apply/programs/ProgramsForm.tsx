@@ -28,10 +28,11 @@ import { programs } from '@/db/schema';
 type Program = typeof programs.$inferSelect;
 
 type Props = {
+  application: Awaited<ReturnType<typeof getApplicationByStudentId>>;
   studentId: number;
 };
 
-export default function ProgramsForm({ studentId }: Props) {
+export default function ProgramsForm({ application, studentId }: Props) {
   const [showFirstChoice, setShowFirstChoice] = useState(false);
   const [showSecondChoice, setShowSecondChoice] = useState(false);
   const [firstChoice, setFirstChoice] = useState<Program | null>(null);
@@ -43,17 +44,12 @@ export default function ProgramsForm({ studentId }: Props) {
     queryFn: () => findAllPrograms(1),
   });
 
-  const { data: existingApplication } = useQuery({
-    queryKey: ['application', studentId],
-    queryFn: () => getApplicationByStudentId(studentId),
-  });
-
   useEffect(() => {
-    if (existingApplication) {
-      setFirstChoice(existingApplication.firstChoice);
-      setSecondChoice(existingApplication.secondChoice);
+    if (application) {
+      setFirstChoice(application.firstChoice);
+      setSecondChoice(application.secondChoice);
     }
-  }, [existingApplication]);
+  }, [application]);
 
   async function handleSave() {
     if (!firstChoice || !secondChoice) {

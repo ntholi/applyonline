@@ -9,7 +9,10 @@ export async function getApplication(id: number) {
   return service.get(id);
 }
 
-export async function getApplicationByStudentId(studentId: number) {
+export async function getApplicationByStudentId(
+  studentId: number | null | undefined,
+) {
+  if (!studentId) return null;
   return service.findByStudentId(studentId);
 }
 
