@@ -35,11 +35,13 @@ export default function ProgramPicker({ label, onSelect }: Props) {
     <>
       <Button 
         variant='outline' 
-        className='flex flex-col p-24'
+        className='group relative flex flex-col items-center justify-center gap-3 p-8 min-h-[180px] min-w-[200px] border-2 border-dashed transition-all hover:border-solid hover:bg-primary/5 hover:border-primary'
         onClick={() => setOpen(true)}
       >
-        <PlusIcon />
-        <span>{label}</span>
+        <div className="rounded-full bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors">
+          <PlusIcon className="h-6 w-6 text-primary" />
+        </div>
+        <span className="text-lg font-medium text-muted-foreground group-hover:text-primary transition-colors">{label}</span>
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
