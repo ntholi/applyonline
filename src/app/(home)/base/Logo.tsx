@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { useColorScheme } from '@mantine/hooks';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 
 interface LogoProps {
@@ -19,9 +19,9 @@ const sizesMap = {
 };
 
 export default function Logo({ size = 'xs', className }: LogoProps) {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
   const logoSrc =
-    colorScheme === 'dark' ? '/images/logo-dark.png' : '/images/logo-light.png';
+    theme === 'dark' ? '/images/logo-dark.png' : '/images/logo-light.png';
 
   const { pixels, tailwind } = sizesMap[size];
 
@@ -32,7 +32,7 @@ export default function Logo({ size = 'xs', className }: LogoProps) {
         alt='Logo'
         width={pixels * 1.7}
         height={pixels * 1.7}
-        className='w-full h-full'
+        className='h-full w-full'
         priority
       />
     </div>
