@@ -18,7 +18,7 @@ export const qualifications = sqliteTable(
   },
   (table) => ({
     nameIdx: index('qualification_name_idx').on(table.name),
-  })
+  }),
 );
 
 export const qualificationsRelations = relations(
@@ -26,7 +26,7 @@ export const qualificationsRelations = relations(
   ({ many }) => ({
     subjects: many(subjects),
     grades: many(qualificationGrades),
-  })
+  }),
 );
 
 export const subjects = sqliteTable(
@@ -43,7 +43,7 @@ export const subjects = sqliteTable(
   },
   (table) => ({
     nameIdx: index('subject_name_idx').on(table.name),
-  })
+  }),
 );
 
 export const subjectsRelations = relations(subjects, ({ one }) => ({
@@ -67,7 +67,7 @@ export const qualificationGrades = sqliteTable(
   },
   (table) => ({
     nameIdx: index('qualification_grade_name_idx').on(table.name),
-  })
+  }),
 );
 
 export const qualificationGradesRelations = relations(
@@ -77,7 +77,7 @@ export const qualificationGradesRelations = relations(
       fields: [qualificationGrades.qualificationId],
       references: [qualifications.id],
     }),
-  })
+  }),
 );
 
 export const programs = sqliteTable('programs', {
@@ -111,7 +111,7 @@ export const programQualifications = sqliteTable(
     compositePK: primaryKey({
       columns: [table.programId, table.qualificationId],
     }),
-  })
+  }),
 );
 
 export const programQualificationsRelations = relations(
@@ -126,7 +126,7 @@ export const programQualificationsRelations = relations(
       references: [qualifications.id],
     }),
     subjects: many(requiredSubjects),
-  })
+  }),
 );
 
 export const requiredSubjects = sqliteTable(
@@ -150,9 +150,9 @@ export const requiredSubjects = sqliteTable(
     }),
     programQualificationFK: index('program_qualification_fk').on(
       table.programId,
-      table.qualificationId
+      table.qualificationId,
     ),
-  })
+  }),
 );
 
 export const qualificationSubjectsRelations = relations(
@@ -169,7 +169,7 @@ export const qualificationSubjectsRelations = relations(
       fields: [requiredSubjects.subjectId],
       references: [subjects.id],
     }),
-  })
+  }),
 );
 
 export const nextOfKinRelationships = [
@@ -227,7 +227,7 @@ export const students = sqliteTable(
   (table) => ({
     emailIdx: index('student_email_idx').on(table.email),
     nationalIdIdx: index('student_national_id_idx').on(table.nationalId),
-  })
+  }),
 );
 
 export const studentsRelations = relations(students, ({ one, many }) => ({
@@ -235,7 +235,7 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
     fields: [students.userId],
     references: [users.id],
   }),
-  applications: many(applications),
+  application: one(applications),
   qualifications: many(studentQualifications),
 }));
 
@@ -259,9 +259,9 @@ export const applications = sqliteTable(
     studentProgramIdx: index('student_program_idx').on(
       table.studentId,
       table.firstChoiceId,
-      table.secondChoiceId
+      table.secondChoiceId,
     ),
-  })
+  }),
 );
 
 export const applicationsRelations = relations(applications, ({ one }) => ({
@@ -295,9 +295,9 @@ export const studentQualifications = sqliteTable(
   (table) => ({
     studentQualificationIdx: index('student_qualification_idx').on(
       table.studentId,
-      table.qualificationId
+      table.qualificationId,
     ),
-  })
+  }),
 );
 
 export const studentQualificationsRelations = relations(
@@ -312,7 +312,7 @@ export const studentQualificationsRelations = relations(
       references: [qualifications.id],
     }),
     subjects: many(studentSubjects),
-  })
+  }),
 );
 
 export const studentSubjects = sqliteTable(
@@ -334,9 +334,9 @@ export const studentSubjects = sqliteTable(
   (table) => ({
     studentSubjectIdx: index('student_subject_idx').on(
       table.studentQualificationId,
-      table.subjectId
+      table.subjectId,
     ),
-  })
+  }),
 );
 
 export const studentSubjectsRelations = relations(
@@ -354,7 +354,7 @@ export const studentSubjectsRelations = relations(
       fields: [studentSubjects.gradeId],
       references: [qualificationGrades.id],
     }),
-  })
+  }),
 );
 
 export const requiredSubjectsRelations = relations(
@@ -364,5 +364,5 @@ export const requiredSubjectsRelations = relations(
       fields: [requiredSubjects.gradeId],
       references: [qualificationGrades.id],
     }),
-  })
+  }),
 );

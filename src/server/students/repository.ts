@@ -15,7 +15,7 @@ export default class StudentRepository extends BaseRepository<
     return await db.query.students.findFirst({
       where: (students, { eq }) => eq(students.id, id),
       with: {
-        applications: true,
+        application: true,
         qualifications: true,
       },
     });
@@ -26,7 +26,7 @@ export default class StudentRepository extends BaseRepository<
     return await db.query.students.findFirst({
       where: (students, { eq }) => eq(students.userId, userId),
       with: {
-        applications: true,
+        application: true,
         qualifications: true,
       },
     });
@@ -50,7 +50,7 @@ export default class StudentRepository extends BaseRepository<
             subjects.map((s) => ({
               ...s,
               studentQualificationId: saved.id,
-            }))
+            })),
           )
           .returning();
       }
