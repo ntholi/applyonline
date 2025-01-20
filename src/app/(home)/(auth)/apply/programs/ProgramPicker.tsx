@@ -43,7 +43,7 @@ export default function ProgramPicker({ label, onSelect }: Props) {
     <>
       <Button
         variant='outline'
-        className='group relative flex min-h-[180px] min-w-[200px] flex-col items-center justify-center gap-3 border-2 border-dashed p-8 transition-all hover:border-solid hover:border-primary hover:bg-primary/5'
+        className='group relative flex min-h-[180px] min-w-[200px] flex-col items-center justify-center gap-3 border-2 border-dashed p-8 transition-all hover:border-solid hover:border-primary/40 hover:bg-primary/5'
         onClick={() => setOpen(true)}
       >
         <div className='rounded-full bg-primary/10 p-3 transition-colors group-hover:bg-primary/20'>
@@ -55,7 +55,7 @@ export default function ProgramPicker({ label, onSelect }: Props) {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className='max-h-[80vh] max-w-4xl overflow-y-auto'>
+        <DialogContent className='h-screen max-w-4xl overflow-y-auto sm:h-[80vh]'>
           <DialogHeader>
             <DialogTitle>Select a Program</DialogTitle>
             <DialogDescription>
@@ -66,7 +66,8 @@ export default function ProgramPicker({ label, onSelect }: Props) {
             <Button
               variant={selectedFaculty === null ? 'default' : 'outline'}
               onClick={() => setSelectedFaculty(null)}
-              className='text-sm'
+              size={'sm'}
+              className='rounded-full text-sm'
             >
               All Faculties
             </Button>
@@ -77,7 +78,8 @@ export default function ProgramPicker({ label, onSelect }: Props) {
                   selectedFaculty === faculty.code ? 'default' : 'outline'
                 }
                 onClick={() => setSelectedFaculty(faculty.code)}
-                className='text-sm'
+                size={'sm'}
+                className='rounded-full text-sm'
               >
                 {faculty.shortName}
               </Button>
