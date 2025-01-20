@@ -7,6 +7,13 @@ export async function getQualification(id: number) {
   return service.get(id);
 }
 
+export async function getQualificationByStudentId(
+  studentId: number | null | undefined,
+) {
+  if (!studentId) return null;
+  return service.findByStudentId(studentId);
+}
+
 export async function findAllQualifications(page: number = 1, search = '') {
   return service.findAll({ page, search });
 }

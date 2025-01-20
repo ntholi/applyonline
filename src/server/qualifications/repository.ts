@@ -22,6 +22,22 @@ export default class QualificationRepository extends BaseRepository<
     });
   }
 
+  async findByStudentId(studentId: number) {
+    return db.query.studentQualifications.findMany({
+      where: (qualifications, { eq }) =>
+        eq(qualifications.studentId, studentId),
+      with: {
+        qualification: true,
+        subjects: {
+          with: {
+            subject: true,
+            grade: true,
+          },
+        },
+      },
+    });
+  }
+
   override async findAll(params: FindAllParams<typeof qualifications>) {
     const { orderByExpressions, whereCondition, offset, pageSize } =
       await this.queryExpressions(params);
@@ -56,7 +72,7 @@ export default class QualificationRepository extends BaseRepository<
         await tx
           .insert(subjects)
           .values(
-            subjectsData.map((s) => ({ ...s, qualificationId: inserted.id }))
+            subjectsData.map((s) => ({ ...s, qualificationId: inserted.id })),
           )
           .returning();
       }
@@ -65,7 +81,7 @@ export default class QualificationRepository extends BaseRepository<
         await tx
           .insert(qualificationGrades)
           .values(
-            gradesData.map((g) => ({ ...g, qualificationId: inserted.id }))
+            gradesData.map((g) => ({ ...g, qualificationId: inserted.id })),
           )
           .returning();
       }
@@ -97,7 +113,7 @@ export default class QualificationRepository extends BaseRepository<
             ...s,
             qualificationId: id,
             updatedAt: new Date(),
-          }))
+          })),
         );
       }
 
@@ -111,7 +127,7 @@ export default class QualificationRepository extends BaseRepository<
             ...g,
             qualificationId: id,
             updatedAt: new Date(),
-          }))
+          })),
         );
       }
 

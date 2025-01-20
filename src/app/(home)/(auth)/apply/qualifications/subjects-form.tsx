@@ -24,13 +24,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { findAllQualifications } from '@/server/qualifications/actions';
+import {
+  findAllQualifications,
+  getQualificationByStudentId,
+} from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { GraduationCap, Loader2, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import SubjectsDialog from './subjects-dialog';
-import { useRouter } from 'next/navigation';
 
 type SubjectEntry = {
   subjectId: number;
@@ -39,6 +42,7 @@ type SubjectEntry = {
 
 type Props = {
   studentId: number;
+  qualification: Awaited<ReturnType<typeof getQualificationByStudentId>>;
 };
 
 export default function SubjectsForm({ studentId }: Props) {

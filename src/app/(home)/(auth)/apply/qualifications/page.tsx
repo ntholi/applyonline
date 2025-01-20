@@ -1,8 +1,8 @@
-import { Metadata } from 'next';
-import SubjectsForm from './subjects-form';
 import { auth } from '@/auth';
-import { getStudentByUserId } from '@/server/students/actions';
+import { getQualificationByStudentId } from '@/server/qualifications/actions';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import SubjectsForm from './subjects-form';
 
 export const metadata: Metadata = {
   title: 'Academic Qualifications | Apply',
@@ -11,11 +11,18 @@ export const metadata: Metadata = {
 
 export default async function QualificationsPage() {
   const session = await auth();
-  const student = await getStudentByUserId(session?.user?.id);
+  const qualification = await getQualificationByStudentId(
+    session?.user?.studentId,
+  );
 
-  if (!student) {
+  if (!session?.user?.studentId) {
     return redirect('/apply/student-details');
   }
 
-  return <SubjectsForm studentId={student.id} />;
+  return (
+    <SubjectsForm
+      studentId={session.user.studentId}
+      qualification={qualification}
+    />
+  );
 }
