@@ -1,32 +1,28 @@
 'use server';
 
-import { db } from '@/db';
+
 import { applications } from '@/db/schema';
+import { applicationsService as service} from './service';
 
-export type CreateApplicationInput = {
-  studentId: number;
-  firstChoiceId: number;
-  secondChoiceId: number;
-};
+type Application = typeof applications.$inferInsert;
 
-export async function createApplication(input: CreateApplicationInput) {
-  return db
-    .insert(applications)
-    .values({
-      studentId: input.studentId,
-      firstChoiceId: input.firstChoiceId,
-      secondChoiceId: input.secondChoiceId,
-    })
-    .returning()
-    .get();
+
+export async function getApplication(id: number) {
+  return service.get(id);
 }
 
-export async function getApplicationByStudentId(studentId: number) {
-  return db.query.applications.findFirst({
-    where: (applications, { eq }) => eq(applications.studentId, studentId),
-    with: {
-      firstChoice: true,
-      secondChoice: true,
-    },
-  });
+export async function findAllApplications(page: number = 1, search = '') {
+  return service.findAll({ page, search });
+}
+
+export async function createApplication(application: Application) {
+  return service.create(application);
+}
+
+export async function updateApplication(id: number, application: Application) {
+  return service.update(id, application);
+}
+
+export async function deleteApplication(id: number) {
+  return service.delete(id);
 }

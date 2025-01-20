@@ -8,26 +8,29 @@ import { useRouter } from 'next/navigation';
 
 type Application = typeof applications.$inferInsert;
 
-
 type Props = {
   onSubmit: (values: Application) => Promise<Application>;
   defaultValues?: Application;
   onSuccess?: (value: Application) => void;
   onError?: (
-    error: Error | React.SyntheticEvent<HTMLDivElement, Event>
+    error: Error | React.SyntheticEvent<HTMLDivElement, Event>,
   ) => void;
   title?: string;
 };
 
-export default function ApplicationForm({ onSubmit, defaultValues, title }: Props) {
+export default function ApplicationForm({
+  onSubmit,
+  defaultValues,
+  title,
+}: Props) {
   const router = useRouter();
-  
+
   return (
-    <Form 
+    <Form
       title={title}
-      action={onSubmit} 
+      action={onSubmit}
       queryKey={['applications']}
-      schema={createInsertSchema(applications)} 
+      schema={createInsertSchema(applications)}
       defaultValues={defaultValues}
       onSuccess={({ id }) => {
         router.push(`/admin/applications/${id}`);
@@ -36,8 +39,14 @@ export default function ApplicationForm({ onSubmit, defaultValues, title }: Prop
       {(form) => (
         <>
           <TextInput label='Student' {...form.getInputProps('student')} />
-          <TextInput label='First Choise' {...form.getInputProps('firstChoise')} />
-          <TextInput label='Second Chose' {...form.getInputProps('secondChose')} />
+          <TextInput
+            label='First Choice'
+            {...form.getInputProps('firstChoice')}
+          />
+          <TextInput
+            label='Second Choice'
+            {...form.getInputProps('secondChoice')}
+          />
         </>
       )}
     </Form>

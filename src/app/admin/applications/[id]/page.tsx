@@ -5,7 +5,10 @@ import {
   DetailsViewBody,
 } from '@/components/adease';
 import { notFound } from 'next/navigation';
-import { getApplication, deleteApplication } from '@/server/applications/actions';
+import {
+  getApplication,
+  deleteApplication,
+} from '@/server/applications/actions';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -14,15 +17,15 @@ type Props = {
 export default async function ApplicationDetails({ params }: Props) {
   const { id } = await params;
   const application = await getApplication(Number(id));
-  
+
   if (!application) {
     return notFound();
   }
 
   return (
     <DetailsView>
-      <DetailsViewHeader 
-        title={'Application'} 
+      <DetailsViewHeader
+        title={'Application'}
         queryKey={['applications']}
         handleDelete={async () => {
           'use server';
@@ -30,9 +33,13 @@ export default async function ApplicationDetails({ params }: Props) {
         }}
       />
       <DetailsViewBody>
-        <FieldView label='Student'>{application.student}</FieldView>
-        <FieldView label='First Choise'>{application.firstChoise}</FieldView>
-        <FieldView label='Second Chose'>{application.secondChose}</FieldView>
+        <FieldView label='Student'>{application.student.name}</FieldView>
+        <FieldView label='First Choice'>
+          {application.firstChoice.name}
+        </FieldView>
+        <FieldView label='Second Choice'>
+          {application.secondChoice.name}
+        </FieldView>
       </DetailsViewBody>
     </DetailsView>
   );
