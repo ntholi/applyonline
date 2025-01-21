@@ -9,14 +9,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Form, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import {
   Select,
   SelectContent,
@@ -28,8 +31,9 @@ import { uploadDocument } from '@/lib/storage';
 import { createDocument } from '@/server/documents/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Plus, Trash2 } from 'lucide-react';
+import { FileUp, Plus, Trash2, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { FormNavigation } from '../core/form-navigation';
@@ -59,32 +63,166 @@ const formSchema = z.object({
             (doc.type === 'Certificate' ||
               doc.type === 'Statement of Results') &&
             doc.file,
-        ) &&
+        ),
+      {
+        message: 'Please upload at least one academic document',
+      },
+    )
+    .refine(
+      (docs) =>
         docs.some(
           (doc) => (doc.type === 'ID' || doc.type === 'Passport') && doc.file,
         ),
       {
-        message:
-          'Please upload both your Certificate/Results and ID/Passport documents',
+        message: 'Please upload at least one identity document',
       },
     ),
 });
 
+type FormSchema = z.infer<typeof formSchema>;
+
+function DocumentDialog({
+  onSubmit,
+}: {
+  onSubmit: (type: string, file: File) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [selectedType, setSelectedType] = React.useState<string>('ID');
+  const fileRef = React.useRef<HTMLInputElement>(null);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const file = fileRef.current?.files?.[0];
+    if (file) {
+      onSubmit(selectedType, file);
+      setOpen(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant='outline'
+          className='w-full gap-2 text-muted-foreground hover:text-foreground'
+        >
+          <Plus className='h-4 w-4' />
+          Add Document
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>Upload Document</DialogTitle>
+            <DialogDescription>
+              Upload your academic certificates, transcripts, or identity
+              documents
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='grid gap-4 py-4'>
+            <div className='space-y-2'>
+              <FormLabel>Document Type</FormLabel>
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='ID'>ID Document</SelectItem>
+                  <SelectItem value='Passport'>Passport</SelectItem>
+                  <SelectItem value='Certificate'>Certificate</SelectItem>
+                  <SelectItem value='Statement of Results'>
+                    Statement of Results
+                  </SelectItem>
+                  <SelectItem value='Other'>Other Document</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className='space-y-2'>
+              <FormLabel>Upload Document</FormLabel>
+              <div className='relative'>
+                <Input
+                  ref={fileRef}
+                  type='file'
+                  accept='application/pdf,image/*'
+                  required
+                  className='cursor-pointer pl-10'
+                />
+                <FileUp className='absolute left-3 top-2.5 h-5 w-5 text-muted-foreground' />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type='submit' className='gap-2'>
+              <Upload className='h-4 w-4' />
+              Upload Document
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DocumentCard({
+  type,
+  file,
+  onRemove,
+}: {
+  type: string;
+  file: File;
+  onRemove: () => void;
+}) {
+  const isIdentity = type === 'ID' || type === 'Passport';
+  const label = {
+    ID: 'ID Document',
+    Passport: 'Passport',
+    Certificate: 'Certificate',
+    'Statement of Results': 'Statement of Results',
+    Other: 'Other Document',
+  }[type];
+
+  return (
+    <div className='group relative flex items-center gap-4 rounded-lg border bg-card p-4 transition-all hover:bg-accent/5'>
+      <div className='flex-1 space-y-1'>
+        <div className='flex items-center gap-2'>
+          <p className='font-medium'>{label}</p>
+          <span className='rounded-full bg-secondary px-2 py-0.5 text-xs font-medium'>
+            {isIdentity ? 'Identity' : 'Academic'}
+          </span>
+        </div>
+        <p className='text-sm text-muted-foreground'>{file.name}</p>
+      </div>
+
+      <Progress value={100} className='h-1 w-[100px]' />
+
+      <Button
+        type='button'
+        variant='ghost'
+        size='icon'
+        className='h-8 w-8 rounded-full opacity-0 transition-opacity group-hover:opacity-100'
+        onClick={onRemove}
+      >
+        <Trash2 className='h-4 w-4' />
+      </Button>
+    </div>
+  );
+}
+
 export default function DocumentForm({ studentId }: DocumentFormProps) {
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      documents: [
-        { type: 'Certificate', file: null },
-        { type: 'ID', file: null },
-      ],
+      documents: [],
     },
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
+    mutationFn: async (values: FormSchema) => {
       for (const doc of values.documents) {
         if (!doc.file) continue;
 
@@ -102,118 +240,61 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: FormSchema) {
     mutate(values);
+  }
+
+  const documents = form.watch('documents');
+
+  function addDocument(type: string, file: File) {
+    form.setValue('documents', [...documents, { type: type as any, file }]);
+  }
+
+  function removeDocument(index: number) {
+    const newDocs = [...documents];
+    newDocs.splice(index, 1);
+    form.setValue('documents', newDocs);
   }
 
   return (
     <Form {...form}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload Documents</CardTitle>
-          <CardDescription>
-            Please upload your Certificate/Results and ID/Passport documents.
-            You can add additional documents if needed.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className='space-y-4'>
-          {form.watch('documents').map((doc, index) => (
-            <div
-              key={index}
-              className='flex items-start gap-4 rounded-lg border p-4'
-            >
-              <div className='flex-1 space-y-4'>
-                <FormField
-                  control={form.control}
-                  name={`documents.${index}.type`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Document Type</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value='Certificate'>
-                            Certificate
-                          </SelectItem>
-                          <SelectItem value='Statement of Results'>
-                            Statement of Results
-                          </SelectItem>
-                          <SelectItem value='ID'>ID</SelectItem>
-                          <SelectItem value='Passport'>Passport</SelectItem>
-                          <SelectItem value='Other'>Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name={`documents.${index}.file`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>File</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='file'
-                          accept='image/*,.pdf'
-                          onChange={(e) =>
-                            field.onChange(e.target.files?.[0] || null)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {index > 1 && (
-                <Button
-                  type='button'
-                  variant='destructive'
-                  size='icon'
-                  onClick={() => {
-                    const newDocs = form.getValues('documents');
-                    newDocs.splice(index, 1);
-                    form.setValue('documents', newDocs);
-                  }}
-                >
-                  <Trash2 className='h-4 w-4' />
-                </Button>
-              )}
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+        <Card>
+          <CardHeader>
+            <CardTitle>Upload Documents</CardTitle>
+            <CardDescription>
+              Please upload your required documents. You must provide at least
+              one identity document (ID or Passport) and one academic document
+              (Certificate or Statement of Results).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='space-y-6'>
+            <div className='space-y-4'>
+              {documents.map((doc, index) => {
+                if (!doc.file) return null;
+                return (
+                  <DocumentCard
+                    key={index}
+                    type={doc.type}
+                    file={doc.file}
+                    onRemove={() => removeDocument(index)}
+                  />
+                );
+              })}
             </div>
-          ))}
 
-          <div className='flex justify-between'>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => {
-                const newDocs = form.getValues('documents');
-                newDocs.push({ type: 'Other', file: null });
-                form.setValue('documents', newDocs);
-              }}
-            >
-              <Plus className='mr-2 h-4 w-4' />
-              Add Document
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-      <FormNavigation
-        onSave={form.handleSubmit(onSubmit)}
-        backUrl='/programs'
-        loading={isPending}
-      />
+            <DocumentDialog onSubmit={addDocument} />
+
+            {form.formState.errors.documents?.message && (
+              <p className='text-sm font-medium text-destructive'>
+                {form.formState.errors.documents.message}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <FormNavigation loading={isPending} />
+      </form>
     </Form>
   );
 }
