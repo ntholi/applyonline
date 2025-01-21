@@ -12,6 +12,7 @@ import { Trash2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import ProgramPicker from './ProgramPicker';
 import { useMutation } from '@tanstack/react-query';
+import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
 
 type Program = typeof programs.$inferSelect;
 
@@ -53,7 +54,7 @@ export default function ProgramsForm({ studentId, application }: Props) {
   });
 
   return (
-    <div className='container mx-auto mt-14 px-4'>
+    <div className='space-y-8'>
       <h2 className='mb-8 text-center text-2xl font-bold'>
         What do you want to study?
       </h2>
@@ -78,17 +79,12 @@ export default function ProgramsForm({ studentId, application }: Props) {
           <ProgramPicker label='Second Choice' onSelect={setSecondChoice} />
         )}
       </div>
-      <div className='mt-10 flex justify-end'>
-        <Button
-          type='submit'
-          onClick={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
-          {isPending ? 'Saving...' : 'Save & Continue'}
-        </Button>
-      </div>
+      <FormNavigation
+        onSave={() => handleSubmit()}
+        backUrl='/apply/qualifications'
+        loading={isPending}
+        saveLabel='Save & Proceed to Documents'
+      />
     </div>
   );
 }

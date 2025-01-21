@@ -44,6 +44,7 @@ import { cn } from '@/lib/utils';
 import { createStudent } from '@/server/students/actions';
 import { createInsertSchema } from 'drizzle-zod';
 import { useSession } from 'next-auth/react';
+import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
 
 const formSchema = createInsertSchema(students).extend({
   userId: z.string().optional(),
@@ -267,7 +268,7 @@ export default function StudentForm({ initialData }: StudentFormProps) {
                             variant={'outline'}
                             className={cn(
                               'w-full pl-3 text-left font-normal',
-                              !field.value && 'text-muted-foreground'
+                              !field.value && 'text-muted-foreground',
                             )}
                           >
                             {field.value ? (
@@ -400,9 +401,11 @@ export default function StudentForm({ initialData }: StudentFormProps) {
               </div>
             </div>
 
-            <div className='flex justify-end'>
-              <Button type='submit'>Save & Continue</Button>
-            </div>
+            <FormNavigation
+              onSave={form.handleSubmit(handleSubmit)}
+              backUrl='/apply'
+              loading={mutation.isPending}
+            />
           </form>
         </Form>
       </CardContent>

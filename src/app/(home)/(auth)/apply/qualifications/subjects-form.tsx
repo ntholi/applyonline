@@ -30,10 +30,11 @@ import {
 } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { GraduationCap, Loader2, Trash2 } from 'lucide-react';
+import { GraduationCap, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import SubjectsDialog from './subjects-dialog';
+import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -150,7 +151,7 @@ export default function SubjectsForm({ studentId, qualification }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <Card className='relative overflow-hidden'>
           <div className='absolute right-0 top-0 h-32 w-32 -translate-y-8 translate-x-8 opacity-5'>
             <GraduationCap className='h-full w-full' />
@@ -280,16 +281,12 @@ export default function SubjectsForm({ studentId, qualification }: Props) {
                   </FormItem>
                 )}
               />
-              <Button
-                type='submit'
-                className='w-full'
-                disabled={saveMutation.isPending}
-              >
-                {saveMutation.isPending && (
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                )}
-                Save Qualification
-              </Button>
+              <FormNavigation
+                onSave={form.handleSubmit(onSubmit)}
+                backUrl='/apply/student-details'
+                loading={saveMutation.isPending}
+                saveLabel='Save & Proceed to Programs'
+              />
             </CardContent>
           </Card>
         )}
