@@ -91,5 +91,19 @@
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
+  },
+  "dockerfile": {
+    "secrets": [
+      "TURSO_DATABASE_URL",
+      "TURSO_AUTH_TOKEN",
+      "AUTH_SECRET",
+      "AUTH_GOOGLE_ID",
+      "AUTH_GOOGLE_SECRET",
+      "FIREBASE_PROJECT_ID",
+      "FIREBASE_CLIENT_EMAIL",
+      "FIREBASE_PRIVATE_KEY",
+      "FIREBASE_STORAGE_BUCKET",
+      "AUTH_TRUST_HOST"
+    ]
   }
 }
