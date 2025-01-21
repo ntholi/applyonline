@@ -33,7 +33,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { GraduationCap, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import SubjectsDialog from './subjects-dialog';
+import SubjectsDialog from './SubjectsDialog';
 import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -66,7 +66,7 @@ type Props = {
   qualification: Awaited<ReturnType<typeof getQualificationByStudentId>>;
 };
 
-export default function SubjectsForm({ studentId, qualification }: Props) {
+export default function QualificationForm({ studentId, qualification }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();

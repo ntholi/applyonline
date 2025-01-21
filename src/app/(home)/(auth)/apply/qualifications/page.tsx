@@ -2,7 +2,7 @@ import { auth } from '@/auth';
 import { getQualificationByStudentId } from '@/server/qualifications/actions';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import SubjectsForm from './subjects-form';
+import QualificationForm from './QualificationForm';
 
 export const metadata: Metadata = {
   title: 'Academic Qualifications | Apply',
@@ -20,7 +20,7 @@ export default async function QualificationsPage() {
   }
 
   return (
-    <SubjectsForm
+    <QualificationForm
       studentId={session.user.studentId}
       qualification={qualification}
     />

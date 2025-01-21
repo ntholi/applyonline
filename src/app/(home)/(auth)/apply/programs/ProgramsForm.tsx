@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import ProgramPicker from './ProgramPicker';
 import { useMutation } from '@tanstack/react-query';
 import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
+import { useRouter } from 'next/navigation';
 
 type Program = typeof programs.$inferSelect;
 
@@ -24,6 +25,7 @@ type Props = {
 export default function ProgramsForm({ studentId, application }: Props) {
   const [firstChoice, setFirstChoice] = useState<Program | null>(null);
   const [secondChoice, setSecondChoice] = useState<Program | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (application) {
@@ -45,7 +47,7 @@ export default function ProgramsForm({ studentId, application }: Props) {
     onSuccess: () => {
       setFirstChoice(null);
       setSecondChoice(null);
-      window.location.href = '/apply/documents';
+      router.push('/apply/documents');
     },
     onError: (error: Error) => {
       console.error('Failed to create application:', error);
