@@ -155,6 +155,16 @@ export const requiredSubjects = sqliteTable(
   }),
 );
 
+export const requiredSubjectsRelations = relations(
+  requiredSubjects,
+  ({ one }) => ({
+    grade: one(qualificationGrades, {
+      fields: [requiredSubjects.gradeId],
+      references: [qualificationGrades.id],
+    }),
+  }),
+);
+
 export const qualificationSubjectsRelations = relations(
   requiredSubjects,
   ({ one }) => ({
@@ -357,12 +367,22 @@ export const studentSubjectsRelations = relations(
   }),
 );
 
-export const requiredSubjectsRelations = relations(
-  requiredSubjects,
-  ({ one }) => ({
-    grade: one(qualificationGrades, {
-      fields: [requiredSubjects.gradeId],
-      references: [qualificationGrades.id],
-    }),
-  }),
-);
+export const documentTypes = [
+  'Certificate',
+  'Statement of Results',
+  'ID',
+  'Passport',
+  'Other',
+] as const;
+
+export const documents = sqliteTable('documents', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  studentId: integer()
+    .notNull()
+    .references(() => students.id, { onDelete: 'cascade' }),
+  name: text().notNull(),
+  file: text().notNull(),
+  type: text({ enum: documentTypes }).notNull(),
+  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+  updatedAt: integer({ mode: 'timestamp' }),
+});
