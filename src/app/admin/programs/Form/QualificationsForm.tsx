@@ -152,7 +152,7 @@ function QualificationCard({
 }: QualificationCardProps) {
   const theme = useMantineTheme();
   const { data } = useQuery({
-    queryKey: ['qualification', qualification.qualificationId],
+    queryKey: ['qualifications', qualification.qualificationId],
     queryFn: () => getQualification(qualification.qualificationId),
     enabled: Boolean(qualification.qualificationId),
   });

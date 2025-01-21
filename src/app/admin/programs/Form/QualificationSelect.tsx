@@ -10,8 +10,8 @@ export default function QualificationSelect(props: Props) {
   const { data } = useQuery({
     queryKey: ['qualifications'],
     queryFn: async () => await findAllQualifications(),
-    select: (data) =>
-      data.items.map((q) => ({
+    select: ({ data }) =>
+      data.map((q) => ({
         value: String(q.id),
         label: q.name,
       })),

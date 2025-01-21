@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Enter your personal details to start your application',
 };
 
-export default async function PersonalDetailsPage() {
+export default async function StudentDetailsPage() {
   const session = await auth();
   const student = await getStudentByUserId(session?.user?.id);
 
