@@ -380,8 +380,8 @@ export const documents = sqliteTable('documents', {
   studentId: integer()
     .notNull()
     .references(() => students.id, { onDelete: 'cascade' }),
-  name: text().notNull(),
-  file: text().notNull(),
+  fileName: text().notNull(),
+  url: text().notNull(),
   type: text({ enum: documentTypes }).notNull(),
   createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
   updatedAt: integer({ mode: 'timestamp' }),
