@@ -118,10 +118,11 @@ export default async function ProgramDetails({ params }: Props) {
                                   />
                                   <div>
                                     <Text size='sm' fw={500}>
-                                      {subject.subject?.name}
+                                      {subject.subjectId} {` (subjectId)`}
                                     </Text>
                                     <Text size='xs' c='dimmed'>
-                                      Minimum Grade (ID: {subject.gradeId} )
+                                      Minimum Grade {subject.gradeId}{' '}
+                                      {` (gradeId)`}
                                     </Text>
                                   </div>
                                 </Group>

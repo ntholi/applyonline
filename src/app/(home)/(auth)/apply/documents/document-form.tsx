@@ -51,7 +51,11 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
     setDocuments(newDocuments);
   }
 
-  function updateDocument(index: number, field: keyof DocumentUpload, value: any) {
+  function updateDocument(
+    index: number,
+    field: keyof DocumentUpload,
+    value: DocumentUpload[keyof DocumentUpload],
+  ) {
     const newDocuments = [...documents];
     newDocuments[index] = { ...newDocuments[index], [field]: value };
     setDocuments(newDocuments);
@@ -64,15 +68,17 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
     try {
       // Validate required documents
       const hasResults = documents.some(
-        (doc) => (doc.type === 'Certificate' || doc.type === 'Statement of Results') && doc.file
+        (doc) =>
+          (doc.type === 'Certificate' || doc.type === 'Statement of Results') &&
+          doc.file,
       );
       const hasId = documents.some(
-        (doc) => (doc.type === 'ID' || doc.type === 'Passport') && doc.file
+        (doc) => (doc.type === 'ID' || doc.type === 'Passport') && doc.file,
       );
 
       if (!hasResults || !hasId) {
         throw new Error(
-          'Please upload both your Certificate/Results and ID/Passport documents'
+          'Please upload both your Certificate/Results and ID/Passport documents',
         );
       }
 
@@ -92,7 +98,9 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
       router.push('/apply/review');
     } catch (error) {
       console.error(error);
-      alert(error instanceof Error ? error.message : 'Failed to upload documents');
+      alert(
+        error instanceof Error ? error.message : 'Failed to upload documents',
+      );
     } finally {
       setUploading(false);
     }
@@ -104,17 +112,17 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
         <CardHeader>
           <CardTitle>Upload Documents</CardTitle>
           <CardDescription>
-            Please upload your Certificate/Results and ID/Passport documents. You
-            can add additional documents if needed.
+            Please upload your Certificate/Results and ID/Passport documents.
+            You can add additional documents if needed.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className='space-y-4'>
           {documents.map((doc, index) => (
             <div
               key={index}
-              className="flex items-start gap-4 rounded-lg border p-4"
+              className='flex items-start gap-4 rounded-lg border p-4'
             >
-              <div className="flex-1 space-y-4">
+              <div className='flex-1 space-y-4'>
                 <div>
                   <Label>Document Type</Label>
                   <Select
@@ -127,13 +135,13 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Certificate">Certificate</SelectItem>
-                      <SelectItem value="Statement of Results">
+                      <SelectItem value='Certificate'>Certificate</SelectItem>
+                      <SelectItem value='Statement of Results'>
                         Statement of Results
                       </SelectItem>
-                      <SelectItem value="ID">ID</SelectItem>
-                      <SelectItem value="Passport">Passport</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
+                      <SelectItem value='ID'>ID</SelectItem>
+                      <SelectItem value='Passport'>Passport</SelectItem>
+                      <SelectItem value='Other'>Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -141,8 +149,8 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
                 <div>
                   <Label>File</Label>
                   <Input
-                    type="file"
-                    accept="image/*,.pdf"
+                    type='file'
+                    accept='image/*,.pdf'
                     onChange={(e) =>
                       updateDocument(index, 'file', e.target.files?.[0] || null)
                     }
@@ -153,28 +161,28 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
 
               {index > 1 && (
                 <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
+                  type='button'
+                  variant='destructive'
+                  size='icon'
                   onClick={() => removeDocument(index)}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className='h-4 w-4' />
                 </Button>
               )}
             </div>
           ))}
 
-          <div className="flex justify-between">
-            <Button type="button" variant="outline" onClick={addDocument}>
-              <Plus className="mr-2 h-4 w-4" />
+          <div className='flex justify-between'>
+            <Button type='button' variant='outline' onClick={addDocument}>
+              <Plus className='mr-2 h-4 w-4' />
               Add Document
             </Button>
 
-            <Button type="submit" disabled={uploading}>
+            <Button type='submit' disabled={uploading}>
               {uploading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
               ) : (
-                <Upload className="mr-2 h-4 w-4" />
+                <Upload className='mr-2 h-4 w-4' />
               )}
               Upload Documents
             </Button>

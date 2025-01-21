@@ -42,7 +42,7 @@ export default class ProgramRepository extends BaseRepository<
             qualificationsData.map((q) => ({
               ...q,
               programId: inserted.id,
-            }))
+            })),
           )
           .returning();
 
@@ -56,7 +56,7 @@ export default class ProgramRepository extends BaseRepository<
                 ...s,
                 programId: inserted.id,
                 qualificationId: insertedQualification.qualificationId,
-              }))
+              })),
             );
           }
         }
@@ -90,7 +90,7 @@ export default class ProgramRepository extends BaseRepository<
               ...q,
               programId: id,
               updatedAt: new Date(),
-            }))
+            })),
           )
           .returning();
 
@@ -108,7 +108,7 @@ export default class ProgramRepository extends BaseRepository<
                 ...s,
                 programId: id,
                 qualificationId: insertedQualification.qualificationId,
-              }))
+              })),
             );
           }
         }

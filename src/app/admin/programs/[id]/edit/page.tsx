@@ -10,7 +10,7 @@ type Props = {
 
 export default async function ProgramEdit({ params }: Props) {
   const { id } = await params;
-  const programData = await getProgram(id);
+  const programData = await getProgram(Number(id));
   if (!programData) {
     return notFound();
   }
@@ -27,7 +27,7 @@ export default async function ProgramEdit({ params }: Props) {
         defaultValues={program}
         onSubmit={async (value) => {
           'use server';
-          return (await updateProgram(id, value)) as Program;
+          return (await updateProgram(Number(id), value)) as Program;
         }}
       />
     </Box>

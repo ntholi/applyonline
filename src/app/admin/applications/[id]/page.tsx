@@ -38,7 +38,7 @@ export default async function ApplicationDetails({ params }: Props) {
           {application.firstChoice.name}
         </FieldView>
         <FieldView label='Second Choice'>
-          {application.secondChoice.name}
+          {application.secondChoice?.name}
         </FieldView>
       </DetailsViewBody>
     </DetailsView>
