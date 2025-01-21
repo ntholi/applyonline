@@ -151,146 +151,143 @@ export default function QualificationForm({ studentId, qualification }: Props) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <Card className='relative overflow-hidden'>
-          <div className='absolute right-0 top-0 h-32 w-32 -translate-y-8 translate-x-8 opacity-5'>
-            <GraduationCap className='h-full w-full' />
+      <Card className='relative overflow-hidden'>
+        <div className='absolute right-0 top-0 h-32 w-32 -translate-y-8 translate-x-8 opacity-5'>
+          <GraduationCap className='h-full w-full' />
+        </div>
+        <CardHeader className='flex flex-row items-start gap-4'>
+          <div className='rounded-lg bg-muted p-2'>
+            <GraduationCap className='h-6 w-6 text-muted-foreground' />
           </div>
-          <CardHeader className='flex flex-row items-start gap-4'>
-            <div className='rounded-lg bg-muted p-2'>
-              <GraduationCap className='h-6 w-6 text-muted-foreground' />
+          <div>
+            <CardTitle>Qualification Type</CardTitle>
+            <CardDescription>
+              Select your qualification to proceed with subject entry
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <FormField
+            control={form.control}
+            name='qualificationId'
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value?.toString()}
+                  >
+                    <SelectTrigger className='w-full'>
+                      <SelectValue placeholder='Select your qualification' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {qualifications?.map((qualification) => (
+                        <SelectItem
+                          key={qualification.id}
+                          value={qualification.id.toString()}
+                        >
+                          {qualification.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </CardContent>
+      </Card>
+
+      {form.watch('qualificationId') && (
+        <Card className='relative overflow-hidden'>
+          <CardHeader className='flex flex-col items-stretch justify-between gap-2 md:flex-row md:items-center'>
+            <div className='flex flex-row items-start gap-4'>
+              <div className='rounded-lg bg-muted p-2'>
+                <GraduationCap className='h-6 w-6 text-muted-foreground' />
+              </div>
+              <div>
+                <CardTitle>Subjects</CardTitle>
+                <CardDescription>
+                  Add your subjects and their respective grades below.
+                </CardDescription>
+              </div>
             </div>
-            <div>
-              <CardTitle>Qualification Type</CardTitle>
-              <CardDescription>
-                Select your qualification to proceed with subject entry
-              </CardDescription>
-            </div>
+            <SubjectsDialog
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+              subjects={qualificationSubjects}
+              grades={qualificationGrades}
+              onAdd={addSubject}
+            />
           </CardHeader>
-          <CardContent>
+          <CardContent className='space-y-6'>
             <FormField
               control={form.control}
-              name='qualificationId'
-              render={({ field }) => (
+              name='subjects'
+              render={() => (
                 <FormItem>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value?.toString()}
-                    >
-                      <SelectTrigger className='w-full'>
-                        <SelectValue placeholder='Select your qualification' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {qualifications?.map((qualification) => (
-                          <SelectItem
-                            key={qualification.id}
-                            value={qualification.id.toString()}
-                          >
-                            {qualification.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Subject</TableHead>
+                          <TableHead>Grade</TableHead>
+                          <TableHead className='w-[100px]'>Action</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {form.watch('subjects').length === 0 ? (
+                          <TableRow>
+                            <TableCell
+                              colSpan={3}
+                              className='h-24 text-center text-muted-foreground'
+                            >
+                              No subjects added. Click the {'"Add Subject"'}{' '}
+                              button to add your subjects.
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          form.watch('subjects').map((subject, index) => {
+                            const subjectData = qualificationSubjects.find(
+                              (s) => s.id === subject.subjectId,
+                            );
+                            const gradeData = qualificationGrades.find(
+                              (g) => g.id === subject.gradeId,
+                            );
+
+                            return (
+                              <TableRow key={index}>
+                                <TableCell>{subjectData?.name}</TableCell>
+                                <TableCell>{gradeData?.name}</TableCell>
+                                <TableCell>
+                                  <Button
+                                    variant='ghost'
+                                    size='icon'
+                                    onClick={() => removeSubject(index)}
+                                  >
+                                    <Trash2 className='h-4 w-4' />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })
+                        )}
+                      </TableBody>
+                    </Table>
+                  </Card>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </CardContent>
         </Card>
-
-        {form.watch('qualificationId') && (
-          <Card className='relative overflow-hidden'>
-            <CardHeader className='flex flex-col items-stretch justify-between gap-2 md:flex-row md:items-center'>
-              <div className='flex flex-row items-start gap-4'>
-                <div className='rounded-lg bg-muted p-2'>
-                  <GraduationCap className='h-6 w-6 text-muted-foreground' />
-                </div>
-                <div>
-                  <CardTitle>Subjects</CardTitle>
-                  <CardDescription>
-                    Add your subjects and their respective grades below.
-                  </CardDescription>
-                </div>
-              </div>
-              <SubjectsDialog
-                open={dialogOpen}
-                onOpenChange={setDialogOpen}
-                subjects={qualificationSubjects}
-                grades={qualificationGrades}
-                onAdd={addSubject}
-              />
-            </CardHeader>
-            <CardContent className='space-y-6'>
-              <FormField
-                control={form.control}
-                name='subjects'
-                render={() => (
-                  <FormItem>
-                    <Card>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Subject</TableHead>
-                            <TableHead>Grade</TableHead>
-                            <TableHead className='w-[100px]'>Action</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {form.watch('subjects').length === 0 ? (
-                            <TableRow>
-                              <TableCell
-                                colSpan={3}
-                                className='h-24 text-center text-muted-foreground'
-                              >
-                                No subjects added. Click the {'"Add Subject"'}{' '}
-                                button to add your subjects.
-                              </TableCell>
-                            </TableRow>
-                          ) : (
-                            form.watch('subjects').map((subject, index) => {
-                              const subjectData = qualificationSubjects.find(
-                                (s) => s.id === subject.subjectId,
-                              );
-                              const gradeData = qualificationGrades.find(
-                                (g) => g.id === subject.gradeId,
-                              );
-
-                              return (
-                                <TableRow key={index}>
-                                  <TableCell>{subjectData?.name}</TableCell>
-                                  <TableCell>{gradeData?.name}</TableCell>
-                                  <TableCell>
-                                    <Button
-                                      variant='ghost'
-                                      size='icon'
-                                      onClick={() => removeSubject(index)}
-                                    >
-                                      <Trash2 className='h-4 w-4' />
-                                    </Button>
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })
-                          )}
-                        </TableBody>
-                      </Table>
-                    </Card>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormNavigation
-                onSave={form.handleSubmit(onSubmit)}
-                backUrl='/apply/student-details'
-                loading={saveMutation.isPending}
-                saveLabel='Save & Proceed to Programs'
-              />
-            </CardContent>
-          </Card>
-        )}
-      </form>
+      )}
+      <FormNavigation
+        onSave={form.handleSubmit(onSubmit)}
+        backUrl='/apply/student-details'
+        loading={saveMutation.isPending}
+      />
     </Form>
   );
 }

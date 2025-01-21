@@ -1,19 +1,20 @@
 'use client';
 
+import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
 import { getFacultyByCode } from '@/app/admin/programs/data/faculties';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { programs } from '@/db/schema';
+import { toast } from '@/hooks/use-toast';
 import {
   createApplication,
   getApplicationByStudentId,
 } from '@/server/applications/actions';
+import { useMutation } from '@tanstack/react-query';
 import { Trash2Icon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ProgramPicker from './ProgramPicker';
-import { useMutation } from '@tanstack/react-query';
-import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
-import { useRouter } from 'next/navigation';
 
 type Program = typeof programs.$inferSelect;
 
@@ -50,42 +51,51 @@ export default function ProgramsForm({ studentId, application }: Props) {
       router.push('/apply/documents');
     },
     onError: (error: Error) => {
-      console.error('Failed to create application:', error);
-      // You might want to add toast notification here
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to save qualification',
+      });
     },
   });
 
   return (
-    <div className='space-y-8'>
-      <h2 className='mb-8 text-center text-2xl font-bold'>
-        What do you want to study?
-      </h2>
-      <div className='grid gap-8 md:grid-cols-2'>
-        {firstChoice ? (
-          <SelectedProgram
-            program={firstChoice}
-            label='First Choice'
-            onDelete={() => setFirstChoice(null)}
-          />
-        ) : (
-          <ProgramPicker label='First Choice' onSelect={setFirstChoice} />
-        )}
+    <div>
+      <Card>
+        <CardHeader>
+          <CardTitle>What do you want to Study?</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className='grid gap-8 md:grid-cols-2'>
+            {firstChoice ? (
+              <SelectedProgram
+                program={firstChoice}
+                label='First Choice'
+                onDelete={() => setFirstChoice(null)}
+              />
+            ) : (
+              <ProgramPicker label='First Choice' onSelect={setFirstChoice} />
+            )}
 
-        {secondChoice ? (
-          <SelectedProgram
-            program={secondChoice}
-            label='Second Choice'
-            onDelete={() => setSecondChoice(null)}
-          />
-        ) : (
-          <ProgramPicker label='Second Choice' onSelect={setSecondChoice} />
-        )}
-      </div>
+            {secondChoice ? (
+              <SelectedProgram
+                program={secondChoice}
+                label='Second Choice'
+                onDelete={() => setSecondChoice(null)}
+              />
+            ) : (
+              <ProgramPicker label='Second Choice' onSelect={setSecondChoice} />
+            )}
+          </div>
+        </CardContent>
+      </Card>
       <FormNavigation
         onSave={() => handleSubmit()}
         backUrl='/apply/qualifications'
         loading={isPending}
-        saveLabel='Save & Proceed to Documents'
       />
     </div>
   );

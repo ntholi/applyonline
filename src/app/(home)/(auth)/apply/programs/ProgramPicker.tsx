@@ -44,7 +44,7 @@ export default function ProgramPicker({ label, onSelect }: Props) {
     <>
       <Button
         variant='outline'
-        className='group relative flex min-h-[180px] min-w-[200px] flex-col items-center justify-center gap-3 border-2 border-dashed p-8 transition-all hover:border-solid hover:border-primary/50 hover:bg-primary/5'
+        className='group relative flex min-h-[180px] min-w-[200px] flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 transition-all hover:border-solid hover:border-primary/50 hover:bg-primary/5'
         onClick={() => setOpen(true)}
       >
         <div className='rounded-full bg-primary/10 p-3 transition-colors group-hover:bg-primary/20'>
