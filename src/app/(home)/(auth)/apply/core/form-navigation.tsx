@@ -12,7 +12,7 @@ interface FormNavigationProps {
 export function FormNavigation({
   onSave,
   backUrl,
-  saveLabel = 'Save & Continue',
+  saveLabel = 'Save',
   loading = false,
 }: FormNavigationProps) {
   const router = useRouter();

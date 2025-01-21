@@ -28,7 +28,7 @@ import { uploadDocument } from '@/lib/storage';
 import { createDocument } from '@/server/documents/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Loader2, Plus, Trash2, Upload } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -205,15 +205,6 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
             >
               <Plus className='mr-2 h-4 w-4' />
               Add Document
-            </Button>
-
-            <Button type='submit' disabled={isPending}>
-              {isPending ? (
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              ) : (
-                <Upload className='mr-2 h-4 w-4' />
-              )}
-              Upload Documents
             </Button>
           </div>
         </CardContent>
