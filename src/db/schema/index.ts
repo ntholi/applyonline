@@ -249,9 +249,9 @@ export const applications = sqliteTable(
     firstChoiceId: integer()
       .notNull()
       .references(() => programs.id, { onDelete: 'cascade' }),
-    secondChoiceId: integer()
-      .notNull()
-      .references(() => programs.id, { onDelete: 'cascade' }),
+    secondChoiceId: integer().references(() => programs.id, {
+      onDelete: 'cascade',
+    }),
     createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
     updatedAt: integer({ mode: 'timestamp' }),
   },
