@@ -95,11 +95,6 @@ export default function QualificationForm({ studentId, qualification }: Props) {
   const saveMutation = useMutation({
     mutationFn: saveStudentQualification,
     onSuccess: () => {
-      toast({
-        title: 'Success',
-        description: 'Qualification saved successfully',
-      });
-      form.reset();
       router.push('/apply/programs');
     },
     onError: (error) => {

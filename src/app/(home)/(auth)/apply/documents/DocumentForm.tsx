@@ -211,7 +211,7 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
       </Card>
       <FormNavigation
         onSave={form.handleSubmit(onSubmit)}
-        backUrl='/'
+        backUrl='/programs'
         loading={isPending}
       />
     </Form>

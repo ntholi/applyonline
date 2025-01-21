@@ -72,10 +72,6 @@ export default function StudentForm({ initialData }: StudentFormProps) {
   const mutation = useMutation({
     mutationFn: createStudent,
     onSuccess: () => {
-      toast({
-        title: 'Success',
-        description: 'Your personal details have been saved',
-      });
       router.push('/apply/qualifications');
     },
     onError: (error: Error) => {
