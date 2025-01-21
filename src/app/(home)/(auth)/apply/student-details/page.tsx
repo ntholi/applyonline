@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 import { getStudentByUserId } from '@/server/students/actions';
 import { Metadata } from 'next';
-import StudentForm from './student-form';
+import StudentForm from './StudentForm';
 
 export const metadata: Metadata = {
   title: 'Personal Details | Apply',
