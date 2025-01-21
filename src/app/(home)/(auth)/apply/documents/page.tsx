@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import DocumentForm from './document-form';
 import { getStudentByUserId } from '@/server/students/actions';
+import DocumentForm from './DocumentForm';
 
 export default async function DocumentsPage() {
   const session = await auth();

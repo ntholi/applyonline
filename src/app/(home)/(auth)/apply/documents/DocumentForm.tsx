@@ -8,8 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -19,71 +26,66 @@ import {
 } from '@/components/ui/select';
 import { uploadDocument } from '@/lib/storage';
 import { createDocument } from '@/server/documents/actions';
-import { DocumentType } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { Loader2, Plus, Trash2, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { FormNavigation } from '../core/form-navigation';
 
 interface DocumentFormProps {
   studentId: number;
 }
 
-interface DocumentUpload {
-  type: DocumentType;
-  file: File | null;
-}
+const formSchema = z.object({
+  documents: z
+    .array(
+      z.object({
+        type: z.enum([
+          'Certificate',
+          'Statement of Results',
+          'ID',
+          'Passport',
+          'Other',
+        ] as const),
+        file: z.instanceof(File).nullable(),
+      }),
+    )
+    .refine(
+      (docs) =>
+        docs.some(
+          (doc) =>
+            (doc.type === 'Certificate' ||
+              doc.type === 'Statement of Results') &&
+            doc.file,
+        ) &&
+        docs.some(
+          (doc) => (doc.type === 'ID' || doc.type === 'Passport') && doc.file,
+        ),
+      {
+        message:
+          'Please upload both your Certificate/Results and ID/Passport documents',
+      },
+    ),
+});
 
 export default function DocumentForm({ studentId }: DocumentFormProps) {
-  const [documents, setDocuments] = useState<DocumentUpload[]>([
-    { type: 'Certificate', file: null },
-    { type: 'ID', file: null },
-  ]);
-  const [uploading, setUploading] = useState(false);
   const router = useRouter();
 
-  function addDocument() {
-    setDocuments([...documents, { type: 'Other', file: null }]);
-  }
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      documents: [
+        { type: 'Certificate', file: null },
+        { type: 'ID', file: null },
+      ],
+    },
+  });
 
-  function removeDocument(index: number) {
-    const newDocuments = [...documents];
-    newDocuments.splice(index, 1);
-    setDocuments(newDocuments);
-  }
-
-  function updateDocument(
-    index: number,
-    field: keyof DocumentUpload,
-    value: DocumentUpload[keyof DocumentUpload],
-  ) {
-    const newDocuments = [...documents];
-    newDocuments[index] = { ...newDocuments[index], [field]: value };
-    setDocuments(newDocuments);
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setUploading(true);
-
-    try {
-      // Validate required documents
-      const hasResults = documents.some(
-        (doc) =>
-          (doc.type === 'Certificate' || doc.type === 'Statement of Results') &&
-          doc.file,
-      );
-      const hasId = documents.some(
-        (doc) => (doc.type === 'ID' || doc.type === 'Passport') && doc.file,
-      );
-
-      if (!hasResults || !hasId) {
-        throw new Error(
-          'Please upload both your Certificate/Results and ID/Passport documents',
-        );
-      }
-
-      // Upload all documents
-      for (const doc of documents) {
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      for (const doc of values.documents) {
         if (!doc.file) continue;
 
         const url = await uploadDocument(doc.file);
@@ -94,20 +96,18 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
           type: doc.type,
         });
       }
+    },
+    onSuccess: () => {
+      router.push('/');
+    },
+  });
 
-      router.push('/apply/review');
-    } catch (error) {
-      console.error(error);
-      alert(
-        error instanceof Error ? error.message : 'Failed to upload documents',
-      );
-    } finally {
-      setUploading(false);
-    }
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    mutate(values);
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Form {...form}>
       <Card>
         <CardHeader>
           <CardTitle>Upload Documents</CardTitle>
@@ -117,46 +117,63 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
-          {documents.map((doc, index) => (
+          {form.watch('documents').map((doc, index) => (
             <div
               key={index}
               className='flex items-start gap-4 rounded-lg border p-4'
             >
               <div className='flex-1 space-y-4'>
-                <div>
-                  <Label>Document Type</Label>
-                  <Select
-                    value={doc.type}
-                    onValueChange={(value) =>
-                      updateDocument(index, 'type', value as DocumentType)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='Certificate'>Certificate</SelectItem>
-                      <SelectItem value='Statement of Results'>
-                        Statement of Results
-                      </SelectItem>
-                      <SelectItem value='ID'>ID</SelectItem>
-                      <SelectItem value='Passport'>Passport</SelectItem>
-                      <SelectItem value='Other'>Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <FormField
+                  control={form.control}
+                  name={`documents.${index}.type`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Document Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value='Certificate'>
+                            Certificate
+                          </SelectItem>
+                          <SelectItem value='Statement of Results'>
+                            Statement of Results
+                          </SelectItem>
+                          <SelectItem value='ID'>ID</SelectItem>
+                          <SelectItem value='Passport'>Passport</SelectItem>
+                          <SelectItem value='Other'>Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                <div>
-                  <Label>File</Label>
-                  <Input
-                    type='file'
-                    accept='image/*,.pdf'
-                    onChange={(e) =>
-                      updateDocument(index, 'file', e.target.files?.[0] || null)
-                    }
-                    required
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name={`documents.${index}.file`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>File</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='file'
+                          accept='image/*,.pdf'
+                          onChange={(e) =>
+                            field.onChange(e.target.files?.[0] || null)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               {index > 1 && (
@@ -164,7 +181,11 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
                   type='button'
                   variant='destructive'
                   size='icon'
-                  onClick={() => removeDocument(index)}
+                  onClick={() => {
+                    const newDocs = form.getValues('documents');
+                    newDocs.splice(index, 1);
+                    form.setValue('documents', newDocs);
+                  }}
                 >
                   <Trash2 className='h-4 w-4' />
                 </Button>
@@ -173,13 +194,21 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
           ))}
 
           <div className='flex justify-between'>
-            <Button type='button' variant='outline' onClick={addDocument}>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => {
+                const newDocs = form.getValues('documents');
+                newDocs.push({ type: 'Other', file: null });
+                form.setValue('documents', newDocs);
+              }}
+            >
               <Plus className='mr-2 h-4 w-4' />
               Add Document
             </Button>
 
-            <Button type='submit' disabled={uploading}>
-              {uploading ? (
+            <Button type='submit' disabled={isPending}>
+              {isPending ? (
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
               ) : (
                 <Upload className='mr-2 h-4 w-4' />
@@ -189,6 +218,11 @@ export default function DocumentForm({ studentId }: DocumentFormProps) {
           </div>
         </CardContent>
       </Card>
-    </form>
+      <FormNavigation
+        onSave={form.handleSubmit(onSubmit)}
+        backUrl='/'
+        loading={isPending}
+      />
+    </Form>
   );
 }
