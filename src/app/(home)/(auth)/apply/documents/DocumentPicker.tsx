@@ -36,6 +36,7 @@ type Props = {
 export default function DocumentPicker({ setValue }: Props) {
   const [selectedType, setSelectedType] = useState<string>();
   const [selectedFile, setSelectedFile] = useState<File>();
+  const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width: 640px)');
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -51,6 +52,9 @@ export default function DocumentPicker({ setValue }: Props) {
         type: selectedType as (typeof documentTypes)[number],
         file: selectedFile,
       });
+      setOpen(false);
+      setSelectedType(undefined);
+      setSelectedFile(undefined);
     }
   }
 
@@ -83,7 +87,7 @@ export default function DocumentPicker({ setValue }: Props) {
           Supported formats: PDF, DOC, DOCX, JPG, PNG
         </p>
       </div>
-      <Button 
+      <Button
         onClick={handleSubmit}
         disabled={!selectedType || !selectedFile}
         className='mt-2'
@@ -95,9 +99,9 @@ export default function DocumentPicker({ setValue }: Props) {
 
   if (isMobile) {
     return (
-      <Drawer>
+      <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
-          <Button variant='outline'>Add Document</Button>
+          <Button>Add Document</Button>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
@@ -110,7 +114,7 @@ export default function DocumentPicker({ setValue }: Props) {
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant='outline'>Add Document</Button>
       </DialogTrigger>
