@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
+import DocumentPicker from './DocumentPicker';
 
 type Props = {
   studentId: number;
@@ -23,7 +24,7 @@ const schema = z.object({
     .refine((f) => f.size < 5 * 1024 * 1024, 'File must be less than 5MB'),
 });
 
-type Document = z.infer<typeof schema>;
+export type Document = z.infer<typeof schema>;
 
 export default function DocumentForm({ studentId }: Props) {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -43,7 +44,7 @@ export default function DocumentForm({ studentId }: Props) {
 
   return (
     <div>
-      <Button>Add Document</Button>
+      <DocumentPicker setValue={(it) => setDocuments([...documents, it])} />
 
       <Separator className='my-5' />
       <Card>
