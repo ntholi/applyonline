@@ -80,12 +80,9 @@ export default function DocumentPicker({ setValue }: Props) {
         <Input
           id='document-file'
           type='file'
-          accept='.pdf,.doc,.docx,.jpg,.jpeg,.png'
+          accept='image/*,.pdf,.doc,.docx'
           onChange={handleFileChange}
         />
-        <p className='text-sm text-muted-foreground'>
-          Supported formats: PDF, DOC, DOCX, JPG, PNG
-        </p>
       </div>
       <Button
         onClick={handleSubmit}

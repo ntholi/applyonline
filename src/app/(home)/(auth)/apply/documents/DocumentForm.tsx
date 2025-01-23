@@ -1,16 +1,15 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { documentTypes } from '@/db/schema';
 import { uploadDocument } from '@/lib/storage';
 import { createDocument } from '@/server/documents/actions';
 import { useMutation } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { z } from 'zod';
 import { FormNavigation } from '../core/form-navigation';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { useState } from 'react';
-import { Separator } from '@/components/ui/separator';
 import DocumentPicker from './DocumentPicker';
 
 type Props = {
@@ -55,7 +54,7 @@ export default function DocumentForm({ studentId }: Props) {
         </CardContent>
       </Card>
       <FormNavigation
-        backUrl='/apply/programs'
+        backUrl='/apply/review'
         loading={isPending}
         onSave={() => router.push('/')}
       />
