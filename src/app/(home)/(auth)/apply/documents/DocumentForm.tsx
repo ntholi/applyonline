@@ -9,7 +9,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
-import { FormNavigation } from '../core/form-navigation';
+import { FormNavigation } from '../core/FormNavigation';
 import DocumentPicker from './DocumentPicker';
 import { Button } from '@/components/ui/button';
 import { Loader2, FileIcon, X } from 'lucide-react';
@@ -94,7 +94,7 @@ export default function DocumentForm({ studentId }: Props) {
 
       {documents.length === 0 ? (
         <Card>
-          <CardContent className='text-muted-foreground flex flex-col items-center justify-center py-8'>
+          <CardContent className='flex flex-col items-center justify-center py-8 text-muted-foreground'>
             <FileIcon className='mb-2 h-12 w-12' />
             <p>No documents added yet</p>
             <p className='text-sm'>
@@ -110,10 +110,10 @@ export default function DocumentForm({ studentId }: Props) {
                 <div className='flex items-start justify-between'>
                   <div className='space-y-1'>
                     <p className='font-medium'>{doc.type}</p>
-                    <p className='text-muted-foreground max-w-[200px] truncate text-sm'>
+                    <p className='max-w-[200px] truncate text-sm text-muted-foreground'>
                       {doc.file.name}
                     </p>
-                    <p className='text-muted-foreground text-xs'>
+                    <p className='text-xs text-muted-foreground'>
                       {(doc.file.size / (1024 * 1024)).toFixed(2)} MB
                     </p>
                   </div>

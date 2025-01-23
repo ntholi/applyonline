@@ -34,7 +34,7 @@ import { GraduationCap, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import SubjectsDialog from './SubjectsDialog';
-import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
+import { FormNavigation } from '@/app/(home)/(auth)/apply/core/FormNavigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';

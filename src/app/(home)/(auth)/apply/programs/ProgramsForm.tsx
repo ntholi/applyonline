@@ -1,6 +1,6 @@
 'use client';
 
-import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
+import { FormNavigation } from '@/app/(home)/(auth)/apply/core/FormNavigation';
 import { getFacultyByCode } from '@/app/admin/programs/data/faculties';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

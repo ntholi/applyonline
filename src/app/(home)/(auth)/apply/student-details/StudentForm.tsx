@@ -44,7 +44,7 @@ import { cn } from '@/lib/utils';
 import { createStudent } from '@/server/students/actions';
 import { createInsertSchema } from 'drizzle-zod';
 import { useSession } from 'next-auth/react';
-import { FormNavigation } from '@/app/(home)/(auth)/apply/core/form-navigation';
+import { FormNavigation } from '@/app/(home)/(auth)/apply/core/FormNavigation';
 
 const formSchema = createInsertSchema(students).extend({
   userId: z.string().optional(),
