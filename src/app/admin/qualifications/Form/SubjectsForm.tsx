@@ -18,6 +18,7 @@ import { useForm } from '@mantine/form';
 import { IconTrashFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Qualification } from '../types';
+import { notifications } from '@mantine/notifications';
 
 type Props = {
   form: ReturnType<typeof useForm<Qualification>>;
@@ -30,6 +31,31 @@ export default function SubjectsForm({ form }: Props) {
 
   function handleAdd() {
     if (!name || !code) return;
+    const isDuplicateName = form.values.subjects.some(
+      (subject) => subject.name.toLowerCase() === name.toLowerCase(),
+    );
+    const isDuplicateCode = form.values.subjects.some(
+      (subject) => subject.code.toLowerCase() === code.toLowerCase(),
+    );
+
+    if (isDuplicateName) {
+      notifications.show({
+        color: 'red',
+        title: 'Duplicate Subject',
+        message: `A subject with name "${name}" already exists`,
+      });
+      return;
+    }
+
+    if (isDuplicateCode) {
+      notifications.show({
+        color: 'red',
+        title: 'Duplicate Subject',
+        message: `A subject with code "${code}" already exists`,
+      });
+      return;
+    }
+
     form.insertListItem('subjects', { name, code, isCommercial });
     setName('');
     setCode('');
@@ -42,7 +68,7 @@ export default function SubjectsForm({ form }: Props) {
 
   return (
     <Stack>
-      <Grid align='flex-end' gutter="lg">
+      <Grid align='flex-end' gutter='lg'>
         <Grid.Col span={{ base: 12, md: 4 }}>
           <TextInput
             label='Name'
