@@ -1,10 +1,5 @@
-import { getApplicationByStudentId } from '@/server/applications/actions';
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FormNavigation } from '../core/FormNavigation';
 import { getFacultyByCode } from '@/app/admin/programs/data/faculties';
-import { students, applications } from '@/db/schema';
+import { auth } from '@/auth';
 import {
   Accordion,
   AccordionContent,
@@ -12,18 +7,11 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import {
-  Check,
-  GraduationCap,
-  User,
-  Users,
-  Phone,
-  School,
-  FileText,
-} from 'lucide-react';
-
-type Student = typeof students.$inferSelect;
-type Application = typeof applications.$inferSelect;
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getApplicationByStudentId } from '@/server/applications/actions';
+import { Check, GraduationCap, School, User, Users } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { FormNavigation } from '../core/FormNavigation';
 
 export default async function ReviewPage() {
   const session = await auth();
@@ -33,8 +21,8 @@ export default async function ReviewPage() {
   if (!application) return null;
 
   return (
-    <div className='mx-auto max-w-4xl space-y-6'>
-      <Card className='bg-white shadow-lg'>
+    <>
+      <Card className='shadow-lg'>
         <CardHeader className='border-b text-center'>
           <CardTitle className='text-2xl font-bold'>
             Application Review
@@ -45,8 +33,10 @@ export default async function ReviewPage() {
         </CardHeader>
         <CardContent className='p-6'>
           <Accordion type='single' collapsible className='w-full space-y-4'>
-            {/* Personal Information */}
-            <AccordionItem value='personal' className='rounded-lg border px-4'>
+            <AccordionItem
+              value='personal'
+              className='rounded-lg border bg-card px-4'
+            >
               <AccordionTrigger className='hover:no-underline'>
                 <div className='flex items-center gap-2'>
                   <User className='h-5 w-5 text-primary' />
@@ -112,8 +102,10 @@ export default async function ReviewPage() {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Program Choices */}
-            <AccordionItem value='programs' className='rounded-lg border px-4'>
+            <AccordionItem
+              value='programs'
+              className='rounded-lg border bg-card px-4'
+            >
               <AccordionTrigger className='hover:no-underline'>
                 <div className='flex items-center gap-2'>
                   <GraduationCap className='h-5 w-5 text-primary' />
@@ -165,8 +157,10 @@ export default async function ReviewPage() {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Next of Kin */}
-            <AccordionItem value='nextOfKin' className='rounded-lg border px-4'>
+            <AccordionItem
+              value='nextOfKin'
+              className='rounded-lg border bg-card px-4'
+            >
               <AccordionTrigger className='hover:no-underline'>
                 <div className='flex items-center gap-2'>
                   <Users className='h-5 w-5 text-primary' />
@@ -204,8 +198,10 @@ export default async function ReviewPage() {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Education Background */}
-            <AccordionItem value='education' className='rounded-lg border px-4'>
+            <AccordionItem
+              value='education'
+              className='rounded-lg border bg-card px-4'
+            >
               <AccordionTrigger className='hover:no-underline'>
                 <div className='flex items-center gap-2'>
                   <School className='h-5 w-5 text-primary' />
@@ -242,7 +238,7 @@ export default async function ReviewPage() {
         </CardContent>
       </Card>
 
-      <div className='flex items-center justify-between rounded-lg bg-white p-4 shadow-lg'>
+      <div className='flex items-center justify-between rounded-lg bg-card p-4 shadow-lg'>
         <div className='flex items-center gap-2'>
           <Check className='h-5 w-5 text-green-500' />
           <span className='text-sm font-medium'>All sections completed</span>
@@ -252,6 +248,6 @@ export default async function ReviewPage() {
           saveLabel='Submit Application'
         />
       </div>
-    </div>
+    </>
   );
 }
