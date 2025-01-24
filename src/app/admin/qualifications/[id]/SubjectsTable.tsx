@@ -21,6 +21,7 @@ export default function SubjectsTable({ subjects }: Props) {
       <TableTr key={subject.id}>
         <TableTd>{subject.name}</TableTd>
         <TableTd>{subject.code}</TableTd>
+        <TableTd>{subject.isCommercial ? 'Yes' : 'No'}</TableTd>
       </TableTr>
     );
   });
@@ -31,6 +32,7 @@ export default function SubjectsTable({ subjects }: Props) {
         <TableTr>
           <TableTh>Name</TableTh>
           <TableTh>Code</TableTh>
+          <TableTh>Commercial</TableTh>
         </TableTr>
       </TableThead>
       <TableTbody>{rows}</TableTbody>

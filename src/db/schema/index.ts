@@ -38,6 +38,7 @@ export const subjects = sqliteTable(
     qualificationId: integer()
       .notNull()
       .references(() => qualifications.id, { onDelete: 'cascade' }),
+    isCommercial: integer({ mode: 'boolean' }).notNull().default(false),
     createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
     updatedAt: integer({ mode: 'timestamp' }),
   },
