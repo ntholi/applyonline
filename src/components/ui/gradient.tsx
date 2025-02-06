@@ -1,18 +1,19 @@
+import React, { PropsWithChildren } from 'react';
 import { cn } from '@/lib/utils';
-import React from 'react';
 
 type Props = {
-  children: React.ReactNode;
   className?: string;
-};
+} & PropsWithChildren;
 
 export function Gradient({ children, className }: Props) {
   return (
-    <div className={cn('relative min-h-screen', className)}>
+    <div
+      className={cn(
+        'bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] via-20% to-50% dark:from-slate-950 dark:via-slate-950 dark:to-black',
+        className,
+      )}
+    >
       {children}
-      <div className='pointer-events-none fixed inset-0'>
-        <div className='absolute inset-0 bg-gradient-to-bl from-transparent from-40% via-blue-900/10 via-75% to-blue-900/15 to-100%' />
-      </div>
     </div>
   );
 }
