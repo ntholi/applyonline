@@ -8,8 +8,8 @@ type Application = typeof applications.$inferInsert;
 class ApplicationService {
   constructor(private readonly repository = new ApplicationRepository()) {}
 
-  findByStudentId(studentId: number) {
-    return withAuth(async () => this.repository.findByStudentId(studentId), []);
+  findByUserId(userId: string) {
+    return withAuth(async () => this.repository.findByUserId(userId), []);
   }
 
   async first() {

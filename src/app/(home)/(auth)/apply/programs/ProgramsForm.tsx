@@ -8,7 +8,7 @@ import { programs } from '@/db/schema';
 import { toast } from '@/hooks/use-toast';
 import {
   createApplication,
-  getApplicationByStudentId,
+  getApplicationByUserId,
 } from '@/server/applications/actions';
 import { useMutation } from '@tanstack/react-query';
 import { Trash2Icon } from 'lucide-react';
@@ -19,11 +19,11 @@ import ProgramPicker from './ProgramPicker';
 type Program = typeof programs.$inferSelect;
 
 type Props = {
-  studentId: number;
-  application: Awaited<ReturnType<typeof getApplicationByStudentId>>;
+  userId: string;
+  application: Awaited<ReturnType<typeof getApplicationByUserId>>;
 };
 
-export default function ProgramsForm({ studentId, application }: Props) {
+export default function ProgramsForm({ userId, application }: Props) {
   const [firstChoice, setFirstChoice] = useState<Program | null>(null);
   const [secondChoice, setSecondChoice] = useState<Program | null>(null);
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function ProgramsForm({ studentId, application }: Props) {
       if (!firstChoice) throw new Error('First choice program is required');
 
       return createApplication({
-        studentId,
+        userId,
         firstChoiceId: firstChoice.id,
         secondChoiceId: secondChoice?.id,
       });

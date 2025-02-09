@@ -22,10 +22,9 @@ export default class QualificationRepository extends BaseRepository<
     });
   }
 
-  async findByStudentId(studentId: number) {
+  async findByUserId(userId: string) {
     return db.query.studentQualifications.findFirst({
-      where: (qualifications, { eq }) =>
-        eq(qualifications.studentId, studentId),
+      where: (qualifications, { eq }) => eq(qualifications.userId, userId),
       with: {
         qualification: true,
         subjects: {

@@ -15,8 +15,8 @@ class QualificationService {
     return withAuth(async () => this.repository.findById(id), []);
   }
 
-  async findByStudentId(studentId: number) {
-    return withAuth(async () => this.repository.findByStudentId(studentId), []);
+  async findByUserId(userId: string) {
+    return withAuth(async () => this.repository.findByUserId(userId), []);
   }
 
   async findAll(params: FindAllParams<typeof qualifications>) {

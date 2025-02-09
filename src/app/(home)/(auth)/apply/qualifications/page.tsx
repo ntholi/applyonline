@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import { getQualificationByStudentId } from '@/server/qualifications/actions';
+import { getQualificationByUserId } from '@/server/qualifications/actions';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import QualificationForm from './QualificationForm';
@@ -11,18 +11,13 @@ export const metadata: Metadata = {
 
 export default async function QualificationsPage() {
   const session = await auth();
-  const qualification = await getQualificationByStudentId(
-    session?.user?.studentId,
-  );
+  const qualification = await getQualificationByUserId(session?.user?.id);
 
-  if (!session?.user?.studentId) {
-    return redirect('/apply/student-details');
+  if (!session?.user?.id) {
+    return redirect('/login');
   }
 
   return (
-    <QualificationForm
-      studentId={session.user.studentId}
-      qualification={qualification}
-    />
+    <QualificationForm userId={session.user.id} qualification={qualification} />
   );
 }

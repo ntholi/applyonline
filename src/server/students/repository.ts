@@ -1,49 +1,27 @@
 import { db } from '@/db';
-import { studentQualifications, students, studentSubjects } from '@/db/schema';
+import {
+  studentInfo,
+  studentQualifications,
+  studentSubjects,
+} from '@/db/schema';
 import BaseRepository from '@/server/base/BaseRepository';
 import { StudentQualification } from './types';
-import { users } from '@/db/schema/auth';
-import { eq } from 'drizzle-orm';
 
 export default class StudentRepository extends BaseRepository<
-  typeof students,
-  'id'
+  typeof studentInfo,
+  'userId'
 > {
   constructor() {
-    super(students, 'id');
+    super(studentInfo, 'userId');
   }
 
-  override async findById(id: number) {
-    return await db.query.students.findFirst({
-      where: (students, { eq }) => eq(students.id, id),
+  override async findById(id: string) {
+    return await db.query.studentInfo.findFirst({
+      where: (studentInfo, { eq }) => eq(studentInfo.userId, id),
       with: {
         application: true,
         qualifications: true,
       },
-    });
-  }
-
-  async findByUserId(userId: string | undefined) {
-    if (!userId) return undefined;
-    return await db.query.students.findFirst({
-      where: (students, { eq }) => eq(students.userId, userId),
-      with: {
-        application: true,
-        qualifications: true,
-      },
-    });
-  }
-
-  override async create(data: typeof students.$inferInsert) {
-    return await db.transaction(async (tx) => {
-      const [student] = await tx.insert(students).values(data).returning();
-
-      await tx
-        .update(users)
-        .set({ studentId: student.id })
-        .where(eq(users.id, data.userId));
-
-      return student;
     });
   }
 
@@ -53,7 +31,7 @@ export default class StudentRepository extends BaseRepository<
       const [saved] = await tx
         .insert(studentQualifications)
         .values({
-          studentId: qualification.studentId,
+          userId: qualification.userId,
           qualificationId: qualification.qualificationId,
         })
         .returning();

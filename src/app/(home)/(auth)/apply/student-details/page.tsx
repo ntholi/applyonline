@@ -1,7 +1,8 @@
 import { auth } from '@/auth';
-import { getStudentByUserId } from '@/server/students/actions';
 import { Metadata } from 'next';
 import StudentForm from './StudentForm';
+import { redirect } from 'next/navigation';
+import { getStudent } from '@/server/students/actions';
 
 export const metadata: Metadata = {
   title: 'Personal Details | Apply',
@@ -10,7 +11,11 @@ export const metadata: Metadata = {
 
 export default async function StudentDetailsPage() {
   const session = await auth();
-  const student = await getStudentByUserId(session?.user?.id);
+
+  if (!session?.user?.id) {
+    return redirect('/login');
+  }
+  const student = await getStudent(session?.user?.id);
 
   return <StudentForm initialData={student} />;
 }

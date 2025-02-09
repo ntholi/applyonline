@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { FormNavigation } from '@/app/(home)/(auth)/apply/core/FormNavigation';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -37,16 +38,15 @@ import {
   maritalStatuses,
   nextOfKinRelationships,
   religions,
-  students,
+  studentInfo,
 } from '@/db/schema';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { createStudent } from '@/server/students/actions';
 import { createInsertSchema } from 'drizzle-zod';
 import { useSession } from 'next-auth/react';
-import { FormNavigation } from '@/app/(home)/(auth)/apply/core/FormNavigation';
 
-const formSchema = createInsertSchema(students).extend({
+const formSchema = createInsertSchema(studentInfo).extend({
   userId: z.string().optional(),
 });
 

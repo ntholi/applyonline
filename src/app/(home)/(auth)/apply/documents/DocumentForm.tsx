@@ -16,7 +16,7 @@ import { Loader2, FileIcon, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 type Props = {
-  studentId: number;
+  userId: string;
 };
 
 const schema = z.object({
@@ -28,7 +28,7 @@ const schema = z.object({
 
 export type Document = z.infer<typeof schema>;
 
-export default function DocumentForm({ studentId }: Props) {
+export default function DocumentForm({ userId }: Props) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const router = useRouter();
   const { toast } = useToast();
@@ -39,7 +39,7 @@ export default function DocumentForm({ studentId }: Props) {
         if (!doc.file) return;
         const url = await uploadDocument(doc.file);
         await createDocument({
-          studentId,
+          userId,
           fileName: doc.file.name,
           url,
           type: doc.type,

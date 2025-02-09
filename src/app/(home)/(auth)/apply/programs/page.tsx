@@ -1,20 +1,15 @@
 import { auth } from '@/auth';
-import { getApplicationByStudentId } from '@/server/applications/actions';
+import { getApplicationByUserId } from '@/server/applications/actions';
 import { redirect } from 'next/navigation';
 import ProgramsForm from './ProgramsForm';
 
 export default async function ProgramsPage() {
   const session = await auth();
-  const application = await getApplicationByStudentId(session?.user?.studentId);
+  const application = await getApplicationByUserId(session?.user?.id);
 
-  if (!session?.user?.studentId) {
-    return redirect('/apply/student-details');
+  if (!session?.user?.id) {
+    return redirect('/login');
   }
 
-  return (
-    <ProgramsForm
-      studentId={session.user.studentId}
-      application={application}
-    />
-  );
+  return <ProgramsForm userId={session.user.id} application={application} />;
 }

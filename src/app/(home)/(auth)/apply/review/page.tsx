@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getApplicationByStudentId } from '@/server/applications/actions';
+import { getApplicationByUserId } from '@/server/applications/actions';
 import { Check, GraduationCap, School, User, Users } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { FormNavigation } from '../core/FormNavigation';
@@ -17,7 +17,7 @@ export default async function ReviewPage() {
   const session = await auth();
   if (!session?.user?.id) redirect('/login');
 
-  const application = await getApplicationByStudentId(session.user.studentId);
+  const application = await getApplicationByUserId(session.user.studentId);
   if (!application) return null;
 
   return (

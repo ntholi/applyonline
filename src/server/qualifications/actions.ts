@@ -7,11 +7,11 @@ export async function getQualification(id: number) {
   return service.get(id);
 }
 
-export async function getQualificationByStudentId(
-  studentId: number | null | undefined,
+export async function getQualificationByUserId(
+  userId: string | null | undefined,
 ) {
-  if (!studentId) return null;
-  return service.findByStudentId(studentId);
+  if (!userId) return null;
+  return service.findByUserId(userId);
 }
 
 export async function findAllQualifications(page: number = 1, search = '') {

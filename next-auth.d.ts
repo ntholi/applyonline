@@ -5,6 +5,5 @@ type Role = (typeof users.$inferSelect)['role'];
 declare module 'next-auth' {
   interface User extends DefaultUser {
     role: Role;
-    studentId: number | null;
   }
 }

@@ -1,20 +1,16 @@
 'use server';
 
-import { students } from '@/db/schema';
+import { studentInfo } from '@/db/schema';
 import { studentsService as service } from './service';
 import { auth } from '@/auth';
 import { StudentQualification } from './types';
 
-type Student = Omit<typeof students.$inferInsert, 'userId'> & {
+type Student = Omit<typeof studentInfo.$inferInsert, 'userId'> & {
   userId?: string;
 };
 
-export async function getStudent(id: number) {
-  return service.get(id);
-}
-
-export async function getStudentByUserId(userId: string | undefined) {
-  return service.getByUserId(userId);
+export async function getStudent(userId: string) {
+  return service.get(userId);
 }
 
 export async function findAllStudents(page: number = 1, search = '') {
@@ -27,9 +23,9 @@ export async function createStudent(student: Student) {
     throw new Error('User not found');
   }
 
-  const existing = await service.getByUserId(session.user.id);
+  const existing = await service.get(session.user.id);
   if (existing) {
-    return service.update(existing.id, {
+    return service.update(existing.userId, {
       ...student,
       userId: session.user.id,
     });
@@ -37,7 +33,7 @@ export async function createStudent(student: Student) {
   return service.create({ ...student, userId: session.user.id });
 }
 
-export async function updateStudent(id: number, student: Student) {
+export async function updateStudent(id: string, student: Student) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error('User not found');
@@ -49,6 +45,6 @@ export async function saveStudentQualification(value: StudentQualification) {
   return service.saveQualification(value);
 }
 
-export async function deleteStudent(id: number) {
+export async function deleteStudent(id: string) {
   return service.delete(id);
 }

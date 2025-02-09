@@ -26,7 +26,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import {
   findAllQualifications,
-  getQualificationByStudentId,
+  getQualificationByUserId,
 } from '@/server/qualifications/actions';
 import { saveStudentQualification } from '@/server/students/actions';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -62,11 +62,11 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 type Props = {
-  studentId: number;
-  qualification: Awaited<ReturnType<typeof getQualificationByStudentId>>;
+  userId: string;
+  qualification: Awaited<ReturnType<typeof getQualificationByUserId>>;
 };
 
-export default function QualificationForm({ studentId, qualification }: Props) {
+export default function QualificationForm({ userId, qualification }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -138,7 +138,7 @@ export default function QualificationForm({ studentId, qualification }: Props) {
 
   function onSubmit(data: FormValues) {
     saveMutation.mutate({
-      studentId,
+      userId,
       qualificationId: Number(data.qualificationId),
       studentSubjects: data.subjects,
     });

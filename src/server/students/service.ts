@@ -1,10 +1,10 @@
-import { students } from '@/db/schema';
-import StudentRepository from './repository';
+import { studentInfo } from '@/db/schema';
 import withAuth from '@/server/base/withAuth';
 import { FindAllParams } from '../base/BaseRepository';
+import StudentRepository from './repository';
 import { StudentQualification } from './types';
 
-type Student = typeof students.$inferInsert;
+type Student = typeof studentInfo.$inferInsert;
 
 class StudentService {
   constructor(private readonly repository = new StudentRepository()) {}
@@ -13,15 +13,11 @@ class StudentService {
     return withAuth(async () => this.repository.findFirst(), []);
   }
 
-  async get(id: number) {
+  async get(id: string) {
     return withAuth(async () => this.repository.findById(id), []);
   }
 
-  async getByUserId(userId: string | undefined) {
-    return withAuth(async () => this.repository.findByUserId(userId), []);
-  }
-
-  async findAll(params: FindAllParams<typeof students>) {
+  async findAll(params: FindAllParams<typeof studentInfo>) {
     return withAuth(async () => this.repository.findAll(params), []);
   }
 
@@ -29,11 +25,11 @@ class StudentService {
     return withAuth(async () => this.repository.create(data), []);
   }
 
-  async update(id: number, data: Student) {
+  async update(id: string, data: Student) {
     return withAuth(async () => this.repository.update(id, data), []);
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return withAuth(async () => this.repository.delete(id), []);
   }
 

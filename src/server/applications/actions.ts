@@ -9,11 +9,11 @@ export async function getApplication(id: number) {
   return service.get(id);
 }
 
-export async function getApplicationByStudentId(
-  studentId: number | null | undefined,
+export async function getApplicationByUserId(
+  userId: string | null | undefined,
 ) {
-  if (!studentId) return null;
-  return service.findByStudentId(studentId);
+  if (!userId) return null;
+  return service.findByUserId(userId);
 }
 
 export async function findAllApplications(page: number = 1, search = '') {
