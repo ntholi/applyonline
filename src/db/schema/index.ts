@@ -1,4 +1,4 @@
-import { relations, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import {
   index,
   integer,
@@ -18,14 +18,7 @@ export const qualifications = sqliteTable(
   },
   (table) => ({
     nameIdx: index('qualification_name_idx').on(table.name),
-  }),
-);
-
-export const qualificationsRelations = relations(
-  qualifications,
-  ({ many }) => ({
-    subjects: many(subjects),
-    grades: many(qualificationGrades),
+    createdAtIdx: index('qualification_created_at_idx').on(table.createdAt),
   }),
 );
 
@@ -44,6 +37,11 @@ export const subjects = sqliteTable(
   },
   (table) => ({
     nameIdx: index('subject_name_idx').on(table.name),
+    codeIdx: index('subject_code_idx').on(table.code),
+    qualificationIdIdx: index('subject_qualification_id_idx').on(
+      table.qualificationId,
+    ),
+    commercialIdx: index('subject_commercial_idx').on(table.isCommercial),
   }),
 );
 
@@ -61,21 +59,28 @@ export const qualificationGrades = sqliteTable(
   },
   (table) => ({
     nameIdx: index('qualification_grade_name_idx').on(table.name),
+    qualificationIdIdx: index('qualification_grade_qual_id_idx').on(
+      table.qualificationId,
+    ),
+    indexIdx: index('qualification_grade_index_idx').on(table.index),
   }),
 );
 
-export const programs = sqliteTable('programs', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  name: text(),
-  faculty: text(),
-  description: text(),
-  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
-  updatedAt: integer({ mode: 'timestamp' }),
-});
-
-export const programsRelations = relations(programs, ({ many }) => ({
-  qualifications: many(programQualifications),
-}));
+export const programs = sqliteTable(
+  'programs',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    name: text(),
+    faculty: text(),
+    description: text(),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    nameIdx: index('program_name_idx').on(table.name),
+    facultyIdx: index('program_faculty_idx').on(table.faculty),
+  }),
+);
 
 export const programQualifications = sqliteTable(
   'program_qualifications',
@@ -95,6 +100,12 @@ export const programQualifications = sqliteTable(
     compositePK: primaryKey({
       columns: [table.programId, table.qualificationId],
     }),
+    programIdIdx: index('program_qualification_program_id_idx').on(
+      table.programId,
+    ),
+    qualificationIdIdx: index('program_qualification_qual_id_idx').on(
+      table.qualificationId,
+    ),
   }),
 );
 
@@ -121,15 +132,23 @@ export const requiredSubjects = sqliteTable(
       table.programId,
       table.qualificationId,
     ),
+    subjectIdIdx: index('required_subject_subject_id_idx').on(table.subjectId),
+    gradeIdIdx: index('required_subject_grade_id_idx').on(table.gradeId),
   }),
 );
 
-export const applications = sqliteTable('applications', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  userId: text()
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-});
+export const applications = sqliteTable(
+  'applications',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    userId: text()
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+  },
+  (table) => ({
+    userIdIdx: index('application_user_id_idx').on(table.userId),
+  }),
+);
 
 export const nextOfKinRelationships = [
   'Father',
@@ -186,32 +205,56 @@ export const studentInfo = sqliteTable(
   (table) => ({
     emailIdx: index('student_email_idx').on(table.email),
     nationalIdIdx: index('student_national_id_idx').on(table.nationalId),
+    nameIdx: index('student_name_idx').on(table.name),
+    dateOfBirthIdx: index('student_dob_idx').on(table.dateOfBirth),
+    highSchoolIdx: index('student_high_school_idx').on(table.highSchool),
+    createdAtIdx: index('student_created_at_idx').on(table.createdAt),
   }),
 );
 
-export const programChoices = sqliteTable('program_choices', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  applicationId: integer()
-    .notNull()
-    .references(() => applications.id, { onDelete: 'cascade' }),
-  programId: integer()
-    .notNull()
-    .references(() => programs.id, { onDelete: 'cascade' }),
-  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
-  updatedAt: integer({ mode: 'timestamp' }),
-});
+export const programChoices = sqliteTable(
+  'program_choices',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    applicationId: integer()
+      .notNull()
+      .references(() => applications.id, { onDelete: 'cascade' }),
+    programId: integer()
+      .notNull()
+      .references(() => programs.id, { onDelete: 'cascade' }),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    applicationIdIdx: index('program_choice_application_id_idx').on(
+      table.applicationId,
+    ),
+    programIdIdx: index('program_choice_program_id_idx').on(table.programId),
+  }),
+);
 
-export const studentQualifications = sqliteTable('student_qualifications', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  applicationId: integer()
-    .notNull()
-    .references(() => applications.id, { onDelete: 'cascade' }),
-  qualificationId: integer()
-    .notNull()
-    .references(() => qualifications.id, { onDelete: 'cascade' }),
-  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
-  updatedAt: integer({ mode: 'timestamp' }),
-});
+export const studentQualifications = sqliteTable(
+  'student_qualifications',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    applicationId: integer()
+      .notNull()
+      .references(() => applications.id, { onDelete: 'cascade' }),
+    qualificationId: integer()
+      .notNull()
+      .references(() => qualifications.id, { onDelete: 'cascade' }),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    applicationIdIdx: index('student_qual_application_id_idx').on(
+      table.applicationId,
+    ),
+    qualificationIdIdx: index('student_qual_qualification_id_idx').on(
+      table.qualificationId,
+    ),
+  }),
+);
 
 export const studentSubjects = sqliteTable(
   'student_subjects',
@@ -234,6 +277,7 @@ export const studentSubjects = sqliteTable(
       table.studentQualificationId,
       table.subjectId,
     ),
+    gradeIdIdx: index('student_subject_grade_id_idx').on(table.gradeId),
   }),
 );
 
@@ -245,14 +289,23 @@ export const documentTypes = [
   'Other',
 ] as const;
 
-export const documents = sqliteTable('documents', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  applicationId: integer()
-    .notNull()
-    .references(() => applications.id, { onDelete: 'cascade' }),
-  fileName: text().notNull(),
-  url: text().notNull(),
-  type: text({ enum: documentTypes }).notNull(),
-  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
-  updatedAt: integer({ mode: 'timestamp' }),
-});
+export const documents = sqliteTable(
+  'documents',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    applicationId: integer()
+      .notNull()
+      .references(() => applications.id, { onDelete: 'cascade' }),
+    fileName: text().notNull(),
+    url: text().notNull(),
+    type: text({ enum: documentTypes }).notNull(),
+    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    updatedAt: integer({ mode: 'timestamp' }),
+  },
+  (table) => ({
+    applicationIdIdx: index('document_application_id_idx').on(
+      table.applicationId,
+    ),
+    typeIdx: index('document_type_idx').on(table.type),
+  }),
+);
