@@ -124,15 +124,12 @@ export const requiredSubjects = sqliteTable(
   }),
 );
 
-export const requiredSubjectsRelations = relations(
-  requiredSubjects,
-  ({ one }) => ({
-    grade: one(qualificationGrades, {
-      fields: [requiredSubjects.gradeId],
-      references: [qualificationGrades.id],
-    }),
-  }),
-);
+export const applications = sqliteTable('applications', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  userId: text()
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+});
 
 export const nextOfKinRelationships = [
   'Father',
@@ -164,10 +161,10 @@ export const religions = [
 export const studentInfo = sqliteTable(
   'student_info',
   {
-    userId: text()
+    applicationId: integer()
       .primaryKey()
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
+      .references(() => applications.id, { onDelete: 'cascade' }),
     nationalId: text().notNull(),
     name: text().notNull(),
     email: text().notNull().unique(),
@@ -192,51 +189,29 @@ export const studentInfo = sqliteTable(
   }),
 );
 
-export const applications = sqliteTable(
-  'applications',
-  {
-    id: integer().primaryKey({ autoIncrement: true }),
-    userId: text()
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    firstChoiceId: integer()
-      .notNull()
-      .references(() => programs.id, { onDelete: 'cascade' }),
-    secondChoiceId: integer().references(() => programs.id, {
-      onDelete: 'cascade',
-    }),
-    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
-    updatedAt: integer({ mode: 'timestamp' }),
-  },
-  (table) => ({
-    studentProgramIdx: index('student_program_idx').on(
-      table.userId,
-      table.firstChoiceId,
-      table.secondChoiceId,
-    ),
-  }),
-);
+export const programChoices = sqliteTable('program_choices', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  applicationId: integer()
+    .notNull()
+    .references(() => applications.id, { onDelete: 'cascade' }),
+  programId: integer()
+    .notNull()
+    .references(() => programs.id, { onDelete: 'cascade' }),
+  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+  updatedAt: integer({ mode: 'timestamp' }),
+});
 
-export const studentQualifications = sqliteTable(
-  'student_qualifications',
-  {
-    id: integer().primaryKey({ autoIncrement: true }),
-    userId: text()
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    qualificationId: integer()
-      .notNull()
-      .references(() => qualifications.id, { onDelete: 'cascade' }),
-    createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
-    updatedAt: integer({ mode: 'timestamp' }),
-  },
-  (table) => ({
-    studentQualificationIdx: index('student_qualification_idx').on(
-      table.userId,
-      table.qualificationId,
-    ),
-  }),
-);
+export const studentQualifications = sqliteTable('student_qualifications', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  applicationId: integer()
+    .notNull()
+    .references(() => applications.id, { onDelete: 'cascade' }),
+  qualificationId: integer()
+    .notNull()
+    .references(() => qualifications.id, { onDelete: 'cascade' }),
+  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+  updatedAt: integer({ mode: 'timestamp' }),
+});
 
 export const studentSubjects = sqliteTable(
   'student_subjects',
@@ -272,9 +247,9 @@ export const documentTypes = [
 
 export const documents = sqliteTable('documents', {
   id: integer().primaryKey({ autoIncrement: true }),
-  userId: text()
+  applicationId: integer()
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => applications.id, { onDelete: 'cascade' }),
   fileName: text().notNull(),
   url: text().notNull(),
   type: text({ enum: documentTypes }).notNull(),
