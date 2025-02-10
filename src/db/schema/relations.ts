@@ -8,15 +8,17 @@ import {
   qualificationGrades,
   qualifications,
   requiredSubjects,
-  studentInfo,
+  studentDetails,
   studentQualifications,
   studentSubjects,
   subjects,
 } from './';
 import { users } from './auth';
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   applications: many(applications),
+  studentDetails: one(studentDetails),
+  reviewedApplications: many(applications),
 }));
 
 export const qualificationsRelations = relations(
@@ -98,17 +100,27 @@ export const applicationsRelations = relations(
       fields: [applications.userId],
       references: [users.id],
     }),
-    studentInfo: one(studentInfo),
-    programChoices: many(programChoices),
+    reviewer: one(users, {
+      fields: [applications.reviewerId],
+      references: [users.id],
+    }),
+    studentDetails: one(studentDetails, {
+      fields: [applications.userId],
+      references: [studentDetails.userId],
+    }),
+    programChoice: one(programChoices, {
+      fields: [applications.id],
+      references: [programChoices.applicationId],
+    }),
     studentQualifications: many(studentQualifications),
     documents: many(documents),
   }),
 );
 
-export const studentInfoRelations = relations(studentInfo, ({ one }) => ({
-  application: one(applications, {
-    fields: [studentInfo.applicationId],
-    references: [applications.id],
+export const studentDetailsRelations = relations(studentDetails, ({ one }) => ({
+  user: one(users, {
+    fields: [studentDetails.userId],
+    references: [users.id],
   }),
 }));
 
@@ -117,8 +129,12 @@ export const programChoicesRelations = relations(programChoices, ({ one }) => ({
     fields: [programChoices.applicationId],
     references: [applications.id],
   }),
-  program: one(programs, {
-    fields: [programChoices.programId],
+  firstChoice: one(programs, {
+    fields: [programChoices.firstProgramId],
+    references: [programs.id],
+  }),
+  secondChoice: one(programs, {
+    fields: [programChoices.secondProgramId],
     references: [programs.id],
   }),
 }));

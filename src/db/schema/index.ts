@@ -137,6 +137,8 @@ export const requiredSubjects = sqliteTable(
   }),
 );
 
+export const applicationStatus = ['pending', 'approved', 'rejected'] as const;
+
 export const applications = sqliteTable(
   'applications',
   {
@@ -144,9 +146,18 @@ export const applications = sqliteTable(
     userId: text()
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
+    status: text({ enum: applicationStatus }).notNull().default('pending'),
+    submissionDate: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+    reviewDate: integer({ mode: 'timestamp' }),
+    reviewerId: text().references(() => users.id),
   },
   (table) => ({
     userIdIdx: index('application_user_id_idx').on(table.userId),
+    statusIdx: index('application_status_idx').on(table.status),
+    submissionDateIdx: index('application_submission_date_idx').on(
+      table.submissionDate,
+    ),
+    reviewerIdIdx: index('application_reviewer_id_idx').on(table.reviewerId),
   }),
 );
 
@@ -177,13 +188,13 @@ export const religions = [
   'Other',
 ] as const;
 
-export const studentInfo = sqliteTable(
-  'student_info',
+export const studentDetails = sqliteTable(
+  'student_details',
   {
-    applicationId: integer()
+    userId: text()
       .primaryKey()
       .notNull()
-      .references(() => applications.id, { onDelete: 'cascade' }),
+      .references(() => users.id, { onDelete: 'cascade' }),
     nationalId: text().notNull(),
     name: text().notNull(),
     email: text().notNull().unique(),
@@ -219,9 +230,12 @@ export const programChoices = sqliteTable(
     applicationId: integer()
       .notNull()
       .references(() => applications.id, { onDelete: 'cascade' }),
-    programId: integer()
+    firstProgramId: integer()
       .notNull()
       .references(() => programs.id, { onDelete: 'cascade' }),
+    secondProgramId: integer().references(() => programs.id, {
+      onDelete: 'cascade',
+    }),
     createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
     updatedAt: integer({ mode: 'timestamp' }),
   },
@@ -229,7 +243,12 @@ export const programChoices = sqliteTable(
     applicationIdIdx: index('program_choice_application_id_idx').on(
       table.applicationId,
     ),
-    programIdIdx: index('program_choice_program_id_idx').on(table.programId),
+    firstChoiceIdx: index('program_choice_first_choice_idx').on(
+      table.firstProgramId,
+    ),
+    secondChoiceIdx: index('program_choice_second_choice_idx').on(
+      table.secondProgramId,
+    ),
   }),
 );
 
@@ -278,6 +297,9 @@ export const studentSubjects = sqliteTable(
       table.subjectId,
     ),
     gradeIdIdx: index('student_subject_grade_id_idx').on(table.gradeId),
+    uniqueSubject: primaryKey({
+      columns: [table.studentQualificationId, table.subjectId],
+    }),
   }),
 );
 
@@ -307,5 +329,8 @@ export const documents = sqliteTable(
       table.applicationId,
     ),
     typeIdx: index('document_type_idx').on(table.type),
+    uniqueType: primaryKey({
+      columns: [table.applicationId, table.type],
+    }),
   }),
 );
