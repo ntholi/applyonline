@@ -14,7 +14,7 @@ class StudentService {
   }
 
   async get(id: string) {
-    return withAuth(async () => this.repository.findById(id), []);
+    return withAuth(async () => this.repository.findById(id), ['user']);
   }
 
   async findAll(params: FindAllParams<typeof studentDetails>) {

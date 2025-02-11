@@ -4,14 +4,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { applications } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-
-export const applicationSteps = [
-  { id: 1, name: 'Personal Details', path: '/apply/student-details' },
-  { id: 2, name: 'Academic Qualifications', path: '/apply/qualifications' },
-  { id: 3, name: 'Program Selection', path: '/apply/programs' },
-  { id: 4, name: 'Documents Upload', path: '/apply/documents' },
-  { id: 5, name: 'Review & Submit', path: '/apply/review' },
-];
+import { applicationSteps } from './steps';
 
 export async function getCurrentStep() {
   const session = await auth();

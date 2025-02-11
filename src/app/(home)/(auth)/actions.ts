@@ -14,6 +14,7 @@ export async function createApplication() {
   await db.insert(applications).values({
     userId: session.user.id,
     status: 'pending',
+    currentStep: 1,
   });
 
   redirect('/apply/student-details');

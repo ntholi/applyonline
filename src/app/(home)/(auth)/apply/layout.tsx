@@ -4,7 +4,7 @@ import { Container } from '@/components/ui/container';
 import { Progress } from '@/components/ui/progress';
 import { usePathname } from 'next/navigation';
 import { PropsWithChildren } from 'react';
-import { applicationSteps } from './core/actions';
+import { applicationSteps } from './core/steps';
 
 export default function ApplyLayout({ children }: PropsWithChildren) {
   const pathname = usePathname();

@@ -6,6 +6,7 @@ import {
 } from '@/db/schema';
 import BaseRepository from '@/server/base/BaseRepository';
 import { StudentQualification } from './types';
+import { eq } from 'drizzle-orm';
 
 export default class StudentRepository extends BaseRepository<
   typeof studentDetails,
@@ -16,8 +17,8 @@ export default class StudentRepository extends BaseRepository<
   }
 
   override async findById(id: string) {
-    return await db.query.studentInfo.findFirst({
-      where: (studentInfo, { eq }) => eq(studentInfo.userId, id),
+    return await db.query.studentDetails.findFirst({
+      where: eq(studentDetails.userId, id),
       with: {
         application: true,
         qualifications: true,
