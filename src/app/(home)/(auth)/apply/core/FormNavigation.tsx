@@ -27,6 +27,12 @@ export function FormNavigation({
     }
   };
 
+  function handleSave() {
+    if (onSave) {
+      onSave();
+    }
+  }
+
   return (
     <div className='mt-8 flex items-center justify-between'>
       <Button variant='outline' onClick={handleBack} type='button'>
@@ -35,7 +41,7 @@ export function FormNavigation({
       </Button>
 
       {onSave && (
-        <Button onClick={onSave} disabled={loading} type='submit'>
+        <Button onClick={handleSave} disabled={loading} type='submit'>
           <Save className='mr-2 h-4 w-4' />
           {saveLabel}
         </Button>

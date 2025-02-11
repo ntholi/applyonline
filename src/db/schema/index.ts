@@ -150,6 +150,7 @@ export const applications = sqliteTable(
     submissionDate: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
     reviewDate: integer({ mode: 'timestamp' }),
     reviewerId: text().references(() => users.id),
+    currentStep: integer().notNull(),
   },
   (table) => ({
     userIdIdx: index('application_user_id_idx').on(table.userId),
@@ -157,7 +158,6 @@ export const applications = sqliteTable(
     submissionDateIdx: index('application_submission_date_idx').on(
       table.submissionDate,
     ),
-    reviewerIdIdx: index('application_reviewer_id_idx').on(table.reviewerId),
   }),
 );
 
