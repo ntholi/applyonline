@@ -5,6 +5,7 @@ import {
   primaryKey,
   sqliteTable,
   text,
+  unique,
 } from 'drizzle-orm/sqlite-core';
 import { users } from './auth';
 
@@ -151,6 +152,9 @@ export const applications = sqliteTable(
     reviewDate: integer({ mode: 'timestamp' }),
     reviewerId: text().references(() => users.id),
     currentStep: integer().notNull(),
+    termId: integer()
+      .notNull()
+      .references(() => terms.id),
   },
   (table) => ({
     userIdIdx: index('application_user_id_idx').on(table.userId),
@@ -158,6 +162,7 @@ export const applications = sqliteTable(
     submissionDateIdx: index('application_submission_date_idx').on(
       table.submissionDate,
     ),
+    uniqueUserIdTermId: unique().on(table.userId, table.termId),
   }),
 );
 
