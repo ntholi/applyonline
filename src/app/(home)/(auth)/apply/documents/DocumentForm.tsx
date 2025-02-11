@@ -1,34 +1,34 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { documentTypes } from '@/db/schema';
+import { useToast } from '@/hooks/use-toast';
 import { uploadDocument } from '@/lib/storage';
 import { createDocument } from '@/server/documents/actions';
 import { useMutation } from '@tanstack/react-query';
+import { FileIcon, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { z } from 'zod';
 import { FormNavigation } from '../core/FormNavigation';
 import DocumentPicker from './DocumentPicker';
-import { Button } from '@/components/ui/button';
-import { Loader2, FileIcon, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 
 type Props = {
-  userId: string;
+  applicationId: number;
 };
 
-const schema = z.object({
+export const documentSchema = z.object({
   type: z.enum(documentTypes),
   file: z
     .instanceof(File)
     .refine((f) => f.size < 5 * 1024 * 1024, 'File must be less than 5MB'),
 });
 
-export type Document = z.infer<typeof schema>;
+export type Document = z.infer<typeof documentSchema>;
 
-export default function DocumentForm({ userId }: Props) {
+export default function DocumentForm({ applicationId }: Props) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const router = useRouter();
   const { toast } = useToast();
@@ -39,7 +39,7 @@ export default function DocumentForm({ userId }: Props) {
         if (!doc.file) return;
         const url = await uploadDocument(doc.file);
         await createDocument({
-          userId,
+          applicationId,
           fileName: doc.file.name,
           url,
           type: doc.type,
@@ -54,7 +54,7 @@ export default function DocumentForm({ userId }: Props) {
       });
       router.push('/');
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: 'Error',
         description: 'Failed to upload documents. Please try again.',

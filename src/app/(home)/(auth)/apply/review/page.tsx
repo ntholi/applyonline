@@ -17,7 +17,7 @@ export default async function ReviewPage() {
   const session = await auth();
   if (!session?.user?.id) redirect('/login');
 
-  const application = await getApplicationByUserId(session.user.studentId);
+  const application = await getApplicationByUserId(session.user.id);
   if (!application) return null;
 
   return (

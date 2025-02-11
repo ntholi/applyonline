@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import {
-  studentInfo,
+  studentDetails,
   studentQualifications,
   studentSubjects,
 } from '@/db/schema';
@@ -8,11 +8,11 @@ import BaseRepository from '@/server/base/BaseRepository';
 import { StudentQualification } from './types';
 
 export default class StudentRepository extends BaseRepository<
-  typeof studentInfo,
+  typeof studentDetails,
   'userId'
 > {
   constructor() {
-    super(studentInfo, 'userId');
+    super(studentDetails, 'userId');
   }
 
   override async findById(id: string) {

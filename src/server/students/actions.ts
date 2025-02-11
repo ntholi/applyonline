@@ -1,11 +1,11 @@
 'use server';
 
-import { studentInfo } from '@/db/schema';
+import { studentDetails } from '@/db/schema';
 import { studentsService as service } from './service';
 import { auth } from '@/auth';
 import { StudentQualification } from './types';
 
-type Student = Omit<typeof studentInfo.$inferInsert, 'userId'> & {
+type Student = Omit<typeof studentDetails.$inferInsert, 'userId'> & {
   userId?: string;
 };
 

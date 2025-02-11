@@ -5,10 +5,13 @@ import ProgramsForm from './ProgramsForm';
 
 export default async function ProgramsPage() {
   const session = await auth();
-  const application = await getApplicationByUserId(session?.user?.id);
 
   if (!session?.user?.id) {
     return redirect('/login');
+  }
+  const application = await getApplicationByUserId(session?.user?.id);
+  if (!application) {
+    redirect('/apply');
   }
 
   return <ProgramsForm userId={session.user.id} application={application} />;

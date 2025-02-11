@@ -38,7 +38,7 @@ import {
   maritalStatuses,
   nextOfKinRelationships,
   religions,
-  studentInfo,
+  studentDetails,
 } from '@/db/schema';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -46,7 +46,7 @@ import { createStudent } from '@/server/students/actions';
 import { createInsertSchema } from 'drizzle-zod';
 import { useSession } from 'next-auth/react';
 
-const formSchema = createInsertSchema(studentInfo).extend({
+const formSchema = createInsertSchema(studentDetails).extend({
   userId: z.string().optional(),
 });
 

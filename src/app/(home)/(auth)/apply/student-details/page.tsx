@@ -15,6 +15,9 @@ export default async function StudentDetailsPage() {
   if (!session?.user?.id) {
     return redirect('/login');
   }
+  if (!session.user.applicationId) {
+    redirect('/apply');
+  }
   const student = await getStudent(session?.user?.id);
 
   return <StudentForm initialData={student} />;

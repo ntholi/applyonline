@@ -4,7 +4,7 @@ import { FormNavigation } from '@/app/(home)/(auth)/apply/core/FormNavigation';
 import { getFacultyByCode } from '@/app/admin/programs/data/faculties';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { programs } from '@/db/schema';
+import { applications, programChoices, programs } from '@/db/schema';
 import { toast } from '@/hooks/use-toast';
 import {
   createApplication,
@@ -17,10 +17,18 @@ import { useEffect, useState } from 'react';
 import ProgramPicker from './ProgramPicker';
 
 type Program = typeof programs.$inferSelect;
+type Application = typeof applications.$inferSelect & {
+  programChoice:
+    | (typeof programChoices.$inferSelect & {
+        firstChoice: typeof programs.$inferSelect;
+        secondChoice: typeof programs.$inferSelect | null;
+      })
+    | null;
+};
 
 type Props = {
   userId: string;
-  application: Awaited<ReturnType<typeof getApplicationByUserId>>;
+  application: NonNullable<Application>;
 };
 
 export default function ProgramsForm({ userId, application }: Props) {
@@ -30,8 +38,8 @@ export default function ProgramsForm({ userId, application }: Props) {
 
   useEffect(() => {
     if (application) {
-      setFirstChoice(application.firstChoice);
-      setSecondChoice(application.secondChoice);
+      setFirstChoice(application?.programChoice?.firstChoice ?? null);
+      setSecondChoice(application?.programChoice?.secondChoice ?? null);
     }
   }, [application]);
 
@@ -41,8 +49,6 @@ export default function ProgramsForm({ userId, application }: Props) {
 
       return createApplication({
         userId,
-        firstChoiceId: firstChoice.id,
-        secondChoiceId: secondChoice?.id,
       });
     },
     onSuccess: () => {

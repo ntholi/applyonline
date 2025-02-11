@@ -1,10 +1,10 @@
-import { studentInfo } from '@/db/schema';
+import { studentDetails } from '@/db/schema';
 import withAuth from '@/server/base/withAuth';
 import { FindAllParams } from '../base/BaseRepository';
 import StudentRepository from './repository';
 import { StudentQualification } from './types';
 
-type Student = typeof studentInfo.$inferInsert;
+type Student = typeof studentDetails.$inferInsert;
 
 class StudentService {
   constructor(private readonly repository = new StudentRepository()) {}
@@ -17,7 +17,7 @@ class StudentService {
     return withAuth(async () => this.repository.findById(id), []);
   }
 
-  async findAll(params: FindAllParams<typeof studentInfo>) {
+  async findAll(params: FindAllParams<typeof studentDetails>) {
     return withAuth(async () => this.repository.findAll(params), []);
   }
 

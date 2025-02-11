@@ -1,6 +1,7 @@
 import BaseRepository from '@/server/base/BaseRepository';
-import { applications } from '@/db/schema';
+import { applications, programChoices } from '@/db/schema';
 import { db } from '@/db';
+import { eq } from 'drizzle-orm';
 
 export default class ApplicationRepository extends BaseRepository<
   typeof applications,
@@ -10,13 +11,16 @@ export default class ApplicationRepository extends BaseRepository<
     super(applications, 'id');
   }
 
-  findByUserId(userId: string) {
+  async findByUserId(userId: string) {
     return db.query.applications.findFirst({
-      where: (applications, { eq }) => eq(applications.userId, userId),
+      where: eq(applications.userId, userId),
       with: {
-        student: true,
-        firstChoice: true,
-        secondChoice: true,
+        programChoice: {
+          with: {
+            firstChoice: true,
+            secondChoice: true,
+          },
+        },
       },
     });
   }
@@ -25,9 +29,25 @@ export default class ApplicationRepository extends BaseRepository<
     return db.query.applications.findFirst({
       where: (applications, { eq }) => eq(applications.id, id),
       with: {
-        student: true,
-        firstChoice: true,
-        secondChoice: true,
+        studentDetails: true,
+        programChoice: {
+          with: {
+            firstChoice: true,
+            secondChoice: true,
+          },
+        },
+        documents: true,
+        studentQualifications: {
+          with: {
+            qualification: true,
+            subjects: {
+              with: {
+                subject: true,
+                grade: true,
+              },
+            },
+          },
+        },
       },
     });
   }
