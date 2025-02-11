@@ -21,7 +21,6 @@ export default class StudentRepository extends BaseRepository<
       where: eq(studentDetails.userId, id),
       with: {
         application: true,
-        qualifications: true,
       },
     });
   }

@@ -18,7 +18,7 @@ import { users } from './auth';
 export const usersRelations = relations(users, ({ many, one }) => ({
   applications: many(applications),
   studentDetails: one(studentDetails),
-  reviewedApplications: many(applications),
+  reviewedApplications: many(applications, { relationName: 'reviewer' }),
 }));
 
 export const qualificationsRelations = relations(
@@ -54,7 +54,8 @@ export const qualificationGradesRelations = relations(
 
 export const programsRelations = relations(programs, ({ many }) => ({
   programQualifications: many(programQualifications),
-  programChoices: many(programChoices),
+  firstChoices: many(programChoices, { relationName: 'firstChoice' }),
+  secondChoices: many(programChoices, { relationName: 'secondChoice' }),
 }));
 
 export const programQualificationsRelations = relations(
@@ -108,10 +109,7 @@ export const applicationsRelations = relations(
       fields: [applications.userId],
       references: [studentDetails.userId],
     }),
-    programChoice: one(programChoices, {
-      fields: [applications.id],
-      references: [programChoices.applicationId],
-    }),
+    programChoice: one(programChoices),
     studentQualifications: many(studentQualifications),
     documents: many(documents),
   }),
@@ -122,13 +120,14 @@ export const studentDetailsRelations = relations(studentDetails, ({ one }) => ({
     fields: [studentDetails.userId],
     references: [users.id],
   }),
+  application: one(applications, {
+    fields: [studentDetails.userId],
+    references: [applications.userId],
+  }),
 }));
 
 export const programChoicesRelations = relations(programChoices, ({ one }) => ({
-  application: one(applications, {
-    fields: [programChoices.applicationId],
-    references: [applications.id],
-  }),
+  application: one(applications),
   firstChoice: one(programs, {
     fields: [programChoices.firstProgramId],
     references: [programs.id],
@@ -142,14 +141,8 @@ export const programChoicesRelations = relations(programChoices, ({ one }) => ({
 export const studentQualificationsRelations = relations(
   studentQualifications,
   ({ one, many }) => ({
-    application: one(applications, {
-      fields: [studentQualifications.applicationId],
-      references: [applications.id],
-    }),
-    qualification: one(qualifications, {
-      fields: [studentQualifications.qualificationId],
-      references: [qualifications.id],
-    }),
+    application: one(applications),
+    qualification: one(qualifications),
     subjects: many(studentSubjects),
   }),
 );
@@ -157,24 +150,12 @@ export const studentQualificationsRelations = relations(
 export const studentSubjectsRelations = relations(
   studentSubjects,
   ({ one }) => ({
-    studentQualification: one(studentQualifications, {
-      fields: [studentSubjects.studentQualificationId],
-      references: [studentQualifications.id],
-    }),
-    subject: one(subjects, {
-      fields: [studentSubjects.subjectId],
-      references: [subjects.id],
-    }),
-    grade: one(qualificationGrades, {
-      fields: [studentSubjects.gradeId],
-      references: [qualificationGrades.id],
-    }),
+    studentQualification: one(studentQualifications),
+    subject: one(subjects),
+    grade: one(qualificationGrades),
   }),
 );
 
 export const documentsRelations = relations(documents, ({ one }) => ({
-  application: one(applications, {
-    fields: [documents.applicationId],
-    references: [applications.id],
-  }),
+  application: one(applications),
 }));
