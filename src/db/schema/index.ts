@@ -330,3 +330,11 @@ export const documents = sqliteTable(
     typeIdx: index('document_type_idx').on(table.type),
   }),
 );
+
+export const terms = sqliteTable('terms', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text(),
+  isActive: integer({ mode: 'boolean' }).default(false),
+  createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
+  updatedAt: integer({ mode: 'timestamp' }),
+});
