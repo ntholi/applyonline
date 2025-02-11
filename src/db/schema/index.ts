@@ -278,7 +278,6 @@ export const studentQualifications = sqliteTable(
 export const studentSubjects = sqliteTable(
   'student_subjects',
   {
-    id: integer().primaryKey({ autoIncrement: true }),
     studentQualificationId: integer()
       .notNull()
       .references(() => studentQualifications.id, { onDelete: 'cascade' }),
@@ -329,8 +328,5 @@ export const documents = sqliteTable(
       table.applicationId,
     ),
     typeIdx: index('document_type_idx').on(table.type),
-    uniqueType: primaryKey({
-      columns: [table.applicationId, table.type],
-    }),
   }),
 );
