@@ -16,7 +16,7 @@ import {
 import { users } from './auth';
 
 export const usersRelations = relations(users, ({ many, one }) => ({
-  applications: many(applications),
+  applications: many(applications, { relationName: 'applications' }),
   studentDetails: one(studentDetails),
   reviewedApplications: many(applications, { relationName: 'reviewer' }),
 }));
@@ -97,13 +97,15 @@ export const requiredSubjectsRelations = relations(
 export const applicationsRelations = relations(
   applications,
   ({ one, many }) => ({
-    user: one(users, {
+    applicant: one(users, {
       fields: [applications.userId],
       references: [users.id],
+      relationName: 'applicant',
     }),
     reviewer: one(users, {
       fields: [applications.reviewerId],
       references: [users.id],
+      relationName: 'reviewer',
     }),
     studentDetails: one(studentDetails, {
       fields: [applications.userId],
