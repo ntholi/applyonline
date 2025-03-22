@@ -1,11 +1,10 @@
 'use server';
 
-
-import { users } from '@/db/schema';
-import { usersService as service} from './service';
+import { users } from '@/db/schema/auth';
+import { usersService as service } from './service';
+import { eq } from 'drizzle-orm';
 
 type User = typeof users.$inferInsert;
-
 
 export async function getUser(id: string) {
   return service.get(id);
@@ -13,6 +12,12 @@ export async function getUser(id: string) {
 
 export async function findAllUsers(page: number = 1, search = '') {
   return service.findAll({ page, search });
+}
+
+export async function findAllAdmins() {
+  return service.findAll({
+    where: eq(users.role, 'admin'),
+  });
 }
 
 export async function createUser(user: User) {

@@ -1,4 +1,4 @@
-import { users } from '@/db/schema';
+import { users } from '@/db/schema/auth';
 import UserRepository from './repository';
 import withAuth from '@/server/base/withAuth';
 import { FindAllParams } from '../base/BaseRepository';

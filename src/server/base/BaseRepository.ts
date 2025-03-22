@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { count, eq, sql, SQL, like, or } from 'drizzle-orm';
+import { count, eq, sql, SQL, ilike, like, or } from 'drizzle-orm';
 import {
   SQLiteTable as Table,
   SQLiteColumn as Column,
@@ -19,7 +19,7 @@ export interface FindAllParams<T extends Table> {
   searchProperties?: (keyof ModelSelect<T>)[];
   orderBy?: OrderBy<T>[];
   pageSize?: number;
-  condition?: SQL;
+  where?: SQL;
 }
 
 class BaseRepository<
@@ -59,7 +59,7 @@ class BaseRepository<
       searchProperties = [],
       orderBy = [],
       pageSize = 15,
-      condition,
+      where,
     } = params;
 
     const offset = (page - 1) * pageSize;
@@ -84,11 +84,11 @@ class BaseRepository<
         )
       );
 
-      whereCondition = condition
-        ? sql`${searchCondition} AND ${condition}`
+      whereCondition = where
+        ? sql`${searchCondition} AND ${where}`
         : searchCondition;
     } else {
-      whereCondition = condition;
+      whereCondition = where;
     }
 
     return {
@@ -161,9 +161,9 @@ class BaseRepository<
       .where(eq(this.table[this.primaryKey] as Column, id));
   }
 
-  async count(condition?: SQL): Promise<number> {
+  async count(where?: SQL): Promise<number> {
     const query = db.select({ count: count() }).from(this.table);
-    const [result] = await (condition ? query.where(condition) : query);
+    const [result] = await (where ? query.where(where) : query);
     return result?.count ?? 0;
   }
 
