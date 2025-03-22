@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/libsql';
 import { createClient } from '@libsql/client';
 import * as schema from './schema';
+import * as auth from './schema/auth';
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL!,
@@ -8,7 +9,10 @@ const client = createClient({
 });
 
 const db = drizzle(client, {
-  schema,
+  schema: {
+    ...schema,
+    auth,
+  },
   casing: 'snake_case',
 });
 
