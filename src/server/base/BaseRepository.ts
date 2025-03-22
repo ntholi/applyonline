@@ -1,10 +1,8 @@
 import { db } from '@/db';
-import { count, eq, like, or, sql, SQL } from 'drizzle-orm';
+import { count, eq, sql, SQL, ilike, like, or } from 'drizzle-orm';
 
-import {
-  SQLiteColumn as Column,
-  SQLiteTable as Table,
-} from 'drizzle-orm/sqlite-core';
+import { SQLiteTable as Table, SQLiteColumn as Column } from 'drizzle-orm/sqlite-core';
+
 
 type ModelInsert<T extends Table> = T['$inferInsert'];
 type ModelSelect<T extends Table> = T['$inferSelect'];
@@ -81,7 +79,9 @@ class BaseRepository<
     if (searchTerm && searchColumns.length > 0) {
       const searchCondition = or(
         ...searchColumns.map((column) =>
+
           like(this.table[column as keyof T] as Column, `%${searchTerm}%`)
+
         )
       );
 
@@ -109,17 +109,13 @@ class BaseRepository<
     return {
       items,
       totalPages: Math.ceil(totalItems / pageSize),
-      totalItems,
+      totalItems
     };
   }
 
   async query(
     options: QueryOptions<T>
-  ): Promise<{
-    items: ModelSelect<T>[];
-    totalPages: number;
-    totalItems: number;
-  }> {
+  ): Promise<{ items: ModelSelect<T>[]; totalPages: number; totalItems: number }> {
     const { sortExpressions, filterCondition, offset, pageSize } =
       await this.buildQueryCriteria(options);
 
@@ -152,6 +148,7 @@ class BaseRepository<
     id: ModelSelect<T>[PK],
     entity: Partial<ModelInsert<T>>
   ): Promise<ModelSelect<T>> {
+
     const [updated] = (await db
       .update(this.table)
       .set(entity)
