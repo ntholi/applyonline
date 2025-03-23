@@ -9,8 +9,8 @@ export async function getUser(id: string) {
   return service.get(id);
 }
 
-export async function findAllUsers(page: number = 1, searchTerm = '') {
-  return service.findAll({ page, searchTerm });
+export async function getUsers(page: number = 1, search = '') {
+  return service.getAll({ page, search });
 }
 
 export async function createUser(user: User) {

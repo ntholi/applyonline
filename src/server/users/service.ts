@@ -16,7 +16,7 @@ class UserService {
     return withAuth(async () => this.repository.findById(id), []);
   }
 
-  async findAll(params: QueryOptions<typeof users>) {
+  async getAll(params: QueryOptions<typeof users>) {
     return withAuth(async () => this.repository.query(params), []);
   }
 

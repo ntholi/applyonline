@@ -14,8 +14,8 @@ export interface SortOptions<T extends Table> {
 
 export interface QueryOptions<T extends Table> {
   page?: number;
-  pageSize?: number;
-  searchTerm?: string;
+  size?: number;
+  search?: string;
   searchColumns?: (keyof ModelSelect<T>)[];
   sort?: SortOptions<T>[];
   filter?: SQL;
@@ -54,14 +54,14 @@ class BaseRepository<
   protected async buildQueryCriteria(options: QueryOptions<T>) {
     const {
       page = 1,
-      pageSize = 15,
-      searchTerm,
+      size = 15,
+      search,
       searchColumns = [],
       sort = [],
       filter,
     } = options;
 
-    const offset = (page - 1) * pageSize;
+    const offset = (page - 1) * size;
 
     let sortExpressions = sort.map((sortOption) => {
       const column = this.table[sortOption.column] as Column;
@@ -76,11 +76,11 @@ class BaseRepository<
 
     let filterCondition: SQL | undefined;
 
-    if (searchTerm && searchColumns.length > 0) {
+    if (search && searchColumns.length > 0) {
       const searchCondition = or(
         ...searchColumns.map((column) =>
 
-          like(this.table[column as keyof T] as Column, `%${searchTerm}%`)
+          like(this.table[column as keyof T] as Column, `%${search}%`)
 
         )
       );
@@ -96,19 +96,19 @@ class BaseRepository<
       sortExpressions,
       filterCondition,
       offset,
-      pageSize,
+      size,
     };
   }
 
   protected async createPaginatedResult<E extends ModelSelect<T>>(
     items: E[],
     filterCondition: SQL | undefined,
-    pageSize: number
+    size: number
   ) {
     const totalItems = await this.count(filterCondition);
     return {
       items,
-      totalPages: Math.ceil(totalItems / pageSize),
+      totalPages: Math.ceil(totalItems / size),
       totalItems
     };
   }
@@ -116,7 +116,7 @@ class BaseRepository<
   async query(
     options: QueryOptions<T>
   ): Promise<{ items: ModelSelect<T>[]; totalPages: number; totalItems: number }> {
-    const { sortExpressions, filterCondition, offset, pageSize } =
+    const { sortExpressions, filterCondition, offset, size } =
       await this.buildQueryCriteria(options);
 
     const items = await db
@@ -124,10 +124,10 @@ class BaseRepository<
       .from(this.table)
       .orderBy(...sortExpressions)
       .where(filterCondition)
-      .limit(pageSize)
+      .limit(size)
       .offset(offset);
 
-    return await this.createPaginatedResult(items, filterCondition, pageSize);
+    return await this.createPaginatedResult(items, filterCondition, size);
   }
 
   async exists(id: ModelSelect<T>[PK]): Promise<boolean> {
