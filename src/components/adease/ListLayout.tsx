@@ -24,8 +24,8 @@ import { SearchField } from './SearchField';
 export type ListLayoutProps<T> = {
   getData: (
     page: number,
-    search: string,
-  ) => Promise<{ data: T[]; pages: number }>;
+    search: string
+  ) => Promise<{ items: T[]; totalPages: number }>;
   renderItem: (item: T) => React.ReactNode;
   path: string;
   queryKey: string[];
@@ -48,12 +48,14 @@ export function ListLayout<T>({
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [view, setView] = useViewSelect();
 
-  const { isLoading, data: { data, pages } = { data: [], pages: 0 } } =
-    useQuery({
-      queryKey: [...queryKey, page, search],
-      queryFn: () => getData(page, search),
-      staleTime: 0,
-    });
+  const {
+    isLoading,
+    data: { items, totalPages } = { items: [], totalPages: 0 },
+  } = useQuery({
+    queryKey: [...queryKey, page, search],
+    queryFn: () => getData(page, search),
+    staleTime: 0,
+  });
 
   const renderListItem = (item: T) => {
     const itemElement = renderItem(item);
@@ -74,7 +76,7 @@ export function ListLayout<T>({
             const url = `${path}/${itemId}?${newSearchParams.toString()}`;
             router.push(url);
           },
-        },
+        }
       );
     }
     return itemElement;
@@ -114,7 +116,7 @@ export function ListLayout<T>({
                   ))}
                 </>
               ) : (
-                data.map((item: T, index: number) => (
+                items.map((item: T, index: number) => (
                   <React.Fragment key={index}>
                     {renderListItem(item)}
                   </React.Fragment>
@@ -123,7 +125,7 @@ export function ListLayout<T>({
             </ScrollArea>
 
             <Divider />
-            <Pagination total={pages} />
+            <Pagination total={totalPages} />
           </Flex>
         </Paper>
       </GridCol>
