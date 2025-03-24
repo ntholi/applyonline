@@ -71,7 +71,8 @@ export const programs = sqliteTable(
   'programs',
   {
     id: integer().primaryKey({ autoIncrement: true }),
-    name: text(),
+    name: text().notNull(),
+    code: text().notNull(),
     faculty: text(),
     description: text(),
     createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),

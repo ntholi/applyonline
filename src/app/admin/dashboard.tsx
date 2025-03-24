@@ -20,6 +20,7 @@ import {
   Icon,
   IconChevronRight,
   IconLogout2,
+  IconSchool,
   IconUsers,
 } from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
@@ -45,6 +46,11 @@ const navigation: NavItem[] = [
     label: 'Users',
     href: '/admin/users',
     icon: IconUsers,
+  },
+  {
+    label: 'Programs',
+    href: '/admin/programs',
+    icon: IconSchool,
   },
 ];
 
