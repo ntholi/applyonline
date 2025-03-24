@@ -11,7 +11,12 @@ export async function extractData(file: File) {
   const base64Data = Buffer.from(fileBuffer).toString('base64');
 
   const parts: Part[] = [
-    { text: 'Extract all text from this image:' },
+    {
+      text: `The attached document contains documents which include student ID document, certificates, etc. 
+      I need you to extract information from the ID and the LGCSE certificates. 
+      From the ID return the ID number, gender, surname and first name. 
+      From the LGCSE certificates return the subject and grade.`,
+    },
     {
       inlineData: {
         mimeType,
