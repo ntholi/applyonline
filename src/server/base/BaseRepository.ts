@@ -1,9 +1,9 @@
 import { db } from '@/db';
-import { count, eq, sql, SQL, ilike, like, or } from 'drizzle-orm';
+import { count, eq, like, or, sql, SQL } from 'drizzle-orm';
 
 import {
-  SQLiteTable as Table,
   SQLiteColumn as Column,
+  SQLiteTable as Table,
 } from 'drizzle-orm/sqlite-core';
 
 type ModelInsert<T extends Table> = T['$inferInsert'];
@@ -113,9 +113,7 @@ class BaseRepository<
     };
   }
 
-  async query(
-    options: QueryOptions<T>
-  ): Promise<{
+  async query(options: QueryOptions<T>): Promise<{
     items: ModelSelect<T>[];
     totalPages: number;
     totalItems: number;
