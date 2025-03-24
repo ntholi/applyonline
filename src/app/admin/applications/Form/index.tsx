@@ -8,6 +8,8 @@ import { DateInput } from '@mantine/dates';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { extractData } from '@/server/applications/ai-staff';
+import { IconFileUpload } from '@tabler/icons-react';
+import DataExtractor from './DataExtractor';
 
 type Application = typeof applications.$inferInsert;
 
@@ -27,13 +29,6 @@ export default function ApplicationForm({
   title,
 }: Props) {
   const router = useRouter();
-  const [file, setFile] = useState<File | null>(null);
-
-  async function extractDate() {
-    if (!file) return;
-    const text = await extractData(file);
-    console.log(text);
-  }
 
   return (
     <Form
@@ -48,20 +43,7 @@ export default function ApplicationForm({
     >
       {(form) => (
         <>
-          <Grid align='end'>
-            <GridCol span={10}>
-              <FileInput
-                label='Document'
-                value={file}
-                onChange={(file) => setFile(file)}
-              />
-            </GridCol>
-            <GridCol span={2}>
-              <Button type='button' onClick={extractDate}>
-                Extract
-              </Button>
-            </GridCol>
-          </Grid>
+          <DataExtractor />
         </>
       )}
     </Form>
