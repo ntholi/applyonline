@@ -67,6 +67,8 @@ export const qualificationGrades = sqliteTable(
   })
 );
 
+export const programLevels = ['certificate', 'diploma', 'degree'] as const;
+
 export const programs = sqliteTable(
   'programs',
   {
@@ -74,6 +76,7 @@ export const programs = sqliteTable(
     name: text().notNull(),
     code: text().notNull(),
     faculty: text(),
+    level: text({ enum: programLevels }).notNull(),
     description: text(),
     createdAt: integer({ mode: 'timestamp' }).default(sql`(unixepoch())`),
     updatedAt: integer({ mode: 'timestamp' }),

@@ -36,6 +36,7 @@
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.1",
+    "drizzle-zod": "^0.7.0",
     "mantine-form-zod-resolver": "^1.1.0",
     "nanoid": "^5.1.5",
     "next": "15.2.3",

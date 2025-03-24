@@ -1,0 +1,1 @@
+ALTER TABLE `programs` ADD `level` text NOT NULL;
