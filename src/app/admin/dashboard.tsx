@@ -20,6 +20,7 @@ import {
   Icon,
   IconChevronRight,
   IconLogout2,
+  IconReceipt2,
   IconSchool,
   IconUsers,
 } from '@tabler/icons-react';
@@ -51,6 +52,11 @@ const navigation: NavItem[] = [
     label: 'Programs',
     href: '/admin/programs',
     icon: IconSchool,
+  },
+  {
+    label: 'Applications',
+    href: '/admin/applications',
+    icon: IconReceipt2,
   },
 ];
 
