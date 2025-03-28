@@ -4,15 +4,15 @@ import safeRun from '@/server/base/safeRun';
 import { QueryOptions } from '../base/BaseRepository';
 
 type Application = typeof applications.$inferInsert;
+const resourceName = 'applications';
 
 class ApplicationService {
-  private readonly serviceName = 'ApplicationService';
   constructor(private readonly repository = new ApplicationRepository()) {}
 
   async first() {
     return safeRun(
       async () => this.repository.findFirst(),
-      this.serviceName,
+      resourceName,
       'first',
       []
     );
@@ -21,7 +21,7 @@ class ApplicationService {
   async get(id: number) {
     return safeRun(
       async () => this.repository.findById(id),
-      this.serviceName,
+      resourceName,
       'get',
       [],
       { id }
@@ -31,7 +31,7 @@ class ApplicationService {
   async getAll(params: QueryOptions<typeof applications>) {
     return safeRun(
       async () => this.repository.query(params),
-      this.serviceName,
+      resourceName,
       'getAll',
       [],
       { params }
@@ -41,7 +41,7 @@ class ApplicationService {
   async create(data: Application) {
     return safeRun(
       async () => this.repository.create(data),
-      this.serviceName,
+      resourceName,
       'create',
       [],
       { data }
@@ -51,7 +51,7 @@ class ApplicationService {
   async update(id: number, data: Application) {
     return safeRun(
       async () => this.repository.update(id, data),
-      this.serviceName,
+      resourceName,
       'update',
       [],
       { id, data }
@@ -61,7 +61,7 @@ class ApplicationService {
   async delete(id: number) {
     return safeRun(
       async () => this.repository.delete(id),
-      this.serviceName,
+      resourceName,
       'delete',
       [],
       { id }
@@ -71,7 +71,7 @@ class ApplicationService {
   async count() {
     return safeRun(
       async () => this.repository.count(),
-      this.serviceName,
+      resourceName,
       'count',
       []
     );

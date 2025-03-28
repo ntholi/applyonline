@@ -4,15 +4,15 @@ import { QueryOptions } from '../base/BaseRepository';
 import safeRun from '@/server/base/safeRun';
 
 type User = typeof users.$inferInsert;
+const resourceName = 'users';
 
 class UserService {
-  private readonly serviceName = 'UserService';
   constructor(private readonly repository = new UserRepository()) {}
 
   async first() {
     return safeRun(
       async () => this.repository.findFirst(),
-      this.serviceName,
+      resourceName,
       'first',
       []
     );
@@ -21,7 +21,7 @@ class UserService {
   async get(id: string) {
     return safeRun(
       async () => this.repository.findById(id),
-      this.serviceName,
+      resourceName,
       'get',
       [],
       { id }
@@ -31,7 +31,7 @@ class UserService {
   async getAll(params: QueryOptions<typeof users>) {
     return safeRun(
       async () => this.repository.query(params),
-      this.serviceName,
+      resourceName,
       'getAll',
       [],
       { params }
@@ -41,7 +41,7 @@ class UserService {
   async create(data: User) {
     return safeRun(
       async () => this.repository.create(data),
-      this.serviceName,
+      resourceName,
       'create',
       [],
       { data }
@@ -51,7 +51,7 @@ class UserService {
   async update(id: string, data: User) {
     return safeRun(
       async () => this.repository.update(id, data),
-      this.serviceName,
+      resourceName,
       'update',
       [],
       { id, data }
@@ -61,7 +61,7 @@ class UserService {
   async delete(id: string) {
     return safeRun(
       async () => this.repository.delete(id),
-      this.serviceName,
+      resourceName,
       'delete',
       [],
       { id }
@@ -71,7 +71,7 @@ class UserService {
   async count() {
     return safeRun(
       async () => this.repository.count(),
-      this.serviceName,
+      resourceName,
       'count',
       []
     );
