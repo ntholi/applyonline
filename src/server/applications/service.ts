@@ -1,39 +1,80 @@
 import { applications } from '@/db/schema';
 import ApplicationRepository from './repository';
-import withAuth from '@/server/base/withAuth';
+import safeRun from '@/server/base/safeRun';
 import { QueryOptions } from '../base/BaseRepository';
 
 type Application = typeof applications.$inferInsert;
 
 class ApplicationService {
+  private readonly serviceName = 'ApplicationService';
   constructor(private readonly repository = new ApplicationRepository()) {}
 
   async first() {
-    return withAuth(async () => this.repository.findFirst(), []);
+    return safeRun(
+      async () => this.repository.findFirst(),
+      this.serviceName,
+      'first',
+      []
+    );
   }
 
   async get(id: number) {
-    return withAuth(async () => this.repository.findById(id), []);
+    return safeRun(
+      async () => this.repository.findById(id),
+      this.serviceName,
+      'get',
+      [],
+      { id }
+    );
   }
 
   async getAll(params: QueryOptions<typeof applications>) {
-    return withAuth(async () => this.repository.query(params), []);
+    return safeRun(
+      async () => this.repository.query(params),
+      this.serviceName,
+      'getAll',
+      [],
+      { params }
+    );
   }
 
   async create(data: Application) {
-    return withAuth(async () => this.repository.create(data), []);
+    return safeRun(
+      async () => this.repository.create(data),
+      this.serviceName,
+      'create',
+      [],
+      { data }
+    );
   }
 
   async update(id: number, data: Application) {
-    return withAuth(async () => this.repository.update(id, data), []);
+    return safeRun(
+      async () => this.repository.update(id, data),
+      this.serviceName,
+      'update',
+      [],
+      { id, data }
+    );
   }
 
   async delete(id: number) {
-    return withAuth(async () => this.repository.delete(id), []);
+    return safeRun(
+      async () => this.repository.delete(id),
+      this.serviceName,
+      'delete',
+      [],
+      { id }
+    );
   }
 
   async count() {
-    return withAuth(async () => this.repository.count(), []);
+    return safeRun(
+      async () => this.repository.count(),
+      this.serviceName,
+      'count',
+      []
+    );
   }
 }
 
