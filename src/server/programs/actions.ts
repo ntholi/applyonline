@@ -1,11 +1,9 @@
 'use server';
 
-
 import { programs } from '@/db/schema';
-import { programsService as service} from './service';
+import { programsService as service } from './service';
 
 type Program = typeof programs.$inferInsert;
-
 
 export async function getProgram(id: number) {
   return service.get(id);

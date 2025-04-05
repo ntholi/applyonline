@@ -14,11 +14,8 @@ class ApplicationsService {
     return withAuth(async () => this.repository.findFirst(), ['admin']);
   }
 
-  async get(id: string) {
-    return withAuth(
-      async () => this.repository.findById(Number(id)),
-      ['admin']
-    );
+  async get(id: number) {
+    return withAuth(async () => this.repository.findById(id), ['admin']);
   }
 
   async getAll(params: QueryOptions<typeof applications>) {
@@ -29,15 +26,12 @@ class ApplicationsService {
     return withAuth(async () => this.repository.create(data), ['admin']);
   }
 
-  async update(id: string, data: Application) {
-    return withAuth(
-      async () => this.repository.update(Number(id), data),
-      ['admin']
-    );
+  async update(id: number, data: Application) {
+    return withAuth(async () => this.repository.update(id, data), ['admin']);
   }
 
-  async delete(id: string) {
-    return withAuth(async () => this.repository.delete(Number(id)), ['admin']);
+  async delete(id: number) {
+    return withAuth(async () => this.repository.delete(id), ['admin']);
   }
 
   async count() {
