@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServiceLogger } from './logger';
 
 type Constructor<T> = new (...args: any[]) => T;
@@ -9,7 +10,7 @@ export function serviceWrapper<T extends object>(
   const logger = createServiceLogger(resourceName);
 
   return new Proxy(new Service(), {
-    get(target: T, prop: string | symbol, receiver: any) {
+    get(target: T, prop: string | symbol, receiver: unknown) {
       const originalMethod = Reflect.get(target, prop, receiver);
 
       if (typeof originalMethod === 'function') {

@@ -1,14 +1,9 @@
 'use client';
 
-import { applications } from '@/db/schema';
 import { Form } from '@/components/adease';
-import { Button, FileInput, Grid, GridCol, TextInput } from '@mantine/core';
+import { applications } from '@/db/schema';
 import { createInsertSchema } from 'drizzle-zod';
-import { DateInput } from '@mantine/dates';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { extractData } from '@/server/applications/ai-staff';
-import { IconFileUpload } from '@tabler/icons-react';
 import DataExtractor from './DataExtractor';
 
 type Application = typeof applications.$inferInsert;
@@ -41,7 +36,7 @@ export default function ApplicationForm({
         router.push(`/admin/applications/${id}`);
       }}
     >
-      {(form) => (
+      {() => (
         <>
           <DataExtractor />
         </>
