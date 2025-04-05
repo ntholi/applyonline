@@ -13,11 +13,7 @@ export default async function withAuth<T>(
   accessCheck?: (session: Session) => Promise<boolean>
 ) {
   const session = await auth();
-  const stack = new Error().stack;
-  const callerLine = stack?.split('\n')[2] || '';
-  const methodMatch = callerLine.match(/at\s+(.*?)\s+\(/);
-
-  const method = methodMatch ? methodMatch[1] : 'unknown method';
+  const method = fn.toString();
 
   if (roles.includes('all')) {
     return fn(session);
