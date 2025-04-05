@@ -1,71 +1,51 @@
 import { users } from '@/db/schema/auth';
 import UserRepository from './repository';
 import { QueryOptions } from '../base/BaseRepository';
-import safeRun from '@/server/base/safeRun';
+import { BaseService } from '../base/BaseService';
+import { createServiceWrapper } from '../base/ServiceWrapper';
 
 type User = typeof users.$inferInsert;
 const resource = 'users';
 
-class UserService {
-  constructor(private readonly repository = new UserRepository()) {}
+class UserService extends BaseService {
+  constructor(private readonly repository = new UserRepository()) {
+    super();
+  }
 
   async first() {
-    return safeRun(this.repository.findFirst, resource, 'first', []);
+    await this.checkAuth(['admin']);
+    return this.repository.findFirst();
   }
 
   async get(id: string) {
-    return safeRun(
-      async () => this.repository.findById(id),
-      resource,
-      'get',
-      [],
-      { id }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.findById(id);
   }
 
   async getAll(params: QueryOptions<typeof users>) {
-    return safeRun(
-      async () => this.repository.query(params),
-      resource,
-      'getAll',
-      [],
-      { params }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.query(params);
   }
 
   async create(data: User) {
-    return safeRun(
-      async () => this.repository.create(data),
-      resource,
-      'create',
-      [],
-      { data }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.create(data);
   }
 
   async update(id: string, data: User) {
-    return safeRun(
-      async () => this.repository.update(id, data),
-      resource,
-      'update',
-      [],
-      { id, data }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.update(id, data);
   }
 
   async delete(id: string) {
-    return safeRun(
-      async () => this.repository.delete(id),
-      resource,
-      'delete',
-      [],
-      { id }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.delete(id);
   }
 
   async count() {
-    return safeRun(this.repository.count, resource, 'count', []);
+    await this.checkAuth(['admin']);
+    return this.repository.count();
   }
 }
 
-export const usersService = new UserService();
+export const usersService = createServiceWrapper(UserService, resource);

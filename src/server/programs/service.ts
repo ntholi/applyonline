@@ -1,72 +1,51 @@
-import { programs } from '@/db/schema';
-import ProgramRepository from './repository';
-import safeRun from '@/server/base/safeRun';
+import ProgramsRepository from './repository';
 import { QueryOptions } from '../base/BaseRepository';
+import { BaseService } from '../base/BaseService';
+import { createServiceWrapper } from '../base/ServiceWrapper';
+import { programs } from '@/db/schema';
 
 type Program = typeof programs.$inferInsert;
-
 const resource = 'programs';
 
-class ProgramService {
-  constructor(private readonly repository = new ProgramRepository()) {}
-
-  async first() {
-    return safeRun(this.repository.findFirst, resource, 'first', []);
+class ProgramsService extends BaseService {
+  constructor(private readonly repository = new ProgramsRepository()) {
+    super();
   }
 
-  async get(id: number) {
-    return safeRun(
-      async () => this.repository.findById(id),
-      resource,
-      'get',
-      [],
-      { id }
-    );
+  async first() {
+    await this.checkAuth(['admin']);
+    return this.repository.findFirst();
+  }
+
+  async get(id: string) {
+    await this.checkAuth(['admin']);
+    return this.repository.findById(Number(id));
   }
 
   async getAll(params: QueryOptions<typeof programs>) {
-    return safeRun(
-      async () => this.repository.query(params),
-      resource,
-      'getAll',
-      [],
-      { params }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.query(params);
   }
 
   async create(data: Program) {
-    return safeRun(
-      async () => this.repository.create(data),
-      resource,
-      'create',
-      [],
-      { data }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.create(data);
   }
 
-  async update(id: number, data: Program) {
-    return safeRun(
-      async () => this.repository.update(id, data),
-      resource,
-      'update',
-      [],
-      { id, data }
-    );
+  async update(id: string, data: Program) {
+    await this.checkAuth(['admin']);
+    return this.repository.update(Number(id), data);
   }
 
-  async delete(id: number) {
-    return safeRun(
-      async () => this.repository.delete(id),
-      resource,
-      'delete',
-      [],
-      { id }
-    );
+  async delete(id: string) {
+    await this.checkAuth(['admin']);
+    return this.repository.delete(Number(id));
   }
 
   async count() {
-    return safeRun(this.repository.count, resource, 'count', []);
+    await this.checkAuth(['admin']);
+    return this.repository.count();
   }
 }
 
-export const programsService = new ProgramService();
+export const programsService = createServiceWrapper(ProgramsService, resource);

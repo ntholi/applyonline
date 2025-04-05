@@ -1,71 +1,54 @@
 import { applications } from '@/db/schema';
-import ApplicationRepository from './repository';
-import safeRun from '@/server/base/safeRun';
 import { QueryOptions } from '../base/BaseRepository';
+import ApplicationRepository from './repository';
+import { BaseService } from '../base/BaseService';
+import { createServiceWrapper } from '../base/ServiceWrapper';
 
 type Application = typeof applications.$inferInsert;
 const resource = 'applications';
 
-class ApplicationService {
-  constructor(private readonly repository = new ApplicationRepository()) {}
-
-  async first() {
-    return safeRun(this.repository.findFirst, resource, 'first', []);
+class ApplicationsService extends BaseService {
+  constructor(private readonly repository = new ApplicationRepository()) {
+    super();
   }
 
-  async get(id: number) {
-    return safeRun(
-      async () => this.repository.findById(id),
-      resource,
-      'get',
-      [],
-      { id }
-    );
+  async first() {
+    await this.checkAuth(['admin']);
+    return this.repository.findFirst();
+  }
+
+  async get(id: string) {
+    await this.checkAuth(['admin']);
+    return this.repository.findById(Number(id));
   }
 
   async getAll(params: QueryOptions<typeof applications>) {
-    return safeRun(
-      async () => this.repository.query(params),
-      resource,
-      'getAll',
-      [],
-      { params }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.query(params);
   }
 
   async create(data: Application) {
-    return safeRun(
-      async () => this.repository.create(data),
-      resource,
-      'create',
-      [],
-      { data }
-    );
+    await this.checkAuth(['admin']);
+    return this.repository.create(data);
   }
 
-  async update(id: number, data: Application) {
-    return safeRun(
-      async () => this.repository.update(id, data),
-      resource,
-      'update',
-      [],
-      { id, data }
-    );
+  async update(id: string, data: Application) {
+    await this.checkAuth(['admin']);
+    return this.repository.update(Number(id), data);
   }
 
-  async delete(id: number) {
-    return safeRun(
-      async () => this.repository.delete(id),
-      resource,
-      'delete',
-      [],
-      { id }
-    );
+  async delete(id: string) {
+    await this.checkAuth(['admin']);
+    return this.repository.delete(Number(id));
   }
 
   async count() {
-    return safeRun(this.repository.count, resource, 'count', []);
+    await this.checkAuth(['admin']);
+    return this.repository.count();
   }
 }
 
-export const applicationsService = new ApplicationService();
+export const applicationsService = createServiceWrapper(
+  ApplicationsService,
+  resource
+);
