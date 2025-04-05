@@ -2,7 +2,7 @@ import { createServiceLogger } from './logger';
 
 type Constructor<T> = new (...args: any[]) => T;
 
-export function createServiceWrapper<T extends object>(
+export function serviceWrapper<T extends object>(
   Service: Constructor<T>,
   resourceName: string
 ): T {

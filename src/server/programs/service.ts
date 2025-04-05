@@ -1,6 +1,6 @@
 import ProgramsRepository from './repository';
 import { QueryOptions } from '../base/BaseRepository';
-import { createServiceWrapper } from '../base/ServiceWrapper';
+import { serviceWrapper } from '../base/serviceWrapper';
 import { programs } from '@/db/schema';
 import withAuth from '../base/withAuth';
 
@@ -39,4 +39,4 @@ class ProgramsService {
   }
 }
 
-export const programsService = createServiceWrapper(ProgramsService, resource);
+export const programsService = serviceWrapper(ProgramsService, resource);

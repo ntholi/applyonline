@@ -1,8 +1,8 @@
 import { applications } from '@/db/schema';
 import { QueryOptions } from '../base/BaseRepository';
 import ApplicationRepository from './repository';
-import { createServiceWrapper } from '../base/ServiceWrapper';
 import withAuth from '../base/withAuth';
+import { serviceWrapper } from '../base/serviceWrapper';
 
 type Application = typeof applications.$inferInsert;
 const resource = 'applications';
@@ -39,7 +39,7 @@ class ApplicationsService {
   }
 }
 
-export const applicationsService = createServiceWrapper(
+export const applicationsService = serviceWrapper(
   ApplicationsService,
   resource
 );

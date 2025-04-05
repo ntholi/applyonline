@@ -1,6 +1,6 @@
 import { users } from '@/db/schema/auth';
 import { QueryOptions } from '../base/BaseRepository';
-import { createServiceWrapper } from '../base/ServiceWrapper';
+import { serviceWrapper } from '../base/serviceWrapper';
 import UsersRepository from './repository';
 import withAuth from '../base/withAuth';
 
@@ -39,4 +39,4 @@ class UsersService {
   }
 }
 
-export const usersService = createServiceWrapper(UsersService, resource);
+export const usersService = serviceWrapper(UsersService, resource);
