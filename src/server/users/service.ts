@@ -18,39 +18,27 @@ class UsersService extends BaseService {
   }
 
   async get(id: string) {
-    return withAuth(async () => {
-      return this.repository.findById(id);
-    }, ['admin']);
+    return withAuth(async () => this.repository.findById(id), ['admin']);
   }
 
   async getAll(params: QueryOptions<typeof users>) {
-    return withAuth(async () => {
-      return this.repository.query(params);
-    }, ['admin']);
+    return withAuth(async () => this.repository.query(params), ['admin']);
   }
 
   async create(data: User) {
-    return withAuth(async () => {
-      return this.repository.create(data);
-    }, ['admin']);
+    return withAuth(async () => this.repository.create(data), ['admin']);
   }
 
   async update(id: string, data: User) {
-    return withAuth(async () => {
-      return this.repository.update(id, data);
-    }, ['admin']);
+    return withAuth(async () => this.repository.update(id, data), ['admin']);
   }
 
   async delete(id: string) {
-    return withAuth(async () => {
-      return this.repository.delete(id);
-    }, ['admin']);
+    return withAuth(async () => this.repository.delete(id), ['admin']);
   }
 
   async count() {
-    return withAuth(async () => {
-      return this.repository.count();
-    }, ['admin']);
+    return withAuth(async () => this.repository.count(), ['admin']);
   }
 }
 

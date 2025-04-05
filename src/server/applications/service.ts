@@ -14,45 +14,37 @@ class ApplicationsService extends BaseService {
   }
 
   async first() {
-    return withAuth(async () => {
-      return this.repository.findFirst();
-    }, ['admin']);
+    return withAuth(async () => this.repository.findFirst(), ['admin']);
   }
 
   async get(id: string) {
-    return withAuth(async () => {
-      return this.repository.findById(Number(id));
-    }, ['admin']);
+    return withAuth(
+      async () => this.repository.findById(Number(id)),
+      ['admin']
+    );
   }
 
   async getAll(params: QueryOptions<typeof applications>) {
-    return withAuth(async () => {
-      return this.repository.query(params);
-    }, ['admin']);
+    return withAuth(async () => this.repository.query(params), ['admin']);
   }
 
   async create(data: Application) {
-    return withAuth(async () => {
-      return this.repository.create(data);
-    }, ['admin']);
+    return withAuth(async () => this.repository.create(data), ['admin']);
   }
 
   async update(id: string, data: Application) {
-    return withAuth(async () => {
-      return this.repository.update(Number(id), data);
-    }, ['admin']);
+    return withAuth(
+      async () => this.repository.update(Number(id), data),
+      ['admin']
+    );
   }
 
   async delete(id: string) {
-    return withAuth(async () => {
-      return this.repository.delete(Number(id));
-    }, ['admin']);
+    return withAuth(async () => this.repository.delete(Number(id)), ['admin']);
   }
 
   async count() {
-    return withAuth(async () => {
-      return this.repository.count();
-    }, ['admin']);
+    return withAuth(async () => this.repository.count(), ['admin']);
   }
 }
 
