@@ -1,6 +1,5 @@
 import ProgramsRepository from './repository';
 import { QueryOptions } from '../base/BaseRepository';
-import { BaseService } from '../base/BaseService';
 import { createServiceWrapper } from '../base/ServiceWrapper';
 import { programs } from '@/db/schema';
 import withAuth from '../base/withAuth';
@@ -8,10 +7,8 @@ import withAuth from '../base/withAuth';
 type Program = typeof programs.$inferInsert;
 const resource = 'programs';
 
-class ProgramsService extends BaseService {
-  constructor(private readonly repository = new ProgramsRepository()) {
-    super();
-  }
+class ProgramsService {
+  constructor(private readonly repository = new ProgramsRepository()) {}
 
   async first() {
     return withAuth(async () => this.repository.findFirst(), ['admin']);

@@ -1,17 +1,14 @@
 import { applications } from '@/db/schema';
 import { QueryOptions } from '../base/BaseRepository';
 import ApplicationRepository from './repository';
-import { BaseService } from '../base/BaseService';
 import { createServiceWrapper } from '../base/ServiceWrapper';
 import withAuth from '../base/withAuth';
 
 type Application = typeof applications.$inferInsert;
 const resource = 'applications';
 
-class ApplicationsService extends BaseService {
-  constructor(private readonly repository = new ApplicationRepository()) {
-    super();
-  }
+class ApplicationsService {
+  constructor(private readonly repository = new ApplicationRepository()) {}
 
   async first() {
     return withAuth(async () => this.repository.findFirst(), ['admin']);

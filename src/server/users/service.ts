@@ -1,6 +1,5 @@
 import { users } from '@/db/schema/auth';
 import { QueryOptions } from '../base/BaseRepository';
-import { BaseService } from '../base/BaseService';
 import { createServiceWrapper } from '../base/ServiceWrapper';
 import UsersRepository from './repository';
 import withAuth from '../base/withAuth';
@@ -8,10 +7,8 @@ import withAuth from '../base/withAuth';
 type User = typeof users.$inferInsert;
 const resource = 'users';
 
-class UsersService extends BaseService {
-  constructor(private readonly repository = new UsersRepository()) {
-    super();
-  }
+class UsersService {
+  constructor(private readonly repository = new UsersRepository()) {}
 
   async first() {
     return withAuth(async () => this.repository.findFirst(), ['admin']);
