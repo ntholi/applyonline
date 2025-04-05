@@ -3,6 +3,7 @@ import { QueryOptions } from '../base/BaseRepository';
 import ApplicationRepository from './repository';
 import { BaseService } from '../base/BaseService';
 import { createServiceWrapper } from '../base/ServiceWrapper';
+import withAuth from '../base/withAuth';
 
 type Application = typeof applications.$inferInsert;
 const resource = 'applications';
@@ -13,38 +14,45 @@ class ApplicationsService extends BaseService {
   }
 
   async first() {
-    await this.checkAuth(['admin']);
-    return this.repository.findFirst();
+    return withAuth(async () => {
+      return this.repository.findFirst();
+    }, ['admin']);
   }
 
   async get(id: string) {
-    await this.checkAuth(['admin']);
-    return this.repository.findById(Number(id));
+    return withAuth(async () => {
+      return this.repository.findById(Number(id));
+    }, ['admin']);
   }
 
   async getAll(params: QueryOptions<typeof applications>) {
-    await this.checkAuth(['admin']);
-    return this.repository.query(params);
+    return withAuth(async () => {
+      return this.repository.query(params);
+    }, ['admin']);
   }
 
   async create(data: Application) {
-    await this.checkAuth(['admin']);
-    return this.repository.create(data);
+    return withAuth(async () => {
+      return this.repository.create(data);
+    }, ['admin']);
   }
 
   async update(id: string, data: Application) {
-    await this.checkAuth(['admin']);
-    return this.repository.update(Number(id), data);
+    return withAuth(async () => {
+      return this.repository.update(Number(id), data);
+    }, ['admin']);
   }
 
   async delete(id: string) {
-    await this.checkAuth(['admin']);
-    return this.repository.delete(Number(id));
+    return withAuth(async () => {
+      return this.repository.delete(Number(id));
+    }, ['admin']);
   }
 
   async count() {
-    await this.checkAuth(['admin']);
-    return this.repository.count();
+    return withAuth(async () => {
+      return this.repository.count();
+    }, ['admin']);
   }
 }
 

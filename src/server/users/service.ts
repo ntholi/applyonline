@@ -1,51 +1,57 @@
 import { users } from '@/db/schema/auth';
-import UserRepository from './repository';
 import { QueryOptions } from '../base/BaseRepository';
 import { BaseService } from '../base/BaseService';
 import { createServiceWrapper } from '../base/ServiceWrapper';
+import UsersRepository from './repository';
+import withAuth from '../base/withAuth';
 
 type User = typeof users.$inferInsert;
 const resource = 'users';
 
-class UserService extends BaseService {
-  constructor(private readonly repository = new UserRepository()) {
+class UsersService extends BaseService {
+  constructor(private readonly repository = new UsersRepository()) {
     super();
   }
 
   async first() {
-    await this.checkAuth(['admin']);
-    return this.repository.findFirst();
+    return withAuth(async () => this.repository.findFirst(), ['admin']);
   }
 
   async get(id: string) {
-    await this.checkAuth(['admin']);
-    return this.repository.findById(id);
+    return withAuth(async () => {
+      return this.repository.findById(id);
+    }, ['admin']);
   }
 
   async getAll(params: QueryOptions<typeof users>) {
-    await this.checkAuth(['admin']);
-    return this.repository.query(params);
+    return withAuth(async () => {
+      return this.repository.query(params);
+    }, ['admin']);
   }
 
   async create(data: User) {
-    await this.checkAuth(['admin']);
-    return this.repository.create(data);
+    return withAuth(async () => {
+      return this.repository.create(data);
+    }, ['admin']);
   }
 
   async update(id: string, data: User) {
-    await this.checkAuth(['admin']);
-    return this.repository.update(id, data);
+    return withAuth(async () => {
+      return this.repository.update(id, data);
+    }, ['admin']);
   }
 
   async delete(id: string) {
-    await this.checkAuth(['admin']);
-    return this.repository.delete(id);
+    return withAuth(async () => {
+      return this.repository.delete(id);
+    }, ['admin']);
   }
 
   async count() {
-    await this.checkAuth(['admin']);
-    return this.repository.count();
+    return withAuth(async () => {
+      return this.repository.count();
+    }, ['admin']);
   }
 }
 
-export const usersService = createServiceWrapper(UserService, resource);
+export const usersService = createServiceWrapper(UsersService, resource);
